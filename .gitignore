@@ -27,3 +27,5 @@ dist-ssr
 pnpm-lock.yaml
 
 .env
+
+.claude/*
