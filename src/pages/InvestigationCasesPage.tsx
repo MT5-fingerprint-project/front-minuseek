@@ -3,7 +3,10 @@ import { Plus } from 'lucide-react'
 import { H1 } from '../components/ui/typography'
 import { Card, CardContent } from '@/components/ui/card'
 
-import type { InvestigationCase } from '@/types/investigationCase/investigationCase'
+import type {
+  InvestigationCase,
+  InvestigationCaseCreateInput,
+} from '@/types/investigationCase/investigationCase'
 import InvestigationCaseCard from '@/components/investigationCase/InvestigationCaseCard'
 import InvestigationCaseCreateForm from '@/components/investigationCase/InvestigationCaseCreateForm'
 
@@ -25,23 +28,17 @@ export default function InvestigationCasesPage() {
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
 
-  const handleInvestigationCaseCreate = (formValues: Partial<InvestigationCase>) => {
+  const handleInvestigationCaseCreate = async (formValues: InvestigationCaseCreateInput) => {
     const newCase: InvestigationCase = {
+      ...formValues,
       id: String(Date.now()),
-      caseNumber: formValues.caseNumber?.trim() || '',
-      pvNumber: formValues.pvNumber?.trim() || '',
-      description: formValues.description?.trim() || '',
-      status: formValues.status || 'OPEN',
-      location: formValues.location?.trim() || '',
       createdAt: new Date(),
       updatedAt: new Date(),
     }
 
     setInvestigationCases((previous) => [...previous, newCase])
 
-    InvestigationCaseAPI.create(newCase).catch((error) => {
-      console.error('Erreur lors de la création de l’affaire :', error)
-    })
+    await InvestigationCaseAPI.create(newCase)
   }
 
   return (
