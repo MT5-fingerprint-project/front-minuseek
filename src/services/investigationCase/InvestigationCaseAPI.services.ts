@@ -4,4 +4,6 @@ import axios from 'axios'
 
 export const InvestigationCaseAPI = {
   create: (caseData: Partial<InvestigationCase>) => axios.post(`${API_URL}/investigation-cases`, caseData),
+
+  getAll: () => axios.get<InvestigationCase[]>(`${API_URL}/investigation-cases`).then((res) => res.data),
 }

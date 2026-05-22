@@ -4,7 +4,6 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './assets/css/index.css'
 import AppLayout from './layouts/AppLayout.tsx'
 import AffairePage from './pages/InvestigationCasesPage.tsx'
-import HomePage from './pages/HomePage.tsx'
 import AffaireDetailsPage from './pages/InvestigationCaseDetailsPage.tsx'
 
 const router = createBrowserRouter([
@@ -12,7 +11,7 @@ const router = createBrowserRouter([
     path: '/',
     element: <AppLayout />,
     children: [
-      { index: true, element: <HomePage /> },
+      { index: true, element: <AffairePage /> },
       { path: 'affaires', element: <AffairePage /> },
       { path: 'affaires/:id', element: <AffaireDetailsPage /> },
     ],

@@ -1,16 +1,9 @@
-import { Link } from 'react-router-dom'
-import { Button } from '../components/ui/button'
+import { H1 } from '@/components/ui/typography'
 
 export default function HomePage() {
   return (
     <div>
-      <h1 className="text-red-500">Home</h1>
-      <div className="flex gap-3">
-        <Button>Click</Button>
-        <Link to="/affaires/123">
-          <Button>Open affaire 123</Button>
-        </Link>
-      </div>
+      <H1>Home</H1>
     </div>
   )
 }

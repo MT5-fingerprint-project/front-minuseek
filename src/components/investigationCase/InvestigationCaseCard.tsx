@@ -7,7 +7,7 @@ import { Calendar, MapPin } from 'lucide-react'
 
 export default function InvestigationCaseCard({ investigationCase }: { investigationCase: InvestigationCase }) {
   return (
-    <Link to={`/affaires/${investigationCase.id}`} className="min-h-44">
+    <Link to={`/affaires/${investigationCase.caseNumber}`} className="min-h-44">
       <Card key={investigationCase.id} className="h-full">
         <CardHeader>
           <Badge variant="secondary">{INVESTIGATION_CASE_STATUS_LABELS[investigationCase.status]}</Badge>

@@ -10,7 +10,7 @@ export default function InvestigationCaseDetailsPage() {
 
   return (
     <div className="flex flex-col gap-4">
-      <H1>Affaire {id}</H1>
+      <H1>Affaire N°{id}</H1>
     </div>
   )
 }

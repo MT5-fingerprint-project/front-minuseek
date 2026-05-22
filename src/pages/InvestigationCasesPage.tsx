@@ -1,12 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { H1 } from '../components/ui/typography'
 import { Card, CardContent } from '@/components/ui/card'
 
-import type {
-  InvestigationCase,
-  InvestigationCaseCreateInput,
-} from '@/types/investigationCase/investigationCase'
+import type { InvestigationCase, InvestigationCaseCreateInput } from '@/types/investigationCase/investigationCase'
 import InvestigationCaseCard from '@/components/investigationCase/InvestigationCaseCard'
 import InvestigationCaseCreateForm from '@/components/investigationCase/InvestigationCaseCreateForm'
 
@@ -40,6 +37,15 @@ export default function InvestigationCasesPage() {
 
     await InvestigationCaseAPI.create(newCase)
   }
+
+  useEffect(() => {
+    const fetchInvestigationCases = async () => {
+      const cases = await InvestigationCaseAPI.getAll()
+      setInvestigationCases(cases)
+    }
+
+    fetchInvestigationCases()
+  }, [])
 
   return (
     <div className="flex flex-col gap-4">
