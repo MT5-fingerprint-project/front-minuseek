@@ -2,9 +2,10 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import './assets/css/index.css'
+import './features/shared/lib/i18n'
 import AppLayout from './layouts/AppLayout.tsx'
-import AffairePage from './pages/InvestigationCasesPage.tsx'
-import AffaireDetailsPage from './pages/InvestigationCaseDetailsPage.tsx'
+import AffairePage from './features/investigation-case/pages/InvestigationCasesPage.tsx'
+import AffaireDetailsPage from './features/investigation-case/pages/InvestigationCaseDetailsPage.tsx'
 
 const router = createBrowserRouter([
   {

@@ -1,4 +1,4 @@
-import { H1 } from '@/components/ui/typography'
+import { H1 } from '@/features/shared/ui/typography'
 
 export default function HomePage() {
   return (

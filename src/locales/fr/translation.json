@@ -1,0 +1,63 @@
+{
+  "common": {
+    "actions": {
+      "cancel": "Annuler"
+    },
+    "errors": {
+      "generic": "Une erreur est survenue"
+    }
+  },
+  "navigation": {
+    "myCases": "Mes affaires",
+    "navigationLabel": "Navigation"
+  },
+  "investigationCase": {
+    "status": {
+      "OPEN": "Ouverte",
+      "IN_PROGRESS": "En cours",
+      "UNDER_REVIEW": "En vérification",
+      "CLOSED": "Fermée"
+    },
+    "list": {
+      "title": "Mes affaires",
+      "addNew": "Ajouter une nouvelle affaire"
+    },
+    "card": {
+      "title": "Affaire N°{{caseNumber}}",
+      "pvNumber": "PV N°{{pvNumber}}",
+      "createdOn": "Créé le {{date}}"
+    },
+    "details": {
+      "title": "Affaire N°{{id}}"
+    },
+    "form": {
+      "createTitle": "Créer une affaire",
+      "createDescription": "Renseignez les informations de la nouvelle affaire.",
+      "submit": "Créer l'affaire",
+      "submitting": "Création…",
+      "fields": {
+        "caseNumber": {
+          "label": "Numéro d'affaire",
+          "placeholder": "ex: 2026-004"
+        },
+        "pvNumber": {
+          "label": "Numéro du PV",
+          "placeholder": "ex: PV-2026-004"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Décrivez l'affaire..."
+        },
+        "location": {
+          "label": "Localisation",
+          "placeholder": "ex: 59 rue nationale, 75013 Paris"
+        }
+      }
+    },
+    "validation": {
+      "caseNumberRequired": "Le numéro d'affaire est requis",
+      "pvNumberRequired": "Le numéro de PV est requis",
+      "locationRequired": "La localisation est requise"
+    }
+  }
+}

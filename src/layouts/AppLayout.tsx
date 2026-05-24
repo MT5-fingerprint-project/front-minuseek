@@ -1,5 +1,6 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { Briefcase } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import {
   Sidebar,
   SidebarContent,
@@ -13,11 +14,12 @@ import {
   SidebarMenuItem,
   SidebarProvider,
   SidebarTrigger,
-} from '../components/ui/sidebar'
-import { TooltipProvider } from '../components/ui/tooltip'
+} from '../features/shared/ui/sidebar'
+import { TooltipProvider } from '../features/shared/ui/tooltip'
 
 export default function AppLayout() {
   const { pathname } = useLocation()
+  const { t } = useTranslation()
   const isInvestigationCase = pathname.startsWith('/affaire')
 
   return (
@@ -34,15 +36,15 @@ export default function AppLayout() {
           </SidebarHeader>
           <SidebarContent>
             <SidebarGroup>
-              <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+              <SidebarGroupLabel>{t('navigation.navigationLabel')}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
                   <SidebarMenuItem></SidebarMenuItem>
                   <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isInvestigationCase} tooltip="Mes affaires">
+                    <SidebarMenuButton asChild isActive={isInvestigationCase} tooltip={t('navigation.myCases')}>
                       <Link to="/affaires">
                         <Briefcase className="size-4" />
-                        <span className="group-data-[collapsible=icon]:hidden">Mes affaires</span>
+                        <span className="group-data-[collapsible=icon]:hidden">{t('navigation.myCases')}</span>
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
