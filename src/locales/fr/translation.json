@@ -60,6 +60,9 @@
       "caseNumberRequired": "Le numéro d'affaire est requis",
       "pvNumberRequired": "Le numéro de PV est requis",
       "locationRequired": "La localisation est requise"
+    },
+    "success": {
+      "created": "Affaire créée avec succès"
     }
   }
 }

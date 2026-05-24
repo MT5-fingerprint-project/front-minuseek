@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import { useForm } from '@tanstack/react-form'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/features/shared/ui/button'
 import {
@@ -13,51 +11,24 @@ import {
 import { Field, FieldError, FieldLabel } from '@/features/shared/ui/field'
 import { Input } from '@/features/shared/ui/input'
 import { Textarea } from '@/features/shared/ui/textarea'
-import {
-  investigationCaseCreateSchema,
-  type InvestigationCaseCreateInput,
-} from '@/features/investigation-case/types/investigationCase'
+import { useCreateInvestigationCaseForm } from '@/features/investigation-case/hooks/useCreateInvestigationCaseForm'
+import type { InvestigationCaseCreateInput } from '@/features/investigation-case/types/investigationCase'
 
 type InvestigationCaseCreateFormProps = {
-  isCreateDialogOpen: boolean
-  setIsCreateDialogOpen: (open: boolean) => void
-  onSubmit: (values: InvestigationCaseCreateInput) => Promise<void> | void
+  isOpen: boolean
+  onClose: () => void
+  onSubmit: (values: InvestigationCaseCreateInput) => Promise<unknown> | unknown
 }
 
-const DEFAULT_VALUES: InvestigationCaseCreateInput = {
-  caseNumber: '',
-  pvNumber: '',
-  description: '',
-  location: '',
-}
-
-export default function InvestigationCaseCreateForm({
-  isCreateDialogOpen,
-  setIsCreateDialogOpen,
-  onSubmit,
-}: InvestigationCaseCreateFormProps) {
+export default function InvestigationCaseCreateForm({ isOpen, onClose, onSubmit }: InvestigationCaseCreateFormProps) {
   const { t } = useTranslation()
-  const [submitError, setSubmitError] = useState<string | null>(null)
-
-  const form = useForm({
-    defaultValues: DEFAULT_VALUES,
-    validators: {
-      onSubmit: investigationCaseCreateSchema,
-    },
-    onSubmit: async ({ value }) => {
-      try {
-        setSubmitError(null)
-        await onSubmit(value)
-        form.reset()
-        setIsCreateDialogOpen(false)
-      } catch (error) {
-        setSubmitError(error instanceof Error ? error.message : t('common.errors.generic'))
-      }
-    },
+  const { form, submitError } = useCreateInvestigationCaseForm({
+    onSubmit,
+    onSuccess: onClose,
   })
 
   return (
-    <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{t('investigationCase.form.createTitle')}</DialogTitle>
@@ -68,9 +39,9 @@ export default function InvestigationCaseCreateForm({
           id="create-case-form"
           className="grid gap-4"
           noValidate
-          onSubmit={(event) => {
-            event.preventDefault()
-            event.stopPropagation()
+          onSubmit={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
             form.handleSubmit()
           }}
         >
@@ -80,9 +51,7 @@ export default function InvestigationCaseCreateForm({
               const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    {t('investigationCase.form.fields.caseNumber.label')}
-                  </FieldLabel>
+                  <FieldLabel htmlFor={field.name}>{t('investigationCase.form.fields.caseNumber.label')}</FieldLabel>
                   <Input
                     id={field.name}
                     name={field.name}
@@ -126,9 +95,7 @@ export default function InvestigationCaseCreateForm({
               const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
               return (
                 <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>
-                    {t('investigationCase.form.fields.description.label')}
-                  </FieldLabel>
+                  <FieldLabel htmlFor={field.name}>{t('investigationCase.form.fields.description.label')}</FieldLabel>
                   <Textarea
                     id={field.name}
                     name={field.name}
@@ -145,7 +112,7 @@ export default function InvestigationCaseCreateForm({
             }}
           />
 
-          <form.Field
+          {/*           <form.Field
             name="location"
             children={(field) => {
               const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
@@ -165,13 +132,13 @@ export default function InvestigationCaseCreateForm({
                 </Field>
               )
             }}
-          />
+          /> */}
 
           {submitError && <p className="text-sm text-destructive">{submitError}</p>}
         </form>
 
         <DialogFooter>
-          <Button variant="outline" type="button" onClick={() => setIsCreateDialogOpen(false)}>
+          <Button variant="outline" type="button" onClick={onClose}>
             {t('common.actions.cancel')}
           </Button>
           <form.Subscribe

@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { InvestigationCaseAPI } from '@/features/investigation-case/services/InvestigationCaseAPI.services'
 import type { InvestigationCaseCreateInput } from '@/features/investigation-case/types/investigationCase'
 
@@ -16,11 +18,13 @@ export function useInvestigationCases() {
 
 export function useCreateInvestigationCase() {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (input: InvestigationCaseCreateInput) => InvestigationCaseAPI.create(input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: investigationCaseKeys.lists() })
+      toast.success(t('investigationCase.success.created'))
     },
   })
 }
