@@ -1,6 +1,7 @@
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { Briefcase } from 'lucide-react'
+import { Briefcase, type LucideIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import type { ParseKeys } from 'i18next'
 import {
   Sidebar,
   SidebarContent,
@@ -17,10 +18,19 @@ import {
 } from '../features/shared/ui/sidebar'
 import { TooltipProvider } from '../features/shared/ui/tooltip'
 
+type NavItem = {
+  path: string
+  labelKey: ParseKeys
+  icon: LucideIcon
+}
+
+const NAV_ITEMS: readonly NavItem[] = [
+  { path: '/affaires', labelKey: 'navigation.myCases', icon: Briefcase },
+] as const
+
 export default function AppLayout() {
   const { pathname } = useLocation()
   const { t } = useTranslation()
-  const isInvestigationCase = pathname.startsWith('/affaire')
 
   return (
     <TooltipProvider>
@@ -39,15 +49,21 @@ export default function AppLayout() {
               <SidebarGroupLabel>{t('navigation.navigationLabel')}</SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  <SidebarMenuItem></SidebarMenuItem>
-                  <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive={isInvestigationCase} tooltip={t('navigation.myCases')}>
-                      <Link to="/affaires">
-                        <Briefcase className="size-4" />
-                        <span className="group-data-[collapsible=icon]:hidden">{t('navigation.myCases')}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
+                  {NAV_ITEMS.map((item) => {
+                    const label = t(item.labelKey)
+                    const isActive = pathname.startsWith(item.path)
+
+                    return (
+                      <SidebarMenuItem key={item.path}>
+                        <SidebarMenuButton asChild isActive={isActive} tooltip={label}>
+                          <Link to={item.path}>
+                            <item.icon className="size-4" />
+                            <span className="group-data-[collapsible=icon]:hidden">{label}</span>
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )
+                  })}
                 </SidebarMenu>
               </SidebarGroupContent>
             </SidebarGroup>

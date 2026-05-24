@@ -1,5 +1,5 @@
-import { Controller, useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
+import { useState } from 'react'
+import { useForm } from '@tanstack/react-form'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/features/shared/ui/button'
 import {
@@ -29,7 +29,6 @@ const DEFAULT_VALUES: InvestigationCaseCreateInput = {
   pvNumber: '',
   description: '',
   location: '',
-  status: 'OPEN',
 }
 
 export default function InvestigationCaseCreateForm({
@@ -38,22 +37,24 @@ export default function InvestigationCaseCreateForm({
   onSubmit,
 }: InvestigationCaseCreateFormProps) {
   const { t } = useTranslation()
-  const form = useForm<InvestigationCaseCreateInput>({
-    resolver: zodResolver(investigationCaseCreateSchema),
-    defaultValues: DEFAULT_VALUES,
-  })
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
-  const handleCreateCaseSubmit = async (values: InvestigationCaseCreateInput) => {
-    try {
-      await onSubmit(values)
-      form.reset(DEFAULT_VALUES)
-      setIsCreateDialogOpen(false)
-    } catch (error) {
-      form.setError('root', {
-        message: error instanceof Error ? error.message : t('common.errors.generic'),
-      })
-    }
-  }
+  const form = useForm({
+    defaultValues: DEFAULT_VALUES,
+    validators: {
+      onSubmit: investigationCaseCreateSchema,
+    },
+    onSubmit: async ({ value }) => {
+      try {
+        setSubmitError(null)
+        await onSubmit(value)
+        form.reset()
+        setIsCreateDialogOpen(false)
+      } catch (error) {
+        setSubmitError(error instanceof Error ? error.message : t('common.errors.generic'))
+      }
+    },
+  })
 
   return (
     <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
@@ -66,90 +67,121 @@ export default function InvestigationCaseCreateForm({
         <form
           id="create-case-form"
           className="grid gap-4"
-          onSubmit={form.handleSubmit(handleCreateCaseSubmit)}
           noValidate
+          onSubmit={(event) => {
+            event.preventDefault()
+            event.stopPropagation()
+            form.handleSubmit()
+          }}
         >
-          <Controller
-            control={form.control}
+          <form.Field
             name="caseNumber"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>{t('investigationCase.form.fields.caseNumber.label')}</FieldLabel>
-                <Input
-                  id={field.name}
-                  placeholder={t('investigationCase.form.fields.caseNumber.placeholder')}
-                  aria-invalid={fieldState.invalid}
-                  {...field}
-                />
-                <FieldError errors={fieldState.error ? [fieldState.error] : undefined} />
-              </Field>
-            )}
+            children={(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    {t('investigationCase.form.fields.caseNumber.label')}
+                  </FieldLabel>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    placeholder={t('investigationCase.form.fields.caseNumber.placeholder')}
+                    aria-invalid={isInvalid}
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              )
+            }}
           />
 
-          <Controller
-            control={form.control}
+          <form.Field
             name="pvNumber"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>{t('investigationCase.form.fields.pvNumber.label')}</FieldLabel>
-                <Input
-                  id={field.name}
-                  placeholder={t('investigationCase.form.fields.pvNumber.placeholder')}
-                  aria-invalid={fieldState.invalid}
-                  {...field}
-                />
-                <FieldError errors={fieldState.error ? [fieldState.error] : undefined} />
-              </Field>
-            )}
+            children={(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>{t('investigationCase.form.fields.pvNumber.label')}</FieldLabel>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    placeholder={t('investigationCase.form.fields.pvNumber.placeholder')}
+                    aria-invalid={isInvalid}
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              )
+            }}
           />
 
-          <Controller
-            control={form.control}
+          <form.Field
             name="description"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>{t('investigationCase.form.fields.description.label')}</FieldLabel>
-                <Textarea
-                  id={field.name}
-                  rows={4}
-                  placeholder={t('investigationCase.form.fields.description.placeholder')}
-                  aria-invalid={fieldState.invalid}
-                  {...field}
-                />
-                <FieldError errors={fieldState.error ? [fieldState.error] : undefined} />
-              </Field>
-            )}
+            children={(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>
+                    {t('investigationCase.form.fields.description.label')}
+                  </FieldLabel>
+                  <Textarea
+                    id={field.name}
+                    name={field.name}
+                    rows={4}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    placeholder={t('investigationCase.form.fields.description.placeholder')}
+                    aria-invalid={isInvalid}
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              )
+            }}
           />
 
-          <Controller
-            control={form.control}
+          <form.Field
             name="location"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>{t('investigationCase.form.fields.location.label')}</FieldLabel>
-                <Input
-                  id={field.name}
-                  placeholder={t('investigationCase.form.fields.location.placeholder')}
-                  aria-invalid={fieldState.invalid}
-                  {...field}
-                />
-                <FieldError errors={fieldState.error ? [fieldState.error] : undefined} />
-              </Field>
-            )}
+            children={(field) => {
+              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+              return (
+                <Field data-invalid={isInvalid}>
+                  <FieldLabel htmlFor={field.name}>{t('investigationCase.form.fields.location.label')}</FieldLabel>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(event) => field.handleChange(event.target.value)}
+                    placeholder={t('investigationCase.form.fields.location.placeholder')}
+                    aria-invalid={isInvalid}
+                  />
+                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                </Field>
+              )
+            }}
           />
 
-          {form.formState.errors.root && (
-            <p className="text-sm text-destructive">{form.formState.errors.root.message}</p>
-          )}
+          {submitError && <p className="text-sm text-destructive">{submitError}</p>}
         </form>
 
         <DialogFooter>
           <Button variant="outline" type="button" onClick={() => setIsCreateDialogOpen(false)}>
             {t('common.actions.cancel')}
           </Button>
-          <Button type="submit" form="create-case-form" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? t('investigationCase.form.submitting') : t('investigationCase.form.submit')}
-          </Button>
+          <form.Subscribe
+            selector={(state) => state.isSubmitting}
+            children={(isSubmitting) => (
+              <Button type="submit" form="create-case-form" disabled={isSubmitting}>
+                {isSubmitting ? t('investigationCase.form.submitting') : t('investigationCase.form.submit')}
+              </Button>
+            )}
+          />
         </DialogFooter>
       </DialogContent>
     </Dialog>

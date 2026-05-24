@@ -1,48 +1,36 @@
 import { useEffect, useState } from 'react'
 import { Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { H1 } from '../../shared/ui/typography'
 import { Card, CardContent } from '@/features/shared/ui/card'
 
-import type {
-  InvestigationCase,
-  InvestigationCaseCreateInput,
-} from '@/features/investigation-case/types/investigationCase'
+import type { InvestigationCaseCreateInput } from '@/features/investigation-case/types/investigationCase'
 import InvestigationCaseCard from '@/features/investigation-case/components/InvestigationCaseCard'
 import InvestigationCaseCreateForm from '@/features/investigation-case/components/InvestigationCaseCreateForm'
 
-import { InvestigationCaseAPI } from '@/features/investigation-case/services/InvestigationCaseAPI.services'
+import {
+  useCreateInvestigationCase,
+  useInvestigationCases,
+} from '@/features/investigation-case/hooks/useInvestigationCases'
+import { Spinner } from '@/features/shared/ui/spinner'
 
 export default function InvestigationCasesPage() {
-  const [investigationCases, setInvestigationCases] = useState<InvestigationCase[]>([
-    {
-      id: '1',
-      caseNumber: '2023-001',
-      pvNumber: 'PV-2023-001',
-      description: "Description de l'affaire 2023-001",
-      location: '10 rue de la paix, 75002 Paris',
-      status: 'OPEN',
-      createdAt: new Date('2023-01-15'),
-      updatedAt: new Date('2023-01-20'),
-    },
-  ])
-
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const { t } = useTranslation()
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+
+  const { data: investigationCases = [], isPending, isError } = useInvestigationCases()
+  const createInvestigationCase = useCreateInvestigationCase()
 
   const handleInvestigationCaseCreate = async (formValues: InvestigationCaseCreateInput) => {
-    const createdCase = await InvestigationCaseAPI.create(formValues)
-    setInvestigationCases((previous) => [...previous, createdCase])
+    await createInvestigationCase.mutateAsync(formValues)
   }
 
   useEffect(() => {
-    const fetchInvestigationCases = async () => {
-      const cases = await InvestigationCaseAPI.getAll()
-      setInvestigationCases(cases)
+    if (isError) {
+      toast.error(t('common.errors.loadFailed'))
     }
-
-    fetchInvestigationCases()
-  }, [])
+  }, [isError, t])
 
   return (
     <div className="flex flex-col gap-4">
@@ -63,9 +51,13 @@ export default function InvestigationCasesPage() {
           </CardContent>
         </Card>
 
-        {investigationCases.map((investigationCase) => (
-          <InvestigationCaseCard key={investigationCase.id} investigationCase={investigationCase} />
-        ))}
+        {isPending ? (
+          <Spinner className="size-6" />
+        ) : (
+          investigationCases.map((investigationCase) => (
+            <InvestigationCaseCard key={investigationCase.id} investigationCase={investigationCase} />
+          ))
+        )}
       </div>
 
       <InvestigationCaseCreateForm

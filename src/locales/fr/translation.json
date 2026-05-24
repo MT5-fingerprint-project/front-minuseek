@@ -4,8 +4,10 @@
       "cancel": "Annuler"
     },
     "errors": {
-      "generic": "Une erreur est survenue"
-    }
+      "generic": "Une erreur est survenue",
+      "loadFailed": "Impossible de charger les données"
+    },
+    "loading": "Chargement…"
   },
   "navigation": {
     "myCases": "Mes affaires",

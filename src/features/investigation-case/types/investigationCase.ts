@@ -3,7 +3,7 @@ import i18n from '@/features/shared/lib/i18n'
 
 export interface InvestigationCase {
   id: string
-  description: string
+  description?: string | undefined
   caseNumber: string
   pvNumber: string
   location?: string
@@ -18,8 +18,7 @@ export const investigationCaseCreateSchema = z.object({
   caseNumber: z.string().trim().min(1, i18n.t('investigationCase.validation.caseNumberRequired')),
   pvNumber: z.string().trim().min(1, i18n.t('investigationCase.validation.pvNumberRequired')),
   description: z.string().trim().max(2000),
-  location: z.string().trim().min(1, i18n.t('investigationCase.validation.locationRequired')),
-  status: z.enum(['OPEN', 'IN_PROGRESS', 'UNDER_REVIEW', 'CLOSED']),
+  location: z.string().trim().optional(),
 })
 
 export type InvestigationCaseCreateInput = z.infer<typeof investigationCaseCreateSchema>
