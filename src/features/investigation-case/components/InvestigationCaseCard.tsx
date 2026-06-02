@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next'
 
 export default function InvestigationCaseCard({ investigationCase }: { investigationCase: InvestigationCase }) {
   const { t, i18n } = useTranslation()
-  const formattedDate = investigationCase.createdAt.toLocaleDateString(i18n.language)
+  const formattedDate = new Date(investigationCase.createdAt).toLocaleDateString(i18n.language)
 
   return (
     <Link to={`/affaires/${investigationCase.id}`} className="min-h-44">

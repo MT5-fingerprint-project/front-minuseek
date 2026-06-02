@@ -6,7 +6,7 @@ import type {
 
 export const InvestigationCaseAPI = {
   create: (caseData: InvestigationCaseCreateInput) =>
-    apiClient.post<InvestigationCase>('/cases', caseData).then((res) => res.data),
+    apiClient.post<InvestigationCase>('/api/investigation-cases', caseData).then((res) => res.data),
 
-  getAll: () => apiClient.get<InvestigationCase[]>('/cases').then((res) => res.data),
+  getAll: () => apiClient.get<InvestigationCase[]>('/api/investigation-cases').then((res) => res.data),
 }
