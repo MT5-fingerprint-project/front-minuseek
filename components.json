@@ -5,19 +5,19 @@
   "tsx": true,
   "tailwind": {
     "config": "",
-    "css": "src/index.css",
-    "baseColor": "neutral",
+    "css": "src/assets/css/index.css",
+    "baseColor": "olive",
     "cssVariables": true,
     "prefix": ""
   },
   "iconLibrary": "lucide",
   "rtl": false,
   "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
+    "components": "@/features/shared",
+    "utils": "@/features/shared/lib/utils",
+    "ui": "@/features/shared/ui",
+    "lib": "@/features/shared/lib",
+    "hooks": "@/features/shared/hooks"
   },
   "menuColor": "default",
   "menuAccent": "subtle",
