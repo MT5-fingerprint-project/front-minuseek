@@ -1,4 +1,40 @@
-# React + TypeScript + Vite
+# front-minuseek
+
+Front du projet **Minuseek** (React + TypeScript + Vite), containerisé avec Docker.
+
+## Démarrage
+
+```bash
+cp .env.example .env   # première fois
+make dev
+```
+
+Le front est disponible sur `http://localhost:5173`.
+
+### Appels API
+
+Le client axios utilise `VITE_API_URL` (par défaut `/api`). En dev, ce chemin relatif
+passe par le **proxy Vite** (`vite.config.ts → server.proxy`), qui transfère `/api`
+vers `API_PROXY_TARGET` (par défaut `http://app:3000`).
+
+`app` est le nom de service du back, joignable grâce au réseau Docker partagé `minuseek`.
+`make dev` crée ce réseau automatiquement s'il n'existe pas (idempotent), des deux côtés.
+
+> Aucune URL n'est codée en dur : tout passe par le `.env`.
+
+### Commandes Makefile
+
+| Commande         | Description                                            |
+|------------------|--------------------------------------------------------|
+| `make dev`       | Lance le front en mode dev avec hot-reload (Vite)      |
+| `make dev-build` | Rebuild l'image puis lance le front                    |
+| `make down`      | Arrête le front                                        |
+| `make network`   | Crée le réseau Docker partagé `minuseek` (idempotent)  |
+| `make logs`      | Affiche les logs du front en temps réel                |
+
+---
+
+## React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

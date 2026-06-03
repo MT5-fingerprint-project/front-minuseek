@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   dev:
     build:
@@ -13,3 +11,10 @@ services:
     environment:
       - NODE_ENV=development
     command: pnpm dev
+    networks:
+      - default
+      - minuseek
+
+networks:
+  minuseek:
+    external: true
