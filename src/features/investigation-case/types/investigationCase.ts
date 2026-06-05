@@ -9,7 +9,6 @@ export interface InvestigationCase {
   description?: string | undefined
   caseNumber: string
   pvNumber: string
-  location?: string
   status: InvestigationCaseStatus
   createdAt: Date
   updatedAt: Date
@@ -21,12 +20,12 @@ export interface ListInvestigationCasesResponse {
 
 export const investigationCaseSchema = z.object({
   id: z.string(),
-  description: z.string(),
+  description: z.string().optional(),
   caseNumber: z.string().min(1),
   pvNumber: z.string().min(1),
   status: investigationCaseStatusSchema,
-  createdAt: z.string().or(z.date()),
-  updatedAt: z.string().or(z.date()),
+  createdAt: z.date(),
+  updatedAt: z.date()
 })
 
 export const listInvestigationCasesResponseSchema = z.object({
