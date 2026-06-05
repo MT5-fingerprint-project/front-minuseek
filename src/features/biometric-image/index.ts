@@ -1,0 +1,5 @@
+export { default as BiometricImageCarousel } from '@/features/biometric-image/components/BiometricImageCarousel'
+export { default as BiometricImageCarouselView } from '@/features/biometric-image/components/BiometricImageCarouselView'
+export { useBiometricImages, biometricImageKeys } from '@/features/biometric-image/hooks/useBiometricImages'
+export { BiometricImageAPI } from '@/features/biometric-image/services/BiometricImageAPI.services'
+export type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'

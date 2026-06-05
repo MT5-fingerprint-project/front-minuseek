@@ -64,5 +64,16 @@
     "success": {
       "created": "Affaire créée avec succès"
     }
+  },
+  "biometricImage": {
+    "import": {
+      "traces": "Importer vos traces ici",
+      "referencePrints": "Importer vos empreintes ici",
+      "button": "Importer"
+    },
+    "nav": {
+      "previous": "Voir les images précédentes",
+      "next": "Voir les images suivantes"
+    }
   }
 }
