@@ -36,7 +36,6 @@ export const investigationCaseCreateSchema = z.object({
   caseNumber: z.string().trim().min(1, i18n.t('investigationCase.validation.caseNumberRequired')),
   pvNumber: z.string().trim().min(1, i18n.t('investigationCase.validation.pvNumberRequired')),
   description: z.string().trim().max(2000),
-  //location: z.string().trim().optional(),
 })
 
 export type InvestigationCaseCreateInput = z.infer<typeof investigationCaseCreateSchema>
