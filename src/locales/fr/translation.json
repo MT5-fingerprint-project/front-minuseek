@@ -30,7 +30,13 @@
       "createdOn": "Créé le {{date}}"
     },
     "details": {
-      "title": "Affaire N°{{id}}"
+      "title": "Affaire n°{{caseNumber}}",
+      "updatedAt": "Modifié le {{date}} à {{time}}",
+      "informations": "Informations",
+      "pvNumber": "Numéro de PV :",
+      "openedAt": "Date ouverture :",
+      "context": "Contexte",
+      "summary": "Résumé des faits :"
     },
     "form": {
       "createTitle": "Créer une affaire",

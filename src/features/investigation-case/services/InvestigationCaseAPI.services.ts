@@ -9,4 +9,7 @@ export const InvestigationCaseAPI = {
     apiClient.post<InvestigationCase>('/investigation-cases', caseData).then((res) => res.data),
 
   getAll: () => apiClient.get<InvestigationCase[]>('/investigation-cases').then((res) => res.data),
+
+  getById: (id: string) =>
+    apiClient.get<InvestigationCase>(`/investigation-cases/${id}`).then((res) => res.data),
 }

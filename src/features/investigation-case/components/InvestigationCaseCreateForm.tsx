@@ -112,28 +112,6 @@ export default function InvestigationCaseCreateForm({ isOpen, onClose, onSubmit 
             }}
           />
 
-          {/*           <form.Field
-            name="location"
-            children={(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>{t('investigationCase.form.fields.location.label')}</FieldLabel>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    placeholder={t('investigationCase.form.fields.location.placeholder')}
-                    aria-invalid={isInvalid}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              )
-            }}
-          /> */}
-
           {submitError && <p className="text-sm text-destructive">{submitError}</p>}
         </form>
 
