@@ -6,7 +6,7 @@ interface HomeIconProps extends React.SVGProps<SVGSVGElement> {
 }
 
 export const HomeIcon = React.forwardRef<SVGSVGElement, HomeIconProps>(
-  ({ color = '--var(--foreground)', size = 24, ...props }, ref) => (
+  ({ color = '--var(--color-blue-dark-1)', size = 24, ...props }, ref) => (
     <svg
       ref={ref}
       width={size}

@@ -1,3 +1,3 @@
 export { InvestigationIcon } from './InvestigationIcon'
-export { CasesIcon } from './CasesIcon'
+export { InformationIcon } from './InformationIcon'
 export { HomeIcon } from './HomeIcon'

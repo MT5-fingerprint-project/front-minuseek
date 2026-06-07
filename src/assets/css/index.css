@@ -2,6 +2,22 @@
 @import 'tw-animate-css';
 @import '@fontsource-variable/inter';
 
+@font-face {
+  font-family: 'Host Grotesk';
+  src: url('../fonts/HostGrotesk-VariableFont_wght.ttf') format('truetype');
+  font-weight: 300 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Host Grotesk';
+  src: url('../fonts/HostGrotesk-Italic-VariableFont_wght.ttf') format('truetype');
+  font-weight: 300 800;
+  font-style: italic;
+  font-display: swap;
+}
+
 /* Minuseek palette */
 :root {
   --ms-background: #eeeeee;
@@ -10,11 +26,53 @@
   --ms-blue: #506f86;
 }
 
+body {
+  font-family: 'Host Grotesk', sans-serif;
+}
+
 /* ShadCn UI */
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: 'Inter Variable', sans-serif;
+  --font-sans: 'Host Grotesk', sans-serif;
+
+  /* White */
+  --color-white: rgb(255, 255, 255); /* #FFFFFF */
+
+  /* Grey */
+  --color-grey-light-1: rgb(238, 238, 238); /* #EEEEEE */
+  --color-grey-light-2: rgb(220, 220, 220); /* #DCDCDC */
+  --color-grey-medium-1: rgb(168, 168, 168); /* #A8A8A8 */
+  --color-grey-medium-2: rgb(113, 113, 113); /* #717171 */
+  --color-grey-dark: rgb(56, 56, 56); /* #383838 */
+  --color-grey-dark-50: rgba(56, 56, 56, 0.5); /* #383838 @ 50% */
+
+  /* Blue */
+  --color-blue-light-1: rgb(224, 224, 232); /* #E0E0E8 */
+  --color-blue-light-2: rgb(208, 217, 233); /* #D0D9E9 */
+  --color-blue-medium-1: rgb(75, 94, 163); /* #4B5EA3 */
+  --color-blue-medium-2: rgb(56, 71, 126); /* #38477E */
+  --color-blue-dark-1: rgb(9, 16, 41); /* #091029 */
+  --color-blue-dark-2: rgb(1, 5, 22); /* #010516 */
+  --color-blue-dark-1-70: rgba(9, 16, 41, 0.7); /* #091029 @ 70% */
+
+  /* Green */
+  --color-green-light: rgb(234, 254, 243); /* #EAFEF3 */
+  --color-green-medium: rgb(18, 135, 85); /* #128755 */
+
+  /* Orange */
+  --color-orange-light: rgb(255, 236, 216); /* #FFECD8 */
+  --color-orange-medium: rgb(216, 87, 3); /* #D85703 */
+
+  /* Red */
+  --color-red-medium: rgb(192, 0, 0); /* #C00000 */
+
+  /* GYRO */
+  --color-gyro-red: rgb(255, 0, 0); /* #FF0000 */
+  --color-gyro-orange: rgb(255, 136, 0); /* #FF8800 */
+  --color-gyro-yellow: rgb(255, 212, 0); /* #FFD400 */
+  --color-gyro-green: rgb(0, 255, 17); /* #00FF11 */
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

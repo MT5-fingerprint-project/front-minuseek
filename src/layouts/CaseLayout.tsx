@@ -1,7 +1,7 @@
 import { Link, Outlet, useLocation, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useInvestigationCase } from '@/features/investigation-case/hooks/useInvestigationCases'
-import { InvestigationIcon, CasesIcon, HomeIcon } from '@/features/shared/icons'
+import { InvestigationIcon, InformationIcon, HomeIcon } from '@/features/shared/icons'
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
 import { cn } from '@/features/shared/lib/utils'
 import { TooltipProvider } from '@/features/shared/ui/tooltip'
@@ -20,7 +20,7 @@ export default function CaseLayout() {
     <TooltipProvider>
       <div className="flex h-screen w-full overflow-hidden">
         {isComparison ? (
-          <aside className="flex flex-col items-center gap-4 bg-[#0a0e1a] text-white w-14 py-4 shrink-0">
+          <aside className="flex flex-col items-center gap-4 bg-blue-dark-1 text-white w-14 py-4 shrink-0">
             <Link to="/affaires" className="flex items-center justify-center w-9 h-9 hover:bg-white/10 rounded-md transition-colors">
               <HomeIcon size={20} color="white"/>
             </Link>
@@ -30,22 +30,21 @@ export default function CaseLayout() {
               className="flex items-center justify-center w-9 h-9 hover:bg-white/10 rounded-md transition-colors"
               title={t('navigation.informations')}
             >
-              <CasesIcon size={20} color="white" />
+              <InformationIcon size={20} color="white" />
             </Link>
             <Link
               to={comparisonPath}
-              className="flex items-center justify-center w-9 h-9 bg-[#1e2a4a] rounded-md transition-colors"
+              className="flex items-center justify-center w-9 h-9 bg-blue-medium-2 rounded-md transition-colors"
               title={t('navigation.tracesAndFingerprints')}
             >
               <InvestigationIcon size={20} color="white" />
             </Link>
           </aside>
         ) : (
-          <aside className="flex flex-col bg-[#0a0e1a] text-white w-72 shrink-0 py-4">
+          <aside className="flex flex-col bg-blue-dark-1 text-white w-64 shrink-0 py-4">
             <div className="px-4 pb-4">
               <span className="text-xl font-bold tracking-wide">MINUSEEK</span>
             </div>
-
             <div className="px-4 flex flex-col gap-3 pb-4">
               <Link
                 to="/affaires"
@@ -54,12 +53,11 @@ export default function CaseLayout() {
                 <HomeIcon size={16} color="white"/>
                 {t('navigation.backToCases')}
               </Link>
-
               {investigationCase && (
                 <>
                   <CaseStatusBadge status={investigationCase.status} />
                   <div>
-                    <p className="font-bold text-lg leading-tight">
+                    <p className="font-bold text-lg leading-tight color-white">
                       Affaire n°{investigationCase.caseNumber}
                     </p>
                     <p className="text-sm text-white/60">PV n°{investigationCase.pvNumber}</p>
@@ -67,20 +65,18 @@ export default function CaseLayout() {
                 </>
               )}
             </div>
-
             <div className="border-t border-white/20 mx-4 mb-4" />
-
             <nav className="flex flex-col px-2 gap-1">
               <Link
                 to={detailsPath}
                 className={cn(
                   'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                   !isComparison
-                    ? 'bg-[#1e2a4a] text-white'
+                    ? 'bg-blue-medium-2 text-white'
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
                 )}
               >
-                <CasesIcon size={18} color="white" />
+                <InformationIcon size={18} color="white" />
                 {t('navigation.informations')}
               </Link>
               <Link
@@ -88,7 +84,7 @@ export default function CaseLayout() {
                 className={cn(
                   'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors',
                   isComparison
-                    ? 'bg-[#1e2a4a] text-white'
+                    ? 'bg-blue-medium-2 text-white'
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
                 )}
               >

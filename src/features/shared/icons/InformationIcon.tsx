@@ -1,12 +1,12 @@
 import React from 'react'
 
-interface CasesIconProps extends React.SVGProps<SVGSVGElement> {
+interface InformationIconProps extends React.SVGProps<SVGSVGElement> {
   color?: string
   size?: number
 }
 
-export const CasesIcon = React.forwardRef<SVGSVGElement, CasesIconProps>(
-  ({ color = '#1C1B1F', size = 24, ...props }, ref) => (
+export const InformationIcon = React.forwardRef<SVGSVGElement, InformationIconProps>(
+  ({ color = '--var(--color-blue-dark-1)', size = 24, ...props }, ref) => (
     <svg
       ref={ref}
       width={size}
@@ -23,4 +23,4 @@ export const CasesIcon = React.forwardRef<SVGSVGElement, CasesIconProps>(
   )
 )
 
-CasesIcon.displayName = 'CasesIcon'
+InformationIcon.displayName = 'InformationIcon'

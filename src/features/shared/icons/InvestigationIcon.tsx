@@ -6,7 +6,7 @@ interface InvestigationIconProps extends React.SVGProps<SVGSVGElement> {
 }
 
 export const InvestigationIcon = React.forwardRef<SVGSVGElement, InvestigationIconProps>(
-  ({ color = '--var(--foreground)', size = 24, ...props }, ref) => (
+  ({ color = '--var(--color-blue-dark-1)', size = 24, ...props }, ref) => (
     <svg
       ref={ref}
       width={size}
