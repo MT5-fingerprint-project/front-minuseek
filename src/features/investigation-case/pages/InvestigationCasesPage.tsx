@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { H1 } from '../../shared/ui/typography'
+import { H1 } from '@/features/shared/ui/typography'
 import InvestigationCaseCreateForm from '@/features/investigation-case/components/InvestigationCaseCreateForm'
 import InvestigationCasesList from '@/features/investigation-case/components/InvestigationCasesList'
 import {
@@ -16,7 +16,7 @@ export default function InvestigationCasesPage() {
   const createInvestigationCase = useCreateInvestigationCase()
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 p-6">
       <H1>{t('investigationCase.list.title')}</H1>
 
       <InvestigationCasesList
