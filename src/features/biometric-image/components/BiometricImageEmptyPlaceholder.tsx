@@ -11,7 +11,7 @@ export default function BiometricImageEmptyPlaceholder({ type }: BiometricImageE
   const label = type === 'traces' ? t('biometricImage.import.traces') : t('biometricImage.import.referencePrints')
 
   return (
-    <div className="flex w-full items-center justify-center rounded-lg bg-white p-2 outline outline-[0.5px] -outline-offset-1 outline-[var(--ms-grey-light)]">
+    <div className="outline-muted flex w-full items-center justify-center rounded-lg bg-white p-2">
       <div className="flex min-h-[107px] items-center justify-center gap-2">
         <ImageUp className="size-6 text-[var(--ms-blue-medium)]" />
         <span className="text-base text-[var(--ms-blue-medium)]">{label}</span>

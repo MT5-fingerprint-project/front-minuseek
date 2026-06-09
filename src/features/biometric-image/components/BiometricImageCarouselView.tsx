@@ -1,8 +1,11 @@
-import { useEffect, useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Button } from '@/features/shared/ui/button'
-import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/features/shared/ui/carousel'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/features/shared/ui/carousel'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
 import BiometricImageThumbnail from '@/features/biometric-image/components/BiometricImageThumbnail'
 import BiometricImageImportButton from '@/features/biometric-image/components/BiometricImageImportButton'
@@ -25,55 +28,29 @@ export default function BiometricImageCarouselView({
   onSelect,
 }: BiometricImageCarouselViewProps) {
   const { t } = useTranslation()
-  const [api, setApi] = useState<CarouselApi>()
-  const [canScrollPrev, setCanScrollPrev] = useState(false)
-  const [canScrollNext, setCanScrollNext] = useState(false)
-
-  // Les flèches font défiler la bande (voir plus loin), sans jamais sélectionner.
-  // L'état désactivé suit la vraie position de scroll d'embla → pas de décalage.
-  useEffect(() => {
-    if (!api) return
-    const update = () => {
-      setCanScrollPrev(api.canScrollPrev())
-      setCanScrollNext(api.canScrollNext())
-    }
-    update()
-    api.on('select', update)
-    api.on('reInit', update)
-    return () => {
-      api.off('select', update)
-      api.off('reInit', update)
-    }
-  }, [api])
 
   if (!isLoading && images.length === 0) {
     return <BiometricImageEmptyPlaceholder type={type} />
   }
 
   return (
-    <div className="flex w-full items-center gap-2 rounded-lg bg-white p-2 outline outline-[0.5px] -outline-offset-1 outline-[var(--ms-grey-light)]">
+    <div className="outline-muted flex w-full items-center gap-2 rounded-lg bg-white p-2">
       <BiometricImageImportButton />
 
       {isLoading ? (
         <BiometricImageCarouselSkeleton />
       ) : (
-        <div className="flex min-w-0 flex-1 items-center gap-1">
-          <Button
+        <Carousel
+          opts={{ dragFree: true, containScroll: 'trimSnaps', slidesToScroll: 'auto' }}
+          className="flex min-w-0 flex-1 items-center gap-1"
+        >
+          <CarouselPrevious
             variant="ghost"
-            size="icon-sm"
-            className="shrink-0 text-[var(--ms-blue-medium)]"
-            onClick={() => api?.scrollPrev()}
-            disabled={!canScrollPrev}
+            className="static shrink-0 translate-y-0 text-[var(--ms-blue-medium)]"
             aria-label={t('biometricImage.nav.previous')}
-          >
-            <ChevronLeft className="size-5" />
-          </Button>
+          />
 
-          <Carousel
-            setApi={setApi}
-            opts={{ dragFree: true, containScroll: 'trimSnaps', slidesToScroll: 'auto' }}
-            className="min-w-0 flex-1"
-          >
+          <div className="min-w-0 flex-1">
             <CarouselContent className="ml-0 gap-2">
               {images.map((image) => (
                 <CarouselItem key={image.id} className="basis-auto pl-0">
@@ -85,19 +62,14 @@ export default function BiometricImageCarouselView({
                 </CarouselItem>
               ))}
             </CarouselContent>
-          </Carousel>
+          </div>
 
-          <Button
+          <CarouselNext
             variant="ghost"
-            size="icon-sm"
-            className="shrink-0 text-[var(--ms-blue-medium)]"
-            onClick={() => api?.scrollNext()}
-            disabled={!canScrollNext}
+            className="static shrink-0 translate-y-0 text-[var(--ms-blue-medium)]"
             aria-label={t('biometricImage.nav.next')}
-          >
-            <ChevronRight className="size-5" />
-          </Button>
-        </div>
+          />
+        </Carousel>
       )}
     </div>
   )
