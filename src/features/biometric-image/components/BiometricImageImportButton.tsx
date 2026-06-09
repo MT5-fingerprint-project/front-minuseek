@@ -1,5 +1,6 @@
 import { ImageUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { Button } from '@/features/shared/ui/button'
 
 /**
  * Zone d'import (bouton "Importer") de la maquette. L'upload n'étant pas encore
@@ -9,13 +10,9 @@ export default function BiometricImageImportButton() {
   const { t } = useTranslation()
 
   return (
-    <button
-      type="button"
-      disabled
-      className="flex shrink-0 items-center gap-2 text-[var(--ms-blue-medium)] disabled:cursor-not-allowed disabled:opacity-60"
-    >
+    <Button variant="ghost" disabled className="shrink-0 gap-2 text-base text-[var(--ms-blue-medium)]">
       <ImageUp className="size-5" />
-      <span className="text-base">{t('biometricImage.import.button')}</span>
-    </button>
+      {t('biometricImage.import.button')}
+    </Button>
   )
 }
