@@ -14,7 +14,7 @@ export function useInvestigationCases() {
   return useQuery({
     queryKey: investigationCaseKeys.lists(),
     queryFn: () => InvestigationCaseAPI.getAll(),
-    select: ({data}) => data,
+    select: ({data}) => data
   })
 }
 

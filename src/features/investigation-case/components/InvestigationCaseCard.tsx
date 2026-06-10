@@ -1,9 +1,9 @@
 import type { InvestigationCase } from '@/features/investigation-case/types/investigationCase'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/features/shared/ui/card'
 import { Link } from 'react-router-dom'
-import { Calendar, MapPin } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
+import { Icon } from '@/features/shared/icons'
 
 export default function InvestigationCaseCard({ investigationCase }: { investigationCase: InvestigationCase }) {
   const { t, i18n } = useTranslation()
@@ -23,13 +23,9 @@ export default function InvestigationCaseCard({ investigationCase }: { investiga
         </CardHeader>
         <CardContent className="flex flex-col gap-1">
           <div className="text-xs text-muted-foreground flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
+            <Icon name="dateStart" size={20} color="var(--color-grey-medium-1)" />
             <span>{t('investigationCase.card.createdOn', { date: formattedDate })}</span>
           </div>
-          {/* <div className="text-sm text-muted-foreground line-clamp-2 flex items-center gap-2">
-            <MapPin className="h-4 w-4" />
-            <span>{investigationCase.location}</span>
-          </div> */}
         </CardContent>
       </Card>
     </Link>
