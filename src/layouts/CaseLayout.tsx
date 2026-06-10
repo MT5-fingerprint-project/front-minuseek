@@ -1,7 +1,7 @@
 import { Link, Outlet, useLocation, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useInvestigationCase } from '@/features/investigation-case/hooks/useInvestigationCases'
-import { InvestigationIcon, InformationIcon, HomeIcon } from '@/features/shared/icons'
+import { Icon } from '@/features/shared/icons'
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
 import { cn } from '@/features/shared/lib/utils'
 import { TooltipProvider } from '@/features/shared/ui/tooltip'
@@ -22,7 +22,7 @@ export default function CaseLayout() {
         {isComparison ? (
           <aside className="flex flex-col items-center gap-4 bg-blue-dark-1 text-white w-14 py-4 shrink-0">
             <Link to="/affaires" className="flex items-center justify-center w-9 h-9 hover:bg-white/10 rounded-md transition-colors">
-              <HomeIcon size={20} color="white"/>
+              <Icon name="home" size={20} color="white" />
             </Link>
             <div className="w-6 border-t border-white/20" />
             <Link
@@ -30,14 +30,14 @@ export default function CaseLayout() {
               className="flex items-center justify-center w-9 h-9 hover:bg-white/10 rounded-md transition-colors"
               title={t('navigation.informations')}
             >
-              <InformationIcon size={20} color="white" />
+              <Icon name="information" size={20} color="white" />
             </Link>
             <Link
               to={comparisonPath}
               className="flex items-center justify-center w-9 h-9 bg-blue-medium-2 rounded-md transition-colors"
               title={t('navigation.tracesAndFingerprints')}
             >
-              <InvestigationIcon size={20} color="white" />
+              <Icon name="investigation" size={20} color="white" />
             </Link>
           </aside>
         ) : (
@@ -50,7 +50,7 @@ export default function CaseLayout() {
                 to="/affaires"
                 className="flex items-center gap-2 text-sm text-white/80 hover:text-white underline transition-colors"
               >
-                <HomeIcon size={16} color="white"/>
+                <Icon name="home" size={16} color="white" />
                 {t('navigation.backToCases')}
               </Link>
               {investigationCase && (
@@ -76,7 +76,7 @@ export default function CaseLayout() {
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
                 )}
               >
-                <InformationIcon size={18} color="white" />
+                <Icon name="information" size={18} color="white" />
                 {t('navigation.informations')}
               </Link>
               <Link
@@ -88,7 +88,7 @@ export default function CaseLayout() {
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
                 )}
               >
-                <InvestigationIcon size={18} color="white" />
+                <Icon name="investigation" size={18} color="white" />
                 {t('navigation.tracesAndFingerprints')}
               </Link>
             </nav>
