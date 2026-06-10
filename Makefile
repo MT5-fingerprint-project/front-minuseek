@@ -1,7 +1,7 @@
 COMPOSE = docker compose -f compose.yaml
 NETWORK = minuseek
 
-.PHONY: network dev dev-build down logs
+.PHONY: network dev dev-build down logs lint build
 
 ## Crée le réseau Docker partagé avec le back s'il n'existe pas (idempotent)
 network:
@@ -22,3 +22,11 @@ down:
 ## Affiche les logs du front en temps réel
 logs:
 	$(COMPOSE) logs -f
+
+## Lance le linter (ESLint) dans le conteneur
+lint:
+	$(COMPOSE) run --rm dev pnpm lint
+
+## Build de production (tsc + vite build) dans le conteneur
+build-pnpm:
+	$(COMPOSE) run --rm dev pnpm build
