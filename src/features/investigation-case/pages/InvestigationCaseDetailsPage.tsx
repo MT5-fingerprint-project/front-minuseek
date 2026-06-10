@@ -1,7 +1,12 @@
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+<<<<<<< HEAD
 import { Icon } from "@/features/shared/icons"
 import { useInvestigationCase } from '@/features/investigation-case/hooks/useInvestigationCases'
+=======
+import { FolderIcon, DateStartIcon } from "@/features/shared/icons"
+import { useInvestigationCases } from '@/features/investigation-case/hooks/useInvestigationCases'
+>>>>>>> ddb1e11498e54232566b0e629753620f83948ae8
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
 import { Spinner } from '@/features/shared/ui/spinner'
 import { H1 } from '@/features/shared/ui/typography'
@@ -9,7 +14,11 @@ import { H1 } from '@/features/shared/ui/typography'
 export default function InvestigationCaseDetailsPage() {
   const { id } = useParams<{ id: string }>()
   const { t, i18n } = useTranslation()
+<<<<<<< HEAD
   const { data: investigationCase, isPending } = useInvestigationCase(id ?? '')
+=======
+  const { data: investigationCase, isPending } = useInvestigationCases(id ?? '')
+>>>>>>> ddb1e11498e54232566b0e629753620f83948ae8
 
   if (isPending) return <Spinner className="size-6" />
 
