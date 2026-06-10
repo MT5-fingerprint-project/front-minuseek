@@ -7,6 +7,7 @@ import type { InvestigationCaseCreateInput } from '@/features/investigation-case
 export const investigationCaseKeys = {
   all: ['investigation-cases'] as const,
   lists: () => [...investigationCaseKeys.all, 'list'] as const,
+  detail: (id: string) => [...investigationCaseKeys.all, 'detail', id] as const,
 }
 
 export function useInvestigationCases() {
@@ -14,6 +15,14 @@ export function useInvestigationCases() {
     queryKey: investigationCaseKeys.lists(),
     queryFn: () => InvestigationCaseAPI.getAll(),
     select: ({data}) => data,
+  })
+}
+
+export function useInvestigationCase(id: string) {
+  return useQuery({
+    queryKey: investigationCaseKeys.detail(id),
+    queryFn: () => InvestigationCaseAPI.getById(id),
+    enabled: !!id,
   })
 }
 

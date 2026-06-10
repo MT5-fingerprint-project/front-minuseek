@@ -11,7 +11,10 @@
   },
   "navigation": {
     "myCases": "Mes affaires",
-    "navigationLabel": "Navigation"
+    "navigationLabel": "Navigation",
+    "backToCases": "Retour aux affaires",
+    "informations": "Informations",
+    "tracesAndFingerprints": "Traces & empreintes"
   },
   "investigationCase": {
     "status": {
@@ -31,6 +34,9 @@
     },
     "details": {
       "title": "Affaire N°{{id}}"
+    },
+    "comparison": {
+      "title": "Comparaison - Affaire N°{{id}}"
     },
     "form": {
       "createTitle": "Créer une affaire",

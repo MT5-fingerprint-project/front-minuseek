@@ -2,13 +2,13 @@ import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { H1 } from '@/features/shared/ui/typography'
 
-export default function InvestigationCaseDetailsPage() {
+export default function InvestigationCaseComparisonPage() {
   const { id } = useParams()
   const { t } = useTranslation()
 
   return (
     <div className="flex flex-col gap-4">
-      <H1>{t('investigationCase.details.title', { id })}</H1>
+      <H1>{t('investigationCase.comparison.title', { id })}</H1>
     </div>
   )
 }

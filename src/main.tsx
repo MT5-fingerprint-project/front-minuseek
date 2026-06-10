@@ -7,18 +7,20 @@ import './assets/css/index.css'
 import './features/shared/lib/i18n'
 import { queryClient } from './features/shared/lib/queryClient.ts'
 import { Toaster } from './features/shared/ui/sonner.tsx'
-import AppLayout from './layouts/AppLayout.tsx'
-import InvestigationCasePage from './features/investigation-case/pages/InvestigationCasesPage.tsx'
+import CaseLayout from './layouts/CaseLayout.tsx'
+import InvestigationCasesPage from './features/investigation-case/pages/InvestigationCasesPage.tsx'
 import InvestigationCaseDetailsPage from './features/investigation-case/pages/InvestigationCaseDetailsPage.tsx'
+import InvestigationCaseComparisonPage from './features/investigation-case/pages/InvestigationCaseComparisonPage.tsx'
 
 const router = createBrowserRouter([
+  { index: true, element: <InvestigationCasesPage /> },
+  { path: 'affaires', element: <InvestigationCasesPage /> },
   {
-    path: '/',
-    element: <AppLayout />,
+    path: 'affaires/:id',
+    element: <CaseLayout />,
     children: [
-      { index: true, element: <InvestigationCasePage /> },
-      { path: 'affaires', element: <InvestigationCasePage /> },
-      { path: 'affaires/:id', element: <InvestigationCaseDetailsPage /> },
+      { index: true, element: <InvestigationCaseDetailsPage /> },
+      { path: 'comparaison', element: <InvestigationCaseComparisonPage /> },
     ],
   },
 ])
