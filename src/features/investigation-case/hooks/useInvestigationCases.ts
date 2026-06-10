@@ -26,14 +26,6 @@ export function useInvestigationCase(id: string) {
   })
 }
 
-export function useInvestigationCase(id: string) {
-  return useQuery({
-    queryKey: investigationCaseKeys.detail(id),
-    queryFn: () => InvestigationCaseAPI.getById(id),
-    enabled: !!id,
-  })
-}
-
 export function useCreateInvestigationCase() {
   const queryClient = useQueryClient()
   const { t } = useTranslation()

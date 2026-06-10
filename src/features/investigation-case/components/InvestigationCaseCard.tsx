@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/fea
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
-import { DateStart } from '@/features/shared/icons'
+import { Icon } from '@/features/shared/icons'
 
 export default function InvestigationCaseCard({ investigationCase }: { investigationCase: InvestigationCase }) {
   const { t, i18n } = useTranslation()
@@ -23,7 +23,7 @@ export default function InvestigationCaseCard({ investigationCase }: { investiga
         </CardHeader>
         <CardContent className="flex flex-col gap-1">
           <div className="text-xs text-muted-foreground flex items-center gap-2">
-            <DateStart className="size-5 text-[grey]" />
+            <Icon name="dateStart" size={20} color="var(--color-grey-medium-1)" />
             <span>{t('investigationCase.card.createdOn', { date: formattedDate })}</span>
           </div>
         </CardContent>
