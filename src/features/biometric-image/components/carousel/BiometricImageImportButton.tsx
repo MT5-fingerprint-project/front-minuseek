@@ -20,11 +20,10 @@ export default function BiometricImageImportButton({
   const inputRef = useRef<HTMLInputElement>(null)
   const upload = useUploadBiometricImage(type, { onSuccess: onUploadSuccess })
 
-  const handleFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+  const handleFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? [])
     event.target.value = ''
-    if (!file) return
-    upload.mutate({ caseId, file })
+    for (const file of files) await upload.mutateAsync({ caseId, file })
   }
 
   return (
@@ -44,6 +43,7 @@ export default function BiometricImageImportButton({
         type="file"
         accept="image/*"
         className="hidden"
+        multiple
         onChange={handleFileSelected}
       />
     </>

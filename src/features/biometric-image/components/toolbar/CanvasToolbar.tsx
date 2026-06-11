@@ -43,7 +43,7 @@ export default function CanvasToolbar() {
           onClick={() => setMode('annotation')}
         />
       </div>
-      {tools.map(({ icon, label }) => <ItemToolbar icon={icon} label={t(label)} />)}
+      {tools.map(({ icon, label }) => <ItemToolbar key={label} icon={icon} label={t(label)} />)}
     </div>
   )
 }
