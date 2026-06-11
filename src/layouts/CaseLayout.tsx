@@ -37,7 +37,7 @@ export default function CaseLayout() {
               className="flex items-center justify-center w-9 h-9 bg-blue-medium-2 rounded-md transition-colors"
               title={t('navigation.tracesAndFingerprints')}
             >
-              <Icon name="investigation" size={20} color="white" />
+              <Icon name="fingerprint" size={20} color="white" />
             </Link>
           </aside>
         ) : (
@@ -88,14 +88,14 @@ export default function CaseLayout() {
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
                 )}
               >
-                <Icon name="investigation" size={18} color="white" />
+                <Icon name="fingerprint" size={18} color="white" />
                 {t('navigation.tracesAndFingerprints')}
               </Link>
             </nav>
           </aside>
         )}
 
-        <main className="flex-1 overflow-auto p-6">
+        <main className="flex-1 overflow-auto p-3">
           <Outlet />
         </main>
       </div>

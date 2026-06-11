@@ -43,7 +43,7 @@ export default function BiometricImageThumbnail({
           aria-pressed={isSelected}
           className={cn(
             'relative h-[107px] w-[73px] shrink-0 overflow-hidden rounded outline-offset-[-1px]',
-            isSelected && 'shadow-[0_0_4px_rgba(9,16,41,0.25)] outline-2 outline-[var(--ms-orange)]'
+            isSelected && 'shadow-[0_0_4px_rgba(9,16,41,0.25)] outline-2 outline-orange-medium'
           )}
         >
           <img

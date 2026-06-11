@@ -44,7 +44,7 @@ export default function BiometricImageCarouselView({
         >
           <CarouselPrevious
             variant="ghost"
-            className="static shrink-0 translate-y-0 text-[var(--ms-blue-medium)]"
+            className="static shrink-0 translate-y-0 text-blue-medium-1"
             aria-label={t('biometricImage.nav.previous')}
           />
 
@@ -66,7 +66,7 @@ export default function BiometricImageCarouselView({
 
           <CarouselNext
             variant="ghost"
-            className="static shrink-0 translate-y-0 text-[var(--ms-blue-medium)]"
+            className="static shrink-0 translate-y-0 text-blue-medium-1"
             aria-label={t('biometricImage.nav.next')}
           />
         </Carousel>

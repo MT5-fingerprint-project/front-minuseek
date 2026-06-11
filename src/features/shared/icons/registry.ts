@@ -13,6 +13,7 @@ import Compare from './compare.svg?react'
 import Contrast from './contrast.svg?react'
 import DateStart from './date-start.svg?react'
 import FileExport from './file-export.svg?react'
+import Fingerprint from './fingerprint.svg?react'
 import FingerprintCheck from './fingerprint-check.svg?react'
 import Folder from './folder.svg?react'
 import Home from './home.svg?react'
@@ -22,7 +23,6 @@ import ImportOff from './import-off.svg?react'
 import ImportPlus from './import-plus.svg?react'
 import Information from './information.svg?react'
 import InvertColors from './invert-colors.svg?react'
-import Investigation from './investigation.svg?react'
 import Layers from './layers.svg?react'
 import LayersOff from './layers-off.svg?react'
 import Location from './location.svg?react'
@@ -73,6 +73,7 @@ export const icons = {
   contrast: Contrast,
   dateStart: DateStart,
   fileExport: FileExport,
+  fingerprint: Fingerprint,
   fingerprintCheck: FingerprintCheck,
   folder: Folder,
   home: Home,
@@ -82,7 +83,6 @@ export const icons = {
   importPlus: ImportPlus,
   information: Information,
   invertColors: InvertColors,
-  investigation: Investigation,
   layers: Layers,
   layersOff: LayersOff,
   location: Location,
