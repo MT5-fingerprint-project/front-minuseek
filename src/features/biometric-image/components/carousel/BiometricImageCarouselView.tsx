@@ -1,16 +1,10 @@
 import { useTranslation } from 'react-i18next'
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/features/shared/ui/carousel'
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/features/shared/ui/carousel'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
-import BiometricImageThumbnail from '@/features/biometric-image/components/BiometricImageThumbnail'
-import BiometricImageImportButton from '@/features/biometric-image/components/BiometricImageImportButton'
-import BiometricImageEmptyPlaceholder from '@/features/biometric-image/components/BiometricImageEmptyPlaceholder'
-import BiometricImageCarouselSkeleton from '@/features/biometric-image/components/BiometricImageCarouselSkeleton'
+import BiometricImageThumbnail from '@/features/biometric-image/components/carousel/BiometricImageThumbnail'
+import BiometricImageImportButton from '@/features/biometric-image/components/carousel/BiometricImageImportButton'
+import BiometricImageEmptyPlaceholder from '@/features/biometric-image/components/carousel/BiometricImageEmptyPlaceholder'
+import BiometricImageCarouselSkeleton from '@/features/biometric-image/components/carousel/BiometricImageCarouselSkeleton'
 
 type BiometricImageCarouselViewProps = {
   images: BiometricImage[]
