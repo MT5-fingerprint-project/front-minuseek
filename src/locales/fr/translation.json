@@ -42,7 +42,9 @@
       "summary": "Résumé des faits :"
     },
     "comparison": {
-      "title": "Comparaison - Affaire N°{{id}}"
+      "title": "Comparaison - Affaire N°{{id}}",
+      "selectTrace": "Sélectionnez une trace dans le carousel pour l'afficher ici",
+      "selectReferencePrint": "Sélectionnez une empreinte de référence pour l'afficher ici"
     },
     "form": {
       "createTitle": "Créer une affaire",
@@ -81,7 +83,20 @@
     "import": {
       "traces": "Importer vos traces ici",
       "referencePrints": "Importer vos empreintes ici",
-      "button": "Importer"
+      "button": "Importer",
+      "uploading": "Envoi…"
+    },
+    "upload": {
+      "success": "Image importée avec succès",
+      "error": "L'import a échoué"
+    },
+    "delete": {
+      "success": "Image supprimée",
+      "error": "La suppression a échoué",
+      "aria": "Supprimer {{fileName}}",
+      "confirmTitle": "Supprimer cette image ?",
+      "confirmDescription": "Toutes les modifications apportées à cette image seront supprimées. Cette action est irréversible.",
+      "confirmAction": "Supprimer"
     },
     "nav": {
       "previous": "Voir les images précédentes",

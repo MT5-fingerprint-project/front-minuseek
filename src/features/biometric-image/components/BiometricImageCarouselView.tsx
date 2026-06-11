@@ -16,26 +16,30 @@ type BiometricImageCarouselViewProps = {
   images: BiometricImage[]
   isLoading: boolean
   type: BiometricImageType
+  caseId: string
   selectedId: string | undefined
-  onSelect: (id: string) => void
+  onSelect: (image: BiometricImage) => void
+  onUploadSuccess?: (image: BiometricImage) => void
 }
 
 export default function BiometricImageCarouselView({
   images,
   isLoading,
   type,
+  caseId,
   selectedId,
   onSelect,
+  onUploadSuccess,
 }: BiometricImageCarouselViewProps) {
   const { t } = useTranslation()
 
   if (!isLoading && images.length === 0) {
-    return <BiometricImageEmptyPlaceholder type={type} />
+    return <BiometricImageEmptyPlaceholder type={type} caseId={caseId} onUploadSuccess={onUploadSuccess} />
   }
 
   return (
     <div className="outline-muted flex w-full items-center gap-2 rounded-lg bg-white p-2">
-      <BiometricImageImportButton />
+      <BiometricImageImportButton type={type} caseId={caseId} onUploadSuccess={onUploadSuccess} />
 
       {isLoading ? (
         <BiometricImageCarouselSkeleton />
@@ -56,8 +60,10 @@ export default function BiometricImageCarouselView({
                 <CarouselItem key={image.id} className="basis-auto pl-0">
                   <BiometricImageThumbnail
                     image={image}
+                    type={type}
+                    caseId={caseId}
                     isSelected={image.id === selectedId}
-                    onSelect={() => onSelect(image.id)}
+                    onSelect={() => onSelect(image)}
                   />
                 </CarouselItem>
               ))}

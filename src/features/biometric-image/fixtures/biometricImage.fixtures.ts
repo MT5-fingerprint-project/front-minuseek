@@ -1,20 +1,32 @@
 import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
 
-/**
- * Données factices pour valider visuellement le carrousel tant que les endpoints
- * back (`GET /api/traces`, `GET /api/reference-prints`) ne sont pas disponibles.
+/* *  * Données factices pour valider visuellement le carrousel sans appeler l'API
+ * (utilisables dans des tests ou des stories Storybook).
  */
+const baseTimestamp = '2026-06-11T01:44:21.943Z'
+
+const makeFixture = (id: string, fileName: string): BiometricImage => ({
+  id,
+  fileName,
+  url: 'https://placehold.co/73x107',
+  status: 'RECEIVED',
+  score: null,
+  caseId: 'fixture-case-id',
+  createdAt: baseTimestamp,
+  updatedAt: baseTimestamp,
+})
+
 export const biometricImageFixtures: BiometricImage[] = [
-  { id: '1', fileName: 'trace1.png', url: 'https://placehold.co/73x107' },
-  { id: '2', fileName: 'trace2.png', url: 'https://placehold.co/73x107' },
-  { id: '3', fileName: 'trace3.png', url: 'https://placehold.co/73x107' },
-  { id: '4', fileName: 'trace4.png', url: 'https://placehold.co/73x107' },
-  { id: '5', fileName: 'trace5.png', url: 'https://placehold.co/73x107' },
-  { id: '6', fileName: 'trace6.png', url: 'https://placehold.co/73x107' },
-  { id: '7', fileName: 'trace7.png', url: 'https://placehold.co/73x107' },
-  { id: '8', fileName: 'trace8.png', url: 'https://placehold.co/73x107' },
-  { id: '9', fileName: 'trace_scene_de_crime_appartement_3eme_etage_2026.png', url: 'https://placehold.co/73x107' },
-  { id: '10', fileName: 'trace6.png', url: 'https://placehold.co/73x107' },
-  { id: '11', fileName: 'trace7.png', url: 'https://placehold.co/73x107' },
-  { id: '12', fileName: 'trace8.png', url: 'https://placehold.co/73x107' },
+  makeFixture('1', 'trace1.png'),
+  makeFixture('2', 'trace2.png'),
+  makeFixture('3', 'trace3.png'),
+  makeFixture('4', 'trace4.png'),
+  makeFixture('5', 'trace5.png'),
+  makeFixture('6', 'trace6.png'),
+  makeFixture('7', 'trace7.png'),
+  makeFixture('8', 'trace8.png'),
+  makeFixture('9', 'trace_scene_de_crime_appartement_3eme_etage_2026.png'),
+  makeFixture('10', 'trace6.png'),
+  makeFixture('11', 'trace7.png'),
+  makeFixture('12', 'trace8.png'),
 ]

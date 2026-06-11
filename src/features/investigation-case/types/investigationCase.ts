@@ -14,10 +14,6 @@ export interface InvestigationCase {
   updatedAt: Date
 }
 
-export interface ListInvestigationCasesResponse {
-  data: InvestigationCase[]
-}
-
 export const investigationCaseSchema = z.object({
   id: z.string(),
   description: z.string().optional(),
@@ -25,11 +21,11 @@ export const investigationCaseSchema = z.object({
   pvNumber: z.string().min(1),
   status: investigationCaseStatusSchema,
   createdAt: z.date(),
-  updatedAt: z.date()
+  updatedAt: z.date(),
 })
 
 export const listInvestigationCasesResponseSchema = z.object({
-  data: z.array(investigationCaseSchema)
+  data: z.array(investigationCaseSchema),
 })
 
 export const investigationCaseCreateSchema = z.object({
