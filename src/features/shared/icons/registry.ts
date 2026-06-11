@@ -48,6 +48,7 @@ import Show from './show.svg?react'
 import ShowOff from './show-off.svg?react'
 import SidebarFill from './sidebar-fill.svg?react'
 import SidebarOutline from './sidebar-outline.svg?react'
+import Target from './target.svg?react'
 import TextOutline from './text-outline.svg?react'
 import Trace from './trace.svg?react'
 import Undo from './undo.svg?react'
@@ -109,6 +110,7 @@ export const icons = {
   sidebarFill: SidebarFill,
   sidebarOutline: SidebarOutline,
   textOutline: TextOutline,
+  target: Target,
   trace: Trace,
   undo: Undo,
   verified: Verified,
