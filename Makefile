@@ -1,11 +1,18 @@
 COMPOSE = docker compose -f compose.yaml
 NETWORK = minuseek
 
-.PHONY: network dev dev-build down logs lint build
+## Fix pour Windows
+ifeq ($(OS),Windows_NT)
+  NULL_DEV = NUL
+else
+  NULL_DEV = /dev/null
+endif
+
+.PHONY: network dev dev-build down logs lint build-pnpm
 
 ## Crée le réseau Docker partagé avec le back s'il n'existe pas (idempotent)
 network:
-	@docker network inspect $(NETWORK) >/dev/null 2>&1 || docker network create $(NETWORK)
+	@docker network inspect $(NETWORK) >$(NULL_DEV) 2>&1 || docker network create $(NETWORK)
 
 ## Lance le front en mode dev avec hot-reload (Vite)
 dev: network
@@ -22,7 +29,7 @@ down:
 ## Affiche les logs du front en temps réel
 logs:
 	$(COMPOSE) logs -f
-
+	
 ## Lance le linter (ESLint) dans le conteneur
 lint:
 	$(COMPOSE) run --rm dev pnpm lint

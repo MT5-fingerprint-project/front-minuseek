@@ -19,6 +19,10 @@ export default defineConfig(({ mode }) => {
           target: env.API_PROXY_TARGET,
           changeOrigin: true,
         },
+        '/media': {
+          target: env.API_PROXY_TARGET,
+          changeOrigin: true,
+        },
       },
     },
     resolve: {

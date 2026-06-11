@@ -1,21 +1,54 @@
+import { useRef, type ChangeEvent } from 'react'
 import { ImageUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import type { BiometricImageType } from '@/features/biometric-image/types/biometricImage'
+import { useUploadBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
+import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
 
 type BiometricImageEmptyPlaceholderProps = {
   type: BiometricImageType
+  caseId: string
+  onUploadSuccess?: (image: BiometricImage) => void
 }
 
-export default function BiometricImageEmptyPlaceholder({ type }: BiometricImageEmptyPlaceholderProps) {
+export default function BiometricImageEmptyPlaceholder({
+  type,
+  caseId,
+  onUploadSuccess,
+}: BiometricImageEmptyPlaceholderProps) {
   const { t } = useTranslation()
+  const inputRef = useRef<HTMLInputElement>(null)
+  const upload = useUploadBiometricImage(type, { onSuccess: onUploadSuccess })
   const label = type === 'traces' ? t('biometricImage.import.traces') : t('biometricImage.import.referencePrints')
 
+  const handleFileSelected = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    upload.mutate({ caseId, file })
+  }
+
   return (
-    <div className="outline-muted flex w-full items-center justify-center rounded-lg bg-white p-2">
-      <div className="flex min-h-[107px] items-center justify-center gap-2">
-        <ImageUp className="size-6 text-[var(--ms-blue-medium)]" />
-        <span className="text-base text-[var(--ms-blue-medium)]">{label}</span>
-      </div>
-    </div>
+    <>
+      <button
+        type="button"
+        disabled={upload.isPending}
+        onClick={() => inputRef.current?.click()}
+        className="outline-muted flex w-full items-center justify-center rounded-lg bg-white p-2 transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        <div className="flex min-h-[107px] items-center justify-center gap-2">
+          <ImageUp className="size-6 text-[var(--ms-blue-medium)]" />
+          <span className="text-base text-[var(--ms-blue-medium)]">
+            {upload.isPending ? t('biometricImage.import.uploading') : label}
+          </span>
+        </div>
+      </button>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileSelected}
+      />
+    </>
   )
 }
