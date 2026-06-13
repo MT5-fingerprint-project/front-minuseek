@@ -6,6 +6,7 @@ import CanvasToolbar from '@/features/biometric-image/components/toolbar/CanvasT
 import DemoLayersPanel from '@/features/biometric-image/components/layers/DemoLayersPanel'
 import { useCanvasView, type CanvasZoomHandle } from '@/features/biometric-image/components/canvas/useCanvasView'
 import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
+import { useCanvasFilters } from '@/features/biometric-image/hooks/useCanvasFilters'
 
 export type { CanvasZoomHandle }
 
@@ -31,6 +32,7 @@ export default function BiometricImageCanvas({
   const containerRef = useRef<HTMLDivElement>(null)
   const size = useContainerSize(containerRef)
   const { view, handleWheel, recenterSignal } = useCanvasView({ size, zoomHandleRef, onScaleChange })
+  const { sliderValues, effectiveFilters, handleFilterChange } = useCanvasFilters(image?.id)
 
   return (
     <div ref={containerRef} className="relative h-full w-full overflow-hidden">
@@ -46,17 +48,22 @@ export default function BiometricImageCanvas({
             onWheel={handleWheel}
           >
             <Layer>
-              <DraggableImage key={`${image.url}-${recenterSignal}`} url={image.url} stageSize={size} />
+              <DraggableImage
+                key={`${image.url}-${recenterSignal}`}
+                url={image.url}
+                stageSize={size}
+                filters={effectiveFilters}
+              />
             </Layer>
           </Stage>
           {toolbarVisible && (
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2">
-              <CanvasToolbar />
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
+              <CanvasToolbar filters={sliderValues} onFiltersChange={handleFilterChange} />
             </div>
           )}
           {layersVisible && onCloseLayers && (
             <div className="absolute inset-y-0 right-0">
-              <DemoLayersPanel key={image.url} imageUrl={image.url} onClose={onCloseLayers} />
+              <DemoLayersPanel fingerprintId={image.id} onClose={onCloseLayers} />
             </div>
           )}
         </>

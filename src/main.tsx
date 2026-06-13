@@ -30,7 +30,7 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
       <Toaster richColors position="top-right" />
-      <ReactQueryDevtools initialIsOpen={false} />
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left"  />
     </QueryClientProvider>
   </StrictMode>
 )
