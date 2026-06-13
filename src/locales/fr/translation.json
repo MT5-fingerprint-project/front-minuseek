@@ -109,7 +109,11 @@
     },
     "layers": {
       "title": "Calques",
-      "close": "Fermer le panneau des calques"
+      "close": "Fermer le panneau des calques",
+      "empty": "Aucun calque pour cette image",
+      "createError": "Impossible de créer le calque",
+      "updateError": "Impossible de mettre à jour le calque",
+      "deleteError": "Impossible de supprimer le calque"
     },
     "toolbar": {
       "modes": {

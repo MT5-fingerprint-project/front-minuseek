@@ -6,10 +6,11 @@ import LayerItem from '@/features/biometric-image/components/layers/LayerItem'
 type LayersPanelProps = {
   layers: Layer[]
   onToggleVisibility: (id: string) => void
+  onDelete: (id: string) => void
   onClose: () => void
 }
 
-export default function LayersPanel({ layers, onToggleVisibility, onClose }: LayersPanelProps) {
+export default function LayersPanel({ layers, onToggleVisibility, onDelete, onClose }: LayersPanelProps) {
   const { t } = useTranslation()
 
   return (
@@ -26,8 +27,11 @@ export default function LayersPanel({ layers, onToggleVisibility, onClose }: Lay
         </button>
       </div>
       <div className="flex-1 overflow-y-auto">
+        {!layers.length && (
+          <p className="p-3 text-xs text-muted-foreground">{t('biometricImage.layers.empty')}</p>
+        )}
         {layers.map((layer) => (
-          <LayerItem key={layer.id} layer={layer} onToggleVisibility={onToggleVisibility} />
+          <LayerItem key={layer.id} layer={layer} onToggleVisibility={onToggleVisibility} onDelete={onDelete} />
         ))}
       </div>
     </div>

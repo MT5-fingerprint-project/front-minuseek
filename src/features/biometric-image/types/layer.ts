@@ -1,10 +1,27 @@
-export type LayerKind = 'annotation' | 'adjustment'
+export type LayerType = 'ANNOTATION' | 'FILTER'
 
 export interface Layer {
   id: string
-  kind: LayerKind
+  fingerprintId: string
   name: string
-  /** Thumbnail preview of the layer content */
-  thumbnailUrl: string
-  visible: boolean
+  type: LayerType
+  zIndex: number
+  isVisible: boolean
+  settings: Record<string, unknown>
+}
+
+export type CreateLayerInput = {
+  id?: string
+  fingerprintId: string
+  name: string
+  type: LayerType
+  zIndex: number
+  settings: Record<string, unknown>
+}
+
+export type UpdateLayerInput = {
+  name?: string
+  zIndex?: number
+  isVisible?: boolean
+  settings?: Record<string, unknown>
 }
