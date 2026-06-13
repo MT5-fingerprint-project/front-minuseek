@@ -3,7 +3,7 @@ import { Stage, Layer } from 'react-konva'
 import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
 import DraggableImage from '@/features/biometric-image/components/canvas/DraggableImage'
 import CanvasToolbar from '@/features/biometric-image/components/toolbar/CanvasToolbar'
-import DemoLayersPanel from '@/features/biometric-image/components/layers/DemoLayersPanel'
+import LayersPanelContainer from '@/features/biometric-image/components/layers/LayersPanelContainer'
 import { useCanvasView, type CanvasZoomHandle } from '@/features/biometric-image/components/canvas/useCanvasView'
 import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
 import { useCanvasFilters } from '@/features/biometric-image/hooks/useCanvasFilters'
@@ -63,7 +63,7 @@ export default function BiometricImageCanvas({
           )}
           {layersVisible && onCloseLayers && (
             <div className="absolute inset-y-0 right-0">
-              <DemoLayersPanel fingerprintId={image.id} onClose={onCloseLayers} />
+              <LayersPanelContainer fingerprintId={image.id} onClose={onCloseLayers} />
             </div>
           )}
         </>
