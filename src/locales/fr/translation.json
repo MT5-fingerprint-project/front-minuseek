@@ -7,7 +7,15 @@
       "generic": "Une erreur est survenue",
       "loadFailed": "Impossible de charger les données"
     },
-    "loading": "Chargement…"
+    "loading": "Chargement…",
+    "window": {
+      "reduce": "Réduire la fenêtre",
+      "expand": "Agrandir la fenêtre",
+      "showFiles": "Afficher l'import",
+      "hideFiles": "Masquer l'import",
+      "showLayers": "Afficher les calques",
+      "hideLayers": "Masquer les calques"
+    }
   },
   "navigation": {
     "myCases": "Mes affaires",
@@ -43,6 +51,10 @@
     },
     "comparison": {
       "title": "Comparaison - Affaire N°{{id}}",
+      "tracesWindow": "Traces",
+      "tracesWindowWithFile": "Traces - {{fileName}}",
+      "referencePrintsWindow": "Empreintes",
+      "referencePrintsWindowWithFile": "Empreintes - {{fileName}}",
       "selectTrace": "Sélectionnez une trace dans le carousel pour l'afficher ici",
       "selectReferencePrint": "Sélectionnez une empreinte de référence pour l'afficher ici"
     },
@@ -89,6 +101,33 @@
     "upload": {
       "success": "Image importée avec succès",
       "error": "L'import a échoué"
+    },
+    "zoom": {
+      "in": "Zoomer",
+      "out": "Dézoomer",
+      "recenter": "Recentrer l'image"
+    },
+    "layers": {
+      "title": "Calques",
+      "close": "Fermer le panneau des calques"
+    },
+    "toolbar": {
+      "modes": {
+        "image": "Édition",
+        "annotation": "Annotations"
+      },
+      "tools": {
+        "mirror": "Miroir",
+        "rotation": "Rotation",
+        "luminosity": "Luminosité",
+        "contrast": "Contraste",
+        "invertColors": "Inversion chromatique",
+        "saturation": "Saturation",
+        "palette": "Palette de couleurs",
+        "point": "Point",
+        "pointArrow": "Point & flèche",
+        "pencil": "Crayon"
+      }
     },
     "delete": {
       "success": "Image supprimée",

@@ -1,6 +1,6 @@
 import { useBiometricImages } from '@/features/biometric-image/hooks/useBiometricImages'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
-import BiometricImageCarouselView from '@/features/biometric-image/components/BiometricImageCarouselView'
+import BiometricImageCarouselView from '@/features/biometric-image/components/carousel/BiometricImageCarouselView'
 
 type BiometricImageCarouselProps = {
   type: BiometricImageType

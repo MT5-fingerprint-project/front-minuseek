@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { ImageUp } from 'lucide-react'
+import { Icon } from '@/features/shared/icons'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/features/shared/ui/button'
 import { useUploadBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
@@ -20,11 +20,10 @@ export default function BiometricImageImportButton({
   const inputRef = useRef<HTMLInputElement>(null)
   const upload = useUploadBiometricImage(type, { onSuccess: onUploadSuccess })
 
-  const handleFileSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
+  const handleFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? [])
     event.target.value = ''
-    if (!file) return
-    upload.mutate({ caseId, file })
+    for (const file of files) await upload.mutateAsync({ caseId, file })
   }
 
   return (
@@ -34,9 +33,9 @@ export default function BiometricImageImportButton({
         type="button"
         disabled={upload.isPending}
         onClick={() => inputRef.current?.click()}
-        className="shrink-0 gap-2 text-base text-[var(--ms-blue-medium)]"
+        className="shrink-0 gap-2 text-base text-blue-medium-1"
       >
-        <ImageUp className="size-5" />
+        <Icon name="importPlus" size={20} color="currentColor" />
         {upload.isPending ? t('biometricImage.import.uploading') : t('biometricImage.import.button')}
       </Button>
       <input
@@ -44,6 +43,7 @@ export default function BiometricImageImportButton({
         type="file"
         accept="image/*"
         className="hidden"
+        multiple
         onChange={handleFileSelected}
       />
     </>

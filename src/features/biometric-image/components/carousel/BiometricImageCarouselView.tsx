@@ -1,16 +1,10 @@
 import { useTranslation } from 'react-i18next'
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/features/shared/ui/carousel'
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/features/shared/ui/carousel'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
-import BiometricImageThumbnail from '@/features/biometric-image/components/BiometricImageThumbnail'
-import BiometricImageImportButton from '@/features/biometric-image/components/BiometricImageImportButton'
-import BiometricImageEmptyPlaceholder from '@/features/biometric-image/components/BiometricImageEmptyPlaceholder'
-import BiometricImageCarouselSkeleton from '@/features/biometric-image/components/BiometricImageCarouselSkeleton'
+import BiometricImageThumbnail from '@/features/biometric-image/components/carousel/BiometricImageThumbnail'
+import BiometricImageImportButton from '@/features/biometric-image/components/carousel/BiometricImageImportButton'
+import BiometricImageEmptyPlaceholder from '@/features/biometric-image/components/carousel/BiometricImageEmptyPlaceholder'
+import BiometricImageCarouselSkeleton from '@/features/biometric-image/components/carousel/BiometricImageCarouselSkeleton'
 
 type BiometricImageCarouselViewProps = {
   images: BiometricImage[]
@@ -50,7 +44,7 @@ export default function BiometricImageCarouselView({
         >
           <CarouselPrevious
             variant="ghost"
-            className="static shrink-0 translate-y-0 text-[var(--ms-blue-medium)]"
+            className="static shrink-0 translate-y-0 text-blue-medium-1"
             aria-label={t('biometricImage.nav.previous')}
           />
 
@@ -72,7 +66,7 @@ export default function BiometricImageCarouselView({
 
           <CarouselNext
             variant="ghost"
-            className="static shrink-0 translate-y-0 text-[var(--ms-blue-medium)]"
+            className="static shrink-0 translate-y-0 text-blue-medium-1"
             aria-label={t('biometricImage.nav.next')}
           />
         </Carousel>

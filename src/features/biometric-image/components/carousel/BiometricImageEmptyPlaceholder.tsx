@@ -36,8 +36,8 @@ export default function BiometricImageEmptyPlaceholder({
         className="outline-muted flex w-full items-center justify-center rounded-lg bg-white p-2 transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
       >
         <div className="flex min-h-[107px] items-center justify-center gap-2">
-          <ImageUp className="size-6 text-[var(--ms-blue-medium)]" />
-          <span className="text-base text-[var(--ms-blue-medium)]">
+          <ImageUp className="size-6 text-blue-medium-1" />
+          <span className="text-base text-blue-medium-1">
             {upload.isPending ? t('biometricImage.import.uploading') : label}
           </span>
         </div>

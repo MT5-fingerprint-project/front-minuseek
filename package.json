@@ -29,6 +29,7 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-i18next": "^17.0.8",
+    "react-konva": "^19.2.5",
     "react-resizable-panels": "^4.11.1",
     "react-router-dom": "^7.15.1",
     "shadcn": "^4.7.0",

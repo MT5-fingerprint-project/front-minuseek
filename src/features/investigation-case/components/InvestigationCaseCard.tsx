@@ -12,7 +12,7 @@ export default function InvestigationCaseCard({ investigationCase }: { investiga
   return (
     <Link to={`/affaires/${investigationCase.id}`} className="min-h-44">
       <Card key={investigationCase.id} className="h-full">
-        <CardHeader>
+        <CardHeader className="justify-items-start">
           <CaseStatusBadge status={investigationCase.status} />
           <CardTitle className="text-lg font-semibold">
             {t('investigationCase.card.title', { caseNumber: investigationCase.caseNumber })}
