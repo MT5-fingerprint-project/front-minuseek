@@ -17,6 +17,8 @@ type Draft =
 
 type AnnotationLayerProps = {
   annotations: Layer[]
+  /** Nombre total de calques (tous types) : base de zIndex pour éviter les collisions. */
+  layerCount: number
   activeTool: AnnotationToolType | null
   activeColor: string
   fingerprintId: string
@@ -33,7 +35,7 @@ function isAnnotationTarget(node: Konva.Node | null): boolean {
   return false
 }
 
-export default function AnnotationLayer({ annotations, activeTool, activeColor, fingerprintId, imageLayout }: AnnotationLayerProps) {
+export default function AnnotationLayer({ annotations, layerCount, activeTool, activeColor, fingerprintId, imageLayout }: AnnotationLayerProps) {
   const { t } = useTranslation()
   const layerRef = useRef<Konva.Layer>(null)
   // Group whose transform mirrors the image: annotation coords live in the image's local frame.
@@ -70,7 +72,7 @@ export default function AnnotationLayer({ annotations, activeTool, activeColor, 
           fingerprintId,
           name: t('biometricImage.toolbar.tools.point'),
           type: 'ANNOTATION',
-          zIndex: annotations.length,
+          zIndex: layerCount,
           settings: { type: 'circle', x: pos.x, y: pos.y, radius: RADIUS, color: activeColor },
         })
       } else if (activeTool === 'circleArrow') {
@@ -105,7 +107,7 @@ export default function AnnotationLayer({ annotations, activeTool, activeColor, 
           fingerprintId,
           name: t('biometricImage.toolbar.tools.pointArrow'),
           type: 'ANNOTATION',
-          zIndex: annotations.length,
+          zIndex: layerCount,
           settings: { type: 'circleArrow', x: d.x, y: d.y, radius: RADIUS, color: activeColor, arrowEndX: d.arrowEndX, arrowEndY: d.arrowEndY },
         })
       } else if (d?.type === 'pencil' && d.points.length >= 4) {
@@ -114,7 +116,7 @@ export default function AnnotationLayer({ annotations, activeTool, activeColor, 
           fingerprintId,
           name: t('biometricImage.toolbar.tools.pencil'),
           type: 'ANNOTATION',
-          zIndex: annotations.length,
+          zIndex: layerCount,
           settings: { type: 'pencil', points: d.points, color: activeColor, strokeWidth: STROKE_WIDTH },
         })
       }
@@ -129,7 +131,7 @@ export default function AnnotationLayer({ annotations, activeTool, activeColor, 
     }
   // createLayer/updateLayer mutate refs are stable; re-bind when tool/color/zIndex base change
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTool, activeColor, fingerprintId, annotations.length])
+  }, [activeTool, activeColor, fingerprintId, layerCount])
 
   const renderShape = (layer: Layer) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

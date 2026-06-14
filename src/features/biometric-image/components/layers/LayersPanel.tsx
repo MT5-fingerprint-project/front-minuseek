@@ -1,5 +1,7 @@
+import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
+import { useClickOutside } from '@/features/shared/hooks/useClickOutside'
 import type { Layer } from '@/features/biometric-image/types/layer'
 import LayerItem from '@/features/biometric-image/components/layers/LayerItem'
 
@@ -12,9 +14,11 @@ type LayersPanelProps = {
 
 export default function LayersPanel({ layers, onToggleVisibility, onDelete, onClose }: LayersPanelProps) {
   const { t } = useTranslation()
+  const panelRef = useRef<HTMLDivElement>(null)
+  useClickOutside(panelRef, onClose, { ignoreSelector: '[data-layers-toggle]' })
 
   return (
-    <div className="flex h-full w-44 flex-col border-l bg-white shadow-lg">
+    <div ref={panelRef} className="flex h-full w-44 flex-col border-l bg-white shadow-lg">
       <div className="flex items-center justify-between border-b px-3 py-2">
         <span className="text-sm font-semibold">{t('biometricImage.layers.title')}</span>
         <button
