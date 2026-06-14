@@ -10,9 +10,10 @@ type LayersPanelProps = {
   onToggleVisibility: (id: string) => void
   onDelete: (id: string) => void
   onClose: () => void
+  onHoverLayer?: (id: string | null) => void
 }
 
-export default function LayersPanel({ layers, onToggleVisibility, onDelete, onClose }: LayersPanelProps) {
+export default function LayersPanel({ layers, onToggleVisibility, onDelete, onClose, onHoverLayer }: LayersPanelProps) {
   const { t } = useTranslation()
   const panelRef = useRef<HTMLDivElement>(null)
   useClickOutside(panelRef, onClose, { ignoreSelector: '[data-layers-toggle]' })
@@ -35,7 +36,7 @@ export default function LayersPanel({ layers, onToggleVisibility, onDelete, onCl
           <p className="p-3 text-xs text-muted-foreground">{t('biometricImage.layers.empty')}</p>
         )}
         {layers.map((layer) => (
-          <LayerItem key={layer.id} layer={layer} onToggleVisibility={onToggleVisibility} onDelete={onDelete} />
+          <LayerItem key={layer.id} layer={layer} onToggleVisibility={onToggleVisibility} onDelete={onDelete} onMouseEnter={(id) => onHoverLayer?.(id)} onMouseLeave={() => onHoverLayer?.(null)} />
         ))}
       </div>
     </div>

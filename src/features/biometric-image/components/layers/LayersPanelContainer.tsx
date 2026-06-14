@@ -4,9 +4,10 @@ import LayersPanel from '@/features/biometric-image/components/layers/LayersPane
 type LayersPanelContainerProps = {
   fingerprintId: string
   onClose: () => void
+  onHoverLayer?: (id: string | null) => void
 }
 
-export default function LayersPanelContainer({ fingerprintId, onClose }: LayersPanelContainerProps) {
+export default function LayersPanelContainer({ fingerprintId, onClose, onHoverLayer }: LayersPanelContainerProps) {
   const { data: layers = [] } = useLayers(fingerprintId)
   const updateLayer = useUpdateLayer(fingerprintId)
   const deleteLayer = useDeleteLayer(fingerprintId)
@@ -23,6 +24,7 @@ export default function LayersPanelContainer({ fingerprintId, onClose }: LayersP
       onToggleVisibility={handleToggleVisibility}
       onDelete={(id) => deleteLayer.mutate(id)}
       onClose={onClose}
+      onHoverLayer={onHoverLayer}
     />
   )
 }

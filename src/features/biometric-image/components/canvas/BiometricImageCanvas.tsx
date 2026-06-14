@@ -39,6 +39,7 @@ export default function BiometricImageCanvas({
   const [activeTool, setActiveTool] = useState<AnnotationToolType | null>(null)
   const [activeColor, setActiveColor] = useState<string>(ANNOTATION_COLORS[0])
   const [imageLayout, setImageLayout] = useState<ImageLayout | null>(null)
+  const [hoveredLayerId, setHoveredLayerId] = useState<string | null>(null)
   const { data: layers = [] } = useLayers(image?.id)
   const annotationLayers = layers.filter((l) => l.type === 'ANNOTATION')
 
@@ -72,6 +73,7 @@ export default function BiometricImageCanvas({
               activeColor={activeColor}
               fingerprintId={image.id}
               imageLayout={imageLayout}
+              hoveredLayerId={hoveredLayerId}
             />
           </Stage>
           {toolbarVisible && (
@@ -88,7 +90,7 @@ export default function BiometricImageCanvas({
           )}
           {layersVisible && onCloseLayers && (
             <div className="absolute inset-y-0 right-0">
-              <LayersPanelContainer fingerprintId={image.id} onClose={onCloseLayers} />
+              <LayersPanelContainer fingerprintId={image.id} onClose={onCloseLayers} onHoverLayer={setHoveredLayerId} />
             </div>
           )}
         </>
