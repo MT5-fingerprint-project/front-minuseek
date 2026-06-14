@@ -8,7 +8,7 @@ else
   NULL_DEV = /dev/null
 endif
 
-.PHONY: network dev dev-build down logs lint build-pnpm
+.PHONY: network dev down logs lint build-pnpm
 
 ## Crée le réseau Docker partagé avec le back s'il n'existe pas (idempotent)
 network:
@@ -16,11 +16,8 @@ network:
 
 ## Lance le front en mode dev avec hot-reload (Vite)
 dev: network
-	$(COMPOSE) up
+	$(COMPOSE) up --build -V
 
-## Rebuild l'image puis lance le front en mode dev
-dev-build: network
-	$(COMPOSE) up --build
 
 ## Arrête le front
 down:
