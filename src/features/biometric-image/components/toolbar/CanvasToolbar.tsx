@@ -150,13 +150,20 @@ export default function CanvasToolbar({
           : tools.map(({ icon, label, ...rest }) => {
               const tool = 'tool' in rest ? (rest.tool as AnnotationToolType) : undefined
               return (
-                <ItemToolbar
-                  key={label}
-                  icon={icon}
-                  label={t(label)}
-                  active={isAnnotationActive(tool)}
-                  onClick={() => handleAnnotationClick(tool)}
-                />
+                <div key={label} className="relative">
+                  <ItemToolbar
+                    icon={icon}
+                    label={t(label)}
+                    active={isAnnotationActive(tool)}
+                    onClick={() => handleAnnotationClick(tool)}
+                  />
+                  {!tool && (
+                    <span
+                      className="pointer-events-none absolute bottom-0.5 right-0.5 h-2.5 w-2.5 rounded-full border border-blue-dark-1"
+                      style={{ backgroundColor: activeColor }}
+                    />
+                  )}
+                </div>
               )
             })}
       </div>

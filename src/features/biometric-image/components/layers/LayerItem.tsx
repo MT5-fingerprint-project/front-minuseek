@@ -7,11 +7,17 @@ type LayerItemProps = {
   layer: Layer
   onToggleVisibility: (id: string) => void
   onDelete: (id: string) => void
+  onMouseEnter?: (id: string) => void
+  onMouseLeave?: () => void
 }
 
-export default function LayerItem({ layer, onToggleVisibility, onDelete }: LayerItemProps) {
+export default function LayerItem({ layer, onToggleVisibility, onDelete, onMouseEnter, onMouseLeave }: LayerItemProps) {
   return (
-    <div className="flex items-center justify-between gap-1 border-b px-3 py-2">
+    <div
+      className="flex items-center justify-between gap-1 border-b px-3 py-2"
+      onMouseEnter={() => onMouseEnter?.(layer.id)}
+      onMouseLeave={() => onMouseLeave?.()}
+    >
       <div className="flex items-center gap-1.5 min-w-0">
         <Icon
           name={(layer.type === 'ANNOTATION' ? 'pen' : (FILTER_META[layer.settings.filterKey as string]?.icon ?? 'layers')) as IconName}
