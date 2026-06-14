@@ -73,9 +73,17 @@ export const IMAGE_TOOLS = [
   { icon: 'invertColors' as IconName, label: 'biometricImage.toolbar.tools.saturation',   filter: { filterKey: 'saturation' } satisfies FilterConfig },
 ]
 
+export type AnnotationToolType = 'circle' | 'circleArrow' | 'pencil'
+
 export const ANNOTATION_TOOLS = [
   { icon: 'palette'    as IconName, label: 'biometricImage.toolbar.tools.palette' },
-  { icon: 'circle'     as IconName, label: 'biometricImage.toolbar.tools.point' },
-  { icon: 'circleLine' as IconName, label: 'biometricImage.toolbar.tools.pointArrow' },
-  { icon: 'penTrace'   as IconName, label: 'biometricImage.toolbar.tools.pencil' },
+  { icon: 'circle'     as IconName, label: 'biometricImage.toolbar.tools.point',      tool: 'circle'      as AnnotationToolType },
+  { icon: 'circleLine' as IconName, label: 'biometricImage.toolbar.tools.pointArrow', tool: 'circleArrow' as AnnotationToolType },
+  { icon: 'penTrace'   as IconName, label: 'biometricImage.toolbar.tools.pencil',     tool: 'pencil'      as AnnotationToolType },
+]
+
+// Palette de couleurs prédéfinies partagée par les outils d'annotation
+export const ANNOTATION_COLORS = [
+  '#ef4444', '#f59e0b', '#22c55e', '#3b82f6',
+  '#a855f7', '#ec4899', '#ffffff', '#000000',
 ]
