@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useLayers, useCreateLayer, useUpdateLayer } from './useLayers'
+import { useLayers, useCreateLayer, useUpdateLayer, useDeleteLayer } from './useLayers'
 import { DEFAULT_FILTERS, FILTER_META, type CanvasFilters } from '../components/toolbar/canvasFilters'
 
 export function useCanvasFilters(fingerprintId: string | undefined) {
@@ -13,6 +13,7 @@ export function useCanvasFilters(fingerprintId: string | undefined) {
   const { data: layers = [] } = useLayers(fingerprintId)
   const createLayer = useCreateLayer(fingerprintId ?? '')
   const updateLayer = useUpdateLayer(fingerprintId ?? '')
+  const deleteLayer = useDeleteLayer(fingerprintId ?? '')
 
   // Restore slider values and layer ids from persisted filter layers on load
   useEffect(() => {
@@ -68,6 +69,15 @@ export function useCanvasFilters(fingerprintId: string | undefined) {
       const settings = { filterKey: changedKey, value }
       const existingId = layerIdByKey.current[changedKey]
 
+      // Valeur revenue au neutre : l'outil n'a plus d'effet, on retire son calque.
+      if (value === 0) {
+        if (existingId) {
+          delete layerIdByKey.current[changedKey]
+          deleteLayer.mutate(existingId)
+        }
+        return
+      }
+
       if (existingId) {
         updateLayer.mutate({ id: existingId, input: { settings } })
       } else {
@@ -79,7 +89,7 @@ export function useCanvasFilters(fingerprintId: string | undefined) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           name: t(FILTER_META[changedKey]?.labelKey as any ?? changedKey),
           type: 'FILTER',
-          zIndex: Object.keys(layerIdByKey.current).length,
+          zIndex: layers.length,
           settings,
         })
       }

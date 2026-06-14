@@ -84,7 +84,8 @@ export default function DraggableImage({ url, stageSize, filters, draggable = tr
   }
   const scaleX = (transformProps.scaleX as number) ?? 1
   const rotation = (transformProps.rotation as number) ?? 0
-  const offsetX = scaleX === -1 ? width : width / 2
+  // Pivot toujours au centre : le miroir (scaleX = -1) se reflète sur place sans décaler l'image.
+  const offsetX = width / 2
   const offsetY = height / 2
   const baseX = position?.x ?? centered.x + width / 2
   const baseY = position?.y ?? centered.y + height / 2

@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useClickOutside } from '@/features/shared/hooks/useClickOutside'
 import ModeButton from './ModeButton'
 import ItemToolbar from './ItemToolbar'
 import FilterPanel from './FilterPanel'
@@ -36,6 +37,13 @@ export default function CanvasToolbar({
   const [openFilter, setOpenFilter] = useState<string | null>(null)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const tools = mode === 'image' ? IMAGE_TOOLS : ANNOTATION_TOOLS
+
+  const rootRef = useRef<HTMLDivElement>(null)
+  const closePanels = useCallback(() => {
+    setOpenFilter(null)
+    setPaletteOpen(false)
+  }, [])
+  useClickOutside(rootRef, closePanels, { enabled: openFilter !== null || paletteOpen })
 
   const switchMode = (next: 'image' | 'annotation') => {
     setMode(next)
@@ -93,7 +101,7 @@ export default function CanvasToolbar({
     tool ? activeTool === tool : paletteOpen
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div ref={rootRef} className="flex flex-col items-center gap-2">
       {activeToolConfig && (
         <FilterPanel filterLabel={t(activeToolConfig.label)}>
           <FilterSlider

@@ -67,6 +67,7 @@ export default function BiometricImageCanvas({
             </Layer>
             <AnnotationLayer
               annotations={annotationLayers}
+              layerCount={layers.length}
               activeTool={activeTool}
               activeColor={activeColor}
               fingerprintId={image.id}

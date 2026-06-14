@@ -41,11 +41,13 @@ export default function WindowTitleBar({
         )}
         {actions ?? <PlaceholderActions />}
         {onToggleLayers && (
-          <WindowActionButton
-            icon={layersVisible ? 'layersOff' : 'layers'}
-            label={t(layersVisible ? 'common.window.hideLayers' : 'common.window.showLayers')}
-            onClick={onToggleLayers}
-          />
+          <span data-layers-toggle>
+            <WindowActionButton
+              icon={layersVisible ? 'layersOff' : 'layers'}
+              label={t(layersVisible ? 'common.window.hideLayers' : 'common.window.showLayers')}
+              onClick={onToggleLayers}
+            />
+          </span>
         )}
       </div>
     </div>
