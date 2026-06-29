@@ -109,6 +109,7 @@ export default function DraggableImage({ url, stageSize, filters, draggable = tr
       offsetX={offsetX}
       offsetY={offsetY}
       draggable={draggable}
+      onDragMove={(e) => setPosition({ x: e.target.x(), y: e.target.y() })}
       onDragEnd={(e) => setPosition({ x: e.target.x(), y: e.target.y() })}
       filters={konvaFilters}
       {...filterProps}
