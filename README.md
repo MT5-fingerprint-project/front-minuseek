@@ -32,6 +32,16 @@ vers `API_PROXY_TARGET` (par défaut `http://app:3000`).
 | `make network`   | Crée le réseau Docker partagé `minuseek` (idempotent)  |
 | `make logs`      | Affiche les logs du front en temps réel                |
 
+## Codegraph (AI agents)
+
+Le projet utilise [codegraph](https://github.com/anthropics/codegraph) comme serveur MCP pour permettre aux agents IA (Claude Code, Antigravity, Cursor…) d'explorer le graphe de dépendances du code (callers, callees, impact analysis…).
+
+La configuration est déjà en place dans [`.mcp.json`](.mcp.json). Pour que ça fonctionne, `codegraph` doit être installé :
+
+```bash
+npm install -g @anthropics/codegraph   # installation globale
+```
+
 ---
 
 ## React + TypeScript + Vite
