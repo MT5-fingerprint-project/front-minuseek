@@ -15,10 +15,8 @@ export default defineConfig(({ mode }) => {
       host: true,
       port: 5173,
       proxy: {
-        '/api': {
-          target: env.API_PROXY_TARGET,
-          changeOrigin: true,
-        },
+        // Seul /media est proxifié : images servies par le back en storage local (pont dev,
+        // supprimé quand la dev passera sur le bucket GCS).
         '/media': {
           target: env.API_PROXY_TARGET,
           changeOrigin: true,
