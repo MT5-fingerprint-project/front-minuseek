@@ -9,10 +9,10 @@ type WindowTitleBarProps = {
   /** Custom action buttons; defaults to placeholder icons for now */
   actions?: ReactNode
   /** When provided, shows an import/importOff toggle as the first action */
-  filesVisible?: boolean
+  isFilesVisible?: boolean
   onToggleFiles?: () => void
   /** When provided, shows a layers toggle as the last action */
-  layersVisible?: boolean
+  isLayersVisible?: boolean
   onToggleLayers?: () => void
 }
 
@@ -20,9 +20,9 @@ export default function WindowTitleBar({
   title,
   icon,
   actions,
-  filesVisible,
+  isFilesVisible,
   onToggleFiles,
-  layersVisible,
+  isLayersVisible,
   onToggleLayers,
 }: WindowTitleBarProps) {
   const { t } = useTranslation()
@@ -34,8 +34,8 @@ export default function WindowTitleBar({
       <div className="ml-auto flex items-center gap-1">
         {onToggleFiles && (
           <WindowActionButton
-            icon={filesVisible ? 'importOff' : 'import'}
-            label={t(filesVisible ? 'common.window.hideFiles' : 'common.window.showFiles')}
+            icon={isFilesVisible ? 'importOff' : 'import'}
+            label={t(isFilesVisible ? 'common.window.hideFiles' : 'common.window.showFiles')}
             onClick={onToggleFiles}
           />
         )}
@@ -43,8 +43,8 @@ export default function WindowTitleBar({
         {onToggleLayers && (
           <span data-layers-toggle>
             <WindowActionButton
-              icon={layersVisible ? 'layersOff' : 'layers'}
-              label={t(layersVisible ? 'common.window.hideLayers' : 'common.window.showLayers')}
+              icon={isLayersVisible ? 'layersOff' : 'layers'}
+              label={t(isLayersVisible ? 'common.window.hideLayers' : 'common.window.showLayers')}
               onClick={onToggleLayers}
             />
           </span>

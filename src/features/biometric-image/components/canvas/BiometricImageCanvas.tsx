@@ -16,8 +16,8 @@ export type { CanvasZoomHandle }
 type BiometricImageCanvasProps = {
   image: BiometricImage | undefined
   placeholder: string
-  toolbarVisible?: boolean
-  layersVisible?: boolean
+  isToolbarVisible?: boolean
+  isLayersVisible?: boolean
   onCloseLayers?: () => void
   zoomHandleRef?: React.RefObject<CanvasZoomHandle | null>
   onScaleChange?: (scale: number) => void
@@ -26,8 +26,8 @@ type BiometricImageCanvasProps = {
 export default function BiometricImageCanvas({
   image,
   placeholder,
-  toolbarVisible = true,
-  layersVisible = false,
+  isToolbarVisible = true,
+  isLayersVisible = false,
   onCloseLayers,
   zoomHandleRef,
   onScaleChange,
@@ -76,7 +76,7 @@ export default function BiometricImageCanvas({
               hoveredLayerId={hoveredLayerId}
             />
           </Stage>
-          {toolbarVisible && (
+          {isToolbarVisible && (
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
               <CanvasToolbar
                 filters={sliderValues}
@@ -88,7 +88,7 @@ export default function BiometricImageCanvas({
               />
             </div>
           )}
-          {layersVisible && onCloseLayers && (
+          {isLayersVisible && onCloseLayers && (
             <div className="absolute inset-y-0 right-0">
               <LayersPanelContainer fingerprintId={image.id} onClose={onCloseLayers} onHoverLayer={setHoveredLayerId} />
             </div>

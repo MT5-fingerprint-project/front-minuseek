@@ -6,14 +6,14 @@ import ZoomControls from '@/features/biometric-image/components/canvas/ZoomContr
 import RecenterButton from '@/features/biometric-image/components/canvas/RecenterControl'
 import type { ComparisonWindowState } from '@/features/investigation-case/hooks/useComparisonWindow'
 
-const COLLAPSED_SIZE = '48px'
-const MIN_PANEL_SIZE = '280px'
+const COLLAPSED_SIZE = '3rem'
+const MIN_PANEL_SIZE = '17.5rem'
 
 type ComparisonWindowProps = {
   side: 'left' | 'right'
   type: 'traces' | 'reference-prints'
   caseId: string
-  active: boolean
+  isActive: boolean
   onActivate: () => void
   window: ComparisonWindowState
 }
@@ -38,18 +38,18 @@ export default function ComparisonWindow({
   side,
   type,
   caseId,
-  active,
+  isActive,
   onActivate,
   window: w,
 }: ComparisonWindowProps) {
   const { t } = useTranslation()
   const keys = TITLES[type]
 
-  const title = w.selected
-    ? t(keys.withFile, { fileName: w.selected.fileName })
+  const title = w.selectedTrace
+    ? t(keys.withFile, { fileName: w.selectedTrace.fileName })
     : t(keys.base)
 
-  const footer = w.selected && (
+  const footer = w.selectedTrace && (
     <div className="flex items-center gap-2">
       {side === 'left' && <RecenterButton onClick={() => w.zoomRef.current?.recenter()} />}
       <ZoomControls
@@ -73,34 +73,34 @@ export default function ComparisonWindow({
       <WorkbenchWindow
         title={title}
         icon={ICON[type]}
-        collapsed={w.collapsed}
+        isCollapsed={w.isCollapsed}
         onToggleCollapse={w.toggle}
         collapseDirection={side === 'left' ? 'left' : 'right'}
-        active={active}
+        isActive={isActive}
         onActivate={onActivate}
-        filesVisible={w.filesVisible}
+        isFilesVisible={w.isFilesVisible}
         onToggleFiles={w.toggleFiles}
-        layersVisible={w.layersVisible}
+        isLayersVisible={w.isLayersVisible}
         onToggleLayers={w.toggleLayers}
         footer={footer}
       >
-        {w.filesVisible && (
+        {w.isFilesVisible && (
           <div className="border-b p-2">
             <BiometricImageCarousel
               type={type}
               caseId={caseId}
-              selectedId={w.selected?.id}
-              onSelect={w.setSelected}
+              selectedId={w.selectedTrace?.id}
+              onSelect={w.setSelectedTrace}
             />
           </div>
         )}
         <div className="min-h-0 flex-1 p-4">
           <div className="h-full overflow-hidden rounded-sm border border-grey-light-2">
             <BiometricImageCanvas
-              image={w.selected}
+              image={w.selectedTrace}
               placeholder={t(`investigationCase.comparison.select${type === 'traces' ? 'Trace' : 'ReferencePrint'}`)}
-              toolbarVisible={active}
-              layersVisible={w.layersVisible}
+              isToolbarVisible={isActive}
+              isLayersVisible={w.isLayersVisible}
               onCloseLayers={w.closeLayersPanel}
               zoomHandleRef={w.zoomRef}
               onScaleChange={w.setScale}
