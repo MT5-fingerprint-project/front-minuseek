@@ -6,8 +6,8 @@ import ZoomControls from '@/features/biometric-image/components/canvas/ZoomContr
 import RecenterButton from '@/features/biometric-image/components/canvas/RecenterControl'
 import type { ComparisonWindowState } from '@/features/investigation-case/hooks/useComparisonWindow'
 
-const COLLAPSED_SIZE = '48px'
-const MIN_PANEL_SIZE = '280px'
+const COLLAPSED_SIZE = '3rem'
+const MIN_PANEL_SIZE = '17.5rem'
 
 type ComparisonWindowProps = {
   side: 'left' | 'right'
