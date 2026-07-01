@@ -20,13 +20,13 @@ export default function CaseLayout() {
       link: `/affaires/${id}`,
       icon: 'information' as const,
       label: t('navigation.informations'),
-      active: !isComparison,
+      isActive: !isComparison,
     },
     {
       link: `/affaires/${id}/comparaison`,
       icon: 'fingerprint' as const,
       label: t('navigation.tracesAndFingerprints'),
-      active: isComparison,
+      isActive: isComparison,
     },
   ]
 
@@ -34,7 +34,7 @@ export default function CaseLayout() {
     <TooltipProvider>
       <div className={cn("flex h-screen w-full overflow-hidden", background)}>
         <Navbar
-          collapsed={isComparison}
+          isCollapsed={isComparison}
           investigationCase={investigationCase}
           items={navItems}
         />

@@ -1,5 +1,6 @@
 import Konva from 'konva'
-import type { FilterFunction } from 'konva/lib/Node'
+import type { Filter } from 'konva/lib/Node'
+import type { ParseKeys } from 'i18next'
 import type { IconName } from '@/features/shared/icons'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -17,7 +18,7 @@ export type FilterConfig = {
 }
 
 export type KonvaFilterDef =
-  | { type: 'filter'; filter: FilterFunction; prop: string; scale: number }
+  | { type: 'filter'; filter: Filter; prop: string; scale: number }
   | { type: 'transform'; prop: string; transform: (v: number) => number }
 
 // ─── Defaults ─────────────────────────────────────────────────────────────────
@@ -64,7 +65,9 @@ export const FILTER_META: Record<string, { labelKey: string; icon: IconName; kon
 
 // ─── Toolbar tool lists ────────────────────────────────────────────────────────
 
-export const IMAGE_TOOLS = [
+type ImageTool = { icon: IconName; label: ParseKeys; filter: FilterConfig }
+
+export const IMAGE_TOOLS: ImageTool[] = [
   { icon: 'mirror'       as IconName, label: 'biometricImage.toolbar.tools.mirror',       filter: { filterKey: 'mirror',    inputType: 'toggle' } satisfies FilterConfig },
   { icon: 'rotate'       as IconName, label: 'biometricImage.toolbar.tools.rotation',     filter: { filterKey: 'rotation',  min: -180, max: 180, unit: '°', origin: 'center' } satisfies FilterConfig },
   { icon: 'compare'      as IconName, label: 'biometricImage.toolbar.tools.invertColors', filter: { filterKey: 'inversion', inputType: 'toggle' } satisfies FilterConfig },
@@ -75,7 +78,9 @@ export const IMAGE_TOOLS = [
 
 export type AnnotationToolType = 'circle' | 'circleArrow' | 'pencil'
 
-export const ANNOTATION_TOOLS = [
+type AnnotationTool = { icon: IconName; label: ParseKeys; tool?: AnnotationToolType }
+
+export const ANNOTATION_TOOLS: AnnotationTool[] = [
   { icon: 'palette'    as IconName, label: 'biometricImage.toolbar.tools.palette' },
   { icon: 'circle'     as IconName, label: 'biometricImage.toolbar.tools.point',      tool: 'circle'      as AnnotationToolType },
   { icon: 'circleLine' as IconName, label: 'biometricImage.toolbar.tools.pointArrow', tool: 'circleArrow' as AnnotationToolType },

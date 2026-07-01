@@ -124,13 +124,13 @@ export default function CanvasToolbar({
           <ModeButton
             icon="image"
             label={t('biometricImage.toolbar.modes.image')}
-            active={mode === 'image'}
+            isActive={mode === 'image'}
             onClick={() => switchMode('image')}
           />
           <ModeButton
             icon="pen"
             label={t('biometricImage.toolbar.modes.annotation')}
-            active={mode === 'annotation'}
+            isActive={mode === 'annotation'}
             onClick={() => switchMode('annotation')}
           />
         </div>
