@@ -1,27 +1,38 @@
 import axios from 'axios'
 import { API_URL } from '@/features/shared/constants/global.constants'
+import { DATA_API_URL } from '@/features/shared/constants/global.constants'
 
-export const apiClient = axios.create({
-  baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-})
 
-apiClient.interceptors.request.use((config) => {
-  const token = localStorage.getItem('accessToken')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
-  }
-  return config
-})
+const createApiClient = (baseURL: string) => {
+  const client = axios.create({
+    baseURL,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
 
-apiClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
-      localStorage.removeItem('accessToken')
+  client.interceptors.request.use((config) => {
+    const token = localStorage.getItem('accessToken')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
     }
-    return Promise.reject(error)
-  }
-)
+    return config
+  })
+  
+  client.interceptors.response.use(
+    (response) => response,
+    (error) => {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        localStorage.removeItem('accessToken')
+      }
+      return Promise.reject(error)
+    }
+  )
+
+  return client
+}
+
+
+
+export const apiClient = createApiClient(API_URL)
+export const dataApiClient = createApiClient(DATA_API_URL)
