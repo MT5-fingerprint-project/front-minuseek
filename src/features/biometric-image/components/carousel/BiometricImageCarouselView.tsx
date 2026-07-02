@@ -14,6 +14,7 @@ type BiometricImageCarouselViewProps = {
   selectedId: string | undefined
   onSelect: (image: BiometricImage) => void
   onUploadSuccess?: (image: BiometricImage) => void
+  selectedTraceId?: string
 }
 
 export default function BiometricImageCarouselView({
@@ -24,6 +25,7 @@ export default function BiometricImageCarouselView({
   selectedId,
   onSelect,
   onUploadSuccess,
+  selectedTraceId,
 }: BiometricImageCarouselViewProps) {
   const { t } = useTranslation()
 
@@ -58,6 +60,7 @@ export default function BiometricImageCarouselView({
                     caseId={caseId}
                     isSelected={image.id === selectedId}
                     onSelect={() => onSelect(image)}
+                    score={image.matchings.find((m) => m.traceId === selectedTraceId)?.score}
                   />
                 </CarouselItem>
               ))}

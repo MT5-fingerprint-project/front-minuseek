@@ -1,5 +1,8 @@
+import { Sparkle, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { cn } from '@/features/shared/lib/utils'
 import { ResizablePanel } from '@/features/shared/ui/resizable'
+import { Button } from '@/features/shared/ui/button'
 import WorkbenchWindow from '@/features/shared/components/window/WorkbenchWindow'
 import { BiometricImageCarousel, BiometricImageCanvas } from '@/features/biometric-image'
 import ZoomControls from '@/features/biometric-image/components/canvas/ZoomControls'
@@ -16,6 +19,9 @@ type ComparisonWindowProps = {
   active: boolean
   onActivate: () => void
   window: ComparisonWindowState
+  isComparing?: boolean
+  onAnalyze?: () => void
+  selectedTraceId?: string
 }
 
 const TITLES = {
@@ -41,6 +47,9 @@ export default function ComparisonWindow({
   active,
   onActivate,
   window: w,
+  isComparing,
+  onAnalyze,
+  selectedTraceId,
 }: ComparisonWindowProps) {
   const { t } = useTranslation()
   const keys = TITLES[type]
@@ -51,7 +60,26 @@ export default function ComparisonWindow({
 
   const footer = w.selected && (
     <div className="flex items-center gap-2">
-      {side === 'left' && <RecenterButton onClick={() => w.zoomRef.current?.recenter()} />}
+      {side === 'left' && (
+        <>
+          <RecenterButton onClick={() => w.zoomRef.current?.recenter()} />
+          <Button
+            type="button"
+            variant="outline"
+            size="xs"
+            disabled={isComparing}
+            onClick={onAnalyze}
+            className={cn(
+              'relative overflow-hidden rounded-full border-blue-medium-1/40 text-blue-medium-1 hover:border-blue-medium-1 hover:bg-blue-medium-1 hover:text-white',
+            )}
+          >
+            {isComparing
+              ? <Loader2 size={13} className="animate-spin" />
+              : <Sparkle size={13} />}
+            Analyse IA
+          </Button>
+        </>
+      )}
       <ZoomControls
         scale={w.scale}
         onZoomIn={() => w.zoomRef.current?.zoomIn()}
@@ -91,6 +119,7 @@ export default function ComparisonWindow({
               caseId={caseId}
               selectedId={w.selected?.id}
               onSelect={w.setSelected}
+              selectedTraceId={selectedTraceId}
             />
           </div>
         )}

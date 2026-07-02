@@ -1,6 +1,8 @@
 import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/features/shared/lib/utils'
+import { MATCH_THRESHOLD } from '@/features/shared/constants/global.constants'
+import { Badge } from '@/features/shared/ui/badge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/features/shared/ui/tooltip'
 import {
   AlertDialog,
@@ -22,6 +24,7 @@ type BiometricImageThumbnailProps = {
   caseId: string
   isSelected: boolean
   onSelect: () => void
+  score?: number
 }
 
 export default function BiometricImageThumbnail({
@@ -30,6 +33,7 @@ export default function BiometricImageThumbnail({
   caseId,
   isSelected,
   onSelect,
+  score,
 }: BiometricImageThumbnailProps) {
   const { t } = useTranslation()
   const deleteImage = useDeleteBiometricImage(type, caseId)
@@ -53,6 +57,18 @@ export default function BiometricImageThumbnail({
             decoding="async"
             className="block h-full w-full object-cover"
           />
+          {score !== undefined && (
+            <Badge
+              className={cn(
+                'absolute top-1 left-1 tabular-nums',
+                score >= MATCH_THRESHOLD
+                  ? 'bg-green-medium/90 text-white hover:bg-green-medium/90'
+                  : 'bg-black/55 text-white/90 hover:bg-black/55',
+              )}
+            >
+              {Math.round(score)}
+            </Badge>
+          )}
           <span className="absolute inset-x-0 bottom-0 truncate bg-[rgba(9,16,41,0.7)] px-0.5 py-0.5 text-center text-xs font-light text-white">
             {image.fileName}
           </span>

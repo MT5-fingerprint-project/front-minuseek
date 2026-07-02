@@ -2,6 +2,12 @@ export type BiometricImageType = 'traces' | 'reference-prints'
 
 export type BiometricImageStatus = 'RECEIVED' | 'PROCESSING' | 'PROCESSED' | 'FAILED'
 
+export interface MatchingScore {
+  traceId: string
+  score: number
+  match: boolean
+}
+
 export interface BiometricImage {
   id: string
   fileName: string
@@ -11,6 +17,7 @@ export interface BiometricImage {
   caseId: string
   createdAt: string
   updatedAt: string
+  matchings: MatchingScore[]
 }
 
 export interface BiometricImageDto {
@@ -21,4 +28,5 @@ export interface BiometricImageDto {
   caseId: string
   createdAt: string
   updatedAt: string
+  matchings: MatchingScore[]
 }
