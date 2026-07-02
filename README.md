@@ -32,7 +32,40 @@ vers `API_PROXY_TARGET` (par défaut `http://app:3000`).
 | `make network`   | Crée le réseau Docker partagé `minuseek` (idempotent)  |
 | `make logs`      | Affiche les logs du front en temps réel                |
 
----
+## AI agents
+
+### Ce que ça apporte
+
+- **`AGENTS.md`** — conventions du repo (+ section « Directives agents » DO/DON'T) ; **`CLAUDE.md`** = `@AGENTS.md`.
+- **`.agents/skills/`** — skills maison versionnés (review pré-PR, best practices, patterns Konva, etc.), exposés à Claude via le lien symbolique `.claude/skills` et lus nativement par Codex/antigravity.
+- **`.agents/rules/`** — règles pour Antigravity (lien symbolique vers `AGENTS.md`).
+- **`.mcp.json`** — serveur MCP **codegraph** pour le repo, n'hésitez pas à mettre d'autres mcp utiles.
+- **`RTK.md`** — règle d'usage de **rtk** (proxy CLI qui économise les tokens).
+- **`docs/adr/`** — gabarit d'ADR : on consigne les décisions structurantes.
+
+### À faire par chaque dev (une fois par poste)
+
+```bash
+brew install codegraph rtk        # les 2 binaires requis
+rtk init -g                       # hook d'auto-réécriture (économie de tokens) — recommandé mais pas obligatoire
+```
+
+- **Claude Code** : approuver le serveur MCP `codegraph` au 1er lancement (prompt automatique sur `.mcp.json`).
+- **Codex** : ajouter une fois `[mcp_servers.codegraph]\ncommand = "codegraph"\nargs = ["serve","--mcp"]` dans `~/.codex/config.toml`.
+- **Windows uniquement** : si les liens symboliques apparaissent comme des fichiers texte → `git config core.symlinks true` puis re-checkout.
+
+> Au clone, les symlinks et les skills sont restaurés automatiquement : à part les 2 binaires ci-dessus, rien à faire.
+
+### Skills IA (`.agents/skills/`)
+
+Les **skills** sont des instructions spécialisées que l'agent IA charge automatiquement selon le contexte de votre demande. Vous n'avez **rien à activer manuellement** : l'agent détecte les mots-clés dans votre prompt et charge le skill adapté. Vous pouvez aussi les invoquer explicitement en mentionnant leur nom.
+
+| Skill | Quand ça se déclenche | Exemple de prompt |
+|-------|----------------------|-------------------|
+| `front-review` | Review de code / PR / diff front, avant un merge sur `main`, audit i18n, React Query, accessibilité, sécurité front | *« Réalise une review complète de ma branche »* |
+| `frontend-best-practices` | Écriture ou refactoring de code React/TS, séparation UI/logique, extraction de hooks, placement dans `features/` | *« refactore ce composant, il fait trop de choses »* |
+| `konva-patterns` | Travail sur le comparateur d'empreintes, canvas Konva, zoom/pan, annotations, filtres image, performance canvas | *« améliore les perfs du canvas de comparaison »* |
+| `product-brainstorming` | Brainstorming produit, exploration de problème | *« brainstorm avec moi sur cette feature »* |
 
 ## React + TypeScript + Vite
 

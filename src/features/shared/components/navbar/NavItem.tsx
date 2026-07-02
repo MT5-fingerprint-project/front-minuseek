@@ -7,19 +7,19 @@ type NavItemProps = {
   link: string
   icon: IconName
   label: string
-  active?: boolean
-  collapsed?: boolean
+  isActive?: boolean
+  isCollapsed?: boolean
 }
 
-export default function NavItem({ link, icon, label, active = false, collapsed = false }: NavItemProps) {
-  if (collapsed) {
+export default function NavItem({ link, icon, label, isActive = false, isCollapsed = false }: NavItemProps) {
+  if (isCollapsed) {
     return (
       <Link
         to={link}
         title={label}
         className={cn(
           'flex items-center justify-center w-9 h-9 rounded-md transition-colors',
-          active ? 'bg-blue-medium-2' : 'hover:bg-white/10',
+          isActive ? 'bg-blue-medium-2' : 'hover:bg-white/10',
         )}
       >
         <Icon name={icon} size={20} color="white" />
@@ -32,7 +32,7 @@ export default function NavItem({ link, icon, label, active = false, collapsed =
       to={link}
       className={cn(
         'flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors',
-        active ? 'bg-blue-medium-2 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white',
+        isActive ? 'bg-blue-medium-2 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white',
       )}
     >
       <Icon name={icon} size={18} color="white" />

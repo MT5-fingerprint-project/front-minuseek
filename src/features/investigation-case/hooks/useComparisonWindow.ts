@@ -9,11 +9,11 @@ export function useComparisonWindow() {
   const panelRef = usePanelRef()
   const zoomRef = useRef<CanvasZoomHandle>(null)
 
-  const [collapsed, setCollapsed] = useState(false)
-  const [filesVisible, setFilesVisible] = useState(true)
-  const [layersVisible, setLayersVisible] = useState(false)
+  const [isCollapsed, setCollapsed] = useState(false)
+  const [isFilesVisible, setFilesVisible] = useState(true)
+  const [isLayersVisible, setLayersVisible] = useState(false)
   const [scale, setScale] = useState(1)
-  const [selected, setSelected] = useState<BiometricImage>()
+  const [selectedTrace, setSelectedTrace] = useState<BiometricImage>()
 
   const toggle = () => {
     const panel = panelRef.current
@@ -27,17 +27,17 @@ export function useComparisonWindow() {
   return {
     panelRef,
     zoomRef,
-    collapsed,
+    isCollapsed,
     syncCollapsed,
-    filesVisible,
+    isFilesVisible,
     toggleFiles: () => setFilesVisible((v) => !v),
-    layersVisible,
+    isLayersVisible,
     toggleLayers: () => setLayersVisible((v) => !v),
     closeLayersPanel: () => setLayersVisible(false),
     scale,
     setScale,
-    selected,
-    setSelected,
+    selectedTrace,
+    setSelectedTrace,
     toggle,
   }
 }

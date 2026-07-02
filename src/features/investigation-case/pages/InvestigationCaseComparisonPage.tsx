@@ -28,7 +28,7 @@ export default function InvestigationCaseComparisonPage() {
         side="left"
         type="traces"
         caseId={id}
-        active={activeWindow === 'trace'}
+        isActive={activeWindow === 'trace'}
         onActivate={() => setActiveWindow('trace')}
         window={trace}
         isComparing={compare.isPending}
@@ -39,7 +39,7 @@ export default function InvestigationCaseComparisonPage() {
         side="right"
         type="reference-prints"
         caseId={id}
-        active={activeWindow === 'reference'}
+        isActive={activeWindow === 'reference'}
         onActivate={() => setActiveWindow('reference')}
         window={reference}
         selectedTraceId={trace.selected?.id}

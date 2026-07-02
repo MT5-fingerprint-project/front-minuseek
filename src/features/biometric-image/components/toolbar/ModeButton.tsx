@@ -5,18 +5,18 @@ import { cn } from '@/features/shared/lib/utils'
 type ModeButtonProps = {
   icon: IconName
   label: string
-  active: boolean
+  isActive: boolean
   onClick: () => void
 }
 
-export default function ModeButton({ icon, label, active, onClick }: ModeButtonProps) {
+export default function ModeButton({ icon, label, isActive, onClick }: ModeButtonProps) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <button
           type="button"
           onClick={onClick}
-          className={cn('rounded-sm p-1.5 hover:bg-white/15', active && 'bg-blue-dark-1')}
+          className={cn('rounded-sm p-1.5 hover:bg-white/15', isActive && 'bg-blue-dark-1')}
         >
           <Icon name={icon} size={20} color="currentColor" />
         </button>

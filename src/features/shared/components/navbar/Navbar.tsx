@@ -9,15 +9,15 @@ import type { InvestigationCase } from '@/features/investigation-case/types/inve
 type NavItemConfig = ComponentProps<typeof NavItem>
 
 type NavbarProps = {
-  collapsed?: boolean
+  isCollapsed?: boolean
   investigationCase?: InvestigationCase
   items: NavItemConfig[]
 }
 
-export default function Navbar({ collapsed = false, investigationCase, items }: NavbarProps) {
+export default function Navbar({ isCollapsed = false, investigationCase, items }: NavbarProps) {
   const { t } = useTranslation()
 
-  if (collapsed) {
+  if (isCollapsed) {
     return (
       <aside className="flex flex-col items-center gap-4 bg-blue-dark-1 text-white w-14 py-4 shrink-0">
         <Link
@@ -29,7 +29,7 @@ export default function Navbar({ collapsed = false, investigationCase, items }: 
         </Link>
         <div className="w-full border-t border-white/20" />
         {items.map((item) => (
-          <NavItem key={item.link} {...item} collapsed />
+          <NavItem key={item.link} {...item} isCollapsed />
         ))}
       </aside>
     )
