@@ -12,6 +12,7 @@ concurrency: deploy-dev
 env:
   BUCKET: minuseek-front-dev
   VITE_API_URL: https://api-dev.minuseek.fr/api
+  VITE_KEYCLOAK_URL: https://auth-dev.minuseek.fr
 
 jobs:
   deploy:
