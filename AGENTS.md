@@ -45,9 +45,12 @@ cp .env.example .env          # variables d'env (gitignoré)
 make dev                      # crée le réseau Docker partagé + build + up (hot-reload Vite)
 ```
 
-Le front écoute sur `http://localhost:5173`. En dev, les appels partent vers le **chemin relatif `/api`** (valeur par défaut de `VITE_API_URL`) et sont relayés par le **proxy Vite** (`vite.config.ts → server.proxy`) vers `API_PROXY_TARGET` (par défaut `http://app:3000`) — `app` étant le service du back, joignable via le réseau Docker partagé `minuseek` (créé par `make dev`, idempotent). Le proxy couvre `/api` **et** `/media`.
+Le front écoute sur `http://localhost:5173`. **Plus aucun proxy Vite** : les
+appels API partent directement vers l'URL **absolue** `VITE_API_URL` (en dev
+`http://localhost:3000/api`, CORS réel comme en prod), et les images arrivent
+en **URLs signées GCS absolues** fournies par l'API (`dto.url`, back ADR-0003).
 
-> **Aucune URL n'est codée en dur** : tout passe par le `.env` (`VITE_API_URL`, `API_PROXY_TARGET`). `apiClient` lit `VITE_API_URL` via `src/features/shared/constants/global.constants.ts` (`API_URL = import.meta.env.VITE_API_URL`). En prod, `VITE_API_URL` pointe vers l'URL absolue de l'API.
+> **Aucune URL n'est codée en dur** : tout passe par le `.env` (`VITE_API_URL`). `apiClient` lit `VITE_API_URL` via `src/features/shared/constants/global.constants.ts` (`API_URL = import.meta.env.VITE_API_URL`). En prod, `VITE_API_URL` pointe vers l'URL absolue de l'API.
 
 ## Commandes (Makefile, à la racine)
 
@@ -121,10 +124,10 @@ components / pages  →  hooks  →  services  →  apiClient
 
 ## Points d'attention
 
-- **Pas d'URL en dur** : tout via `VITE_API_URL` / `API_PROXY_TARGET` (`.env`). Une URL absolue glissée dans un service est une erreur.
+- **Pas d'URL en dur** : tout via `VITE_API_URL` (`.env`). Une URL absolue glissée dans un service est une erreur.
 - **Ne pas committer `.env`** (gitignoré) ; partir de `.env.example`.
 - **`pnpm-lock.yaml`** doit être commité pour des installs reproductibles (Docker + CI).
-- **Réseau Docker partagé `minuseek`** : `make dev` le crée, mais le back doit aussi tourner pour que le proxy `/api` réponde (sinon erreurs réseau côté front).
+- **Le back doit tourner** (`http://localhost:3000`) pour que les appels API répondent — plus de proxy, le navigateur appelle l'API en direct (CORS : le back autorise `http://localhost:5173` via `ORIGIN`).
 - **`shared/` ne dépend d'aucune feature** : garder cette direction de dépendance pour éviter les cycles.
 - **i18n FR uniquement** : `lng: 'fr'`, `fallbackLng: 'fr'` ; toute nouvelle chaîne va dans `translation.json`.
 

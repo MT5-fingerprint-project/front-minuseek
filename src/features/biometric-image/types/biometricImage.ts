@@ -23,6 +23,7 @@ export interface BiometricImage {
 export interface BiometricImageDto {
   id: string
   path: string
+  url: string
   status: BiometricImageStatus
   score: number | null
   caseId: string

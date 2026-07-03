@@ -19,7 +19,7 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
   return {
     id: dto.id,
     fileName: dto.path.split('/').pop() ?? dto.path,
-    url: `/${dto.path}`,
+    url: dto.url,
     status: dto.status,
     score: dto.score,
     caseId: dto.caseId,
