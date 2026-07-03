@@ -1,16 +1,17 @@
 import type { InvestigationCase } from '@/features/investigation-case/types/investigationCase'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/features/shared/ui/card'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
 import { Icon } from '@/features/shared/icons'
 
 export default function InvestigationCaseCard({ investigationCase }: { investigationCase: InvestigationCase }) {
   const { t, i18n } = useTranslation()
+  const { slug } = useParams<{ slug: string }>()
   const formattedDate = new Date(investigationCase.createdAt).toLocaleDateString(i18n.language)
 
   return (
-    <Link to={`/affaires/${investigationCase.id}`} className="min-h-44">
+    <Link to={`/${slug}/affaires/${investigationCase.id}`} className="min-h-44">
       <Card key={investigationCase.id} className="h-full">
         <CardHeader className="justify-items-start">
           <CaseStatusBadge status={investigationCase.status} />
