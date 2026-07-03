@@ -16,9 +16,9 @@ export default function InvestigationCaseComparisonPage() {
   const compare = useCompare()
 
   const runCompare = useCallback(() => {
-    if (!trace.selected || referencePrints.length === 0 || !id) return
-    compare.mutate({ caseId: id, trace: trace.selected, referencePrints })
-  }, [trace.selected, referencePrints, id])
+    if (!trace.selectedTrace || referencePrints.length === 0 || !id) return
+    compare.mutate({ caseId: id, trace: trace.selectedTrace, referencePrints })
+  }, [trace.selectedTrace, referencePrints, id])
 
   if (!id) return null
 
@@ -42,7 +42,7 @@ export default function InvestigationCaseComparisonPage() {
         isActive={activeWindow === 'reference'}
         onActivate={() => setActiveWindow('reference')}
         window={reference}
-        selectedTraceId={trace.selected?.id}
+        selectedTraceId={trace.selectedTrace?.id}
       />
     </ResizablePanelGroup>
   )

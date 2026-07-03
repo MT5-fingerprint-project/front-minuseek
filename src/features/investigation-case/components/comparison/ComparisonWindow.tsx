@@ -117,8 +117,8 @@ export default function ComparisonWindow({
             <BiometricImageCarousel
               type={type}
               caseId={caseId}
-              selectedId={w.selected?.id}
-              onSelect={w.setSelected}
+              selectedId={w.selectedTrace?.id}
+              onSelect={w.setSelectedTrace}
               selectedTraceId={selectedTraceId}
             />
           </div>
