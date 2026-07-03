@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       proxy: {
         '/data/api': {
-          target: env.DATA_API_PROXY_TARGET,
+          target: env.API_PROXY_TARGET,
           changeOrigin: true,
         },
         '/api': {
