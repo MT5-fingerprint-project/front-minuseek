@@ -3,10 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { AuthContext, type AuthContextValue } from './auth-context'
 import { getKeycloak, setActiveKeycloak } from './keycloak'
 
-// Clé héritée de l'ancien stockage localStorage : purgée au login (le token
-// ne vit désormais qu'en mémoire).
-const LEGACY_TOKEN_KEY = 'accessToken'
-
 type AuthProviderProps = {
   slug: string
   children: ReactNode
@@ -27,7 +23,6 @@ export function AuthProvider({ slug, children }: AuthProviderProps) {
           void keycloak.login()
           return
         }
-        localStorage.removeItem(LEGACY_TOKEN_KEY)
         setActiveKeycloak(keycloak)
         if (isActive) {
           setStatus('authenticated')
