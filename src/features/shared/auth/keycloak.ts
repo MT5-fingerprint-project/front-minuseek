@@ -2,19 +2,17 @@ import Keycloak from 'keycloak-js'
 import { KEYCLOAK_URL } from '@/features/shared/constants/global.constants'
 
 const KEYCLOAK_CLIENT_ID = 'front-minuseek'
+function realmForSlug(slug: string): string {
+  return `minuseek-${slug}`
+}
 
 type KeycloakEntry = {
   keycloak: Keycloak
   initialization: Promise<boolean>
 }
 
-// Une instance par tenant (realm = slug), initialisée une seule fois — le
-// double-montage de StrictMode ne doit jamais rappeler keycloak.init().
 const instancesBySlug = new Map<string, KeycloakEntry>()
 
-// Instance du tenant courant : consommée par apiClient pour obtenir un token
-// frais à chaque requête — le token ne vit qu'en mémoire (jamais en storage,
-// la persistance de session est portée par le cookie HttpOnly de Keycloak).
 let activeKeycloak: Keycloak | null = null
 
 export function setActiveKeycloak(keycloak: Keycloak): void {
@@ -33,7 +31,7 @@ export function getKeycloak(slug: string): KeycloakEntry {
 
   const keycloak = new Keycloak({
     url: KEYCLOAK_URL,
-    realm: slug,
+    realm: realmForSlug(slug),
     clientId: KEYCLOAK_CLIENT_ID,
   })
 
