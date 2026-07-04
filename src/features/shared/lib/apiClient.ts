@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { API_URL } from '@/features/shared/constants/global.constants'
-import { getActiveKeycloak } from '@/features/shared/auth/keycloak'
+import { getActiveKeycloak, getActiveTenantSlug } from '@/features/shared/auth/keycloak'
 
 const TOKEN_MIN_VALIDITY_SECONDS = 30
 
@@ -21,6 +21,11 @@ apiClient.interceptors.request.use(async (config) => {
       await keycloak.login()
     }
     config.headers.Authorization = `Bearer ${keycloak.token}`
+    
+    const tenantSlug = getActiveTenantSlug()
+    if (tenantSlug) {
+      config.headers['X-Tenant-Slug'] = tenantSlug
+    }
   }
   return config
 })

@@ -19,11 +19,10 @@ export function AuthProvider({ slug, children }: AuthProviderProps) {
     initialization
       .then((authenticated) => {
         if (!authenticated) {
-          // login-required redirige déjà ; filet de sécurité si le flux échoue.
           void keycloak.login()
           return
         }
-        setActiveKeycloak(keycloak)
+        setActiveKeycloak(keycloak, slug)
         if (isActive) {
           setStatus('authenticated')
         }

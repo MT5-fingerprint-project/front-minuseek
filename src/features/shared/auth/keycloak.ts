@@ -14,13 +14,19 @@ type KeycloakEntry = {
 const instancesBySlug = new Map<string, KeycloakEntry>()
 
 let activeKeycloak: Keycloak | null = null
+let activeTenantSlug: string | null = null
 
-export function setActiveKeycloak(keycloak: Keycloak): void {
+export function setActiveKeycloak(keycloak: Keycloak, slug: string): void {
   activeKeycloak = keycloak
+  activeTenantSlug = slug
 }
 
 export function getActiveKeycloak(): Keycloak | null {
   return activeKeycloak
+}
+
+export function getActiveTenantSlug(): string | null {
+  return activeTenantSlug
 }
 
 export function getKeycloak(slug: string): KeycloakEntry {
