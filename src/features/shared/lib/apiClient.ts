@@ -1,36 +1,41 @@
 import axios from 'axios'
 import { API_URL } from '@/features/shared/constants/global.constants'
+import { getActiveKeycloak, getActiveTenantSlug } from '@/features/shared/auth/keycloak'
+
+const TOKEN_MIN_VALIDITY_SECONDS = 30
+
+export const apiClient = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
 
 
-const createApiClient = (baseURL: string) => {
-  const client = axios.create({
-    baseURL,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  })
-
-  client.interceptors.request.use((config) => {
-    const token = localStorage.getItem('accessToken')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+apiClient.interceptors.request.use(async (config) => {
+  const keycloak = getActiveKeycloak()
+  if (keycloak?.token) {
+    try {
+      await keycloak.updateToken(TOKEN_MIN_VALIDITY_SECONDS)
+    } catch {
+      await keycloak.login()
     }
-    return config
-  })
-  
-  client.interceptors.response.use(
-    (response) => response,
-    (error) => {
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        localStorage.removeItem('accessToken')
-      }
-      return Promise.reject(error)
+    config.headers.Authorization = `Bearer ${keycloak.token}`
+    
+    const tenantSlug = getActiveTenantSlug()
+    if (tenantSlug) {
+      config.headers['X-Tenant-Slug'] = tenantSlug
     }
-  )
+  }
+  return config
+})
 
-  return client
-}
-
-
-
-export const apiClient = createApiClient(API_URL)
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
+      await getActiveKeycloak()?.login()
+    }
+    return Promise.reject(error)
+  }
+)

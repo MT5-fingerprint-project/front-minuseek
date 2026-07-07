@@ -145,5 +145,14 @@
       "previous": "Voir les images précédentes",
       "next": "Voir les images suivantes"
     }
+  },
+  "auth": {
+    "connecting": "Connexion en cours…",
+    "logout": "Déconnexion",
+    "tenantRequired": {
+      "title": "Organisation requise",
+      "message": "Accédez à l'application via l'adresse de votre organisation."
+    },
+    "error": "Impossible de contacter le service d'authentification."
   }
 }

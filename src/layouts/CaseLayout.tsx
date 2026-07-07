@@ -6,7 +6,7 @@ import { TooltipProvider } from '@/features/shared/ui/tooltip'
 import Navbar from '@/features/shared/components/navbar/Navbar'
 
 export default function CaseLayout() {
-  const { id } = useParams<{ id: string }>()
+  const { slug, id } = useParams<{ slug: string; id: string }>()
   const { pathname } = useLocation()
   const { t } = useTranslation()
   const { data: investigationCase } = useInvestigationCase(id ?? '')
@@ -17,13 +17,13 @@ export default function CaseLayout() {
 
   const navItems = [
     {
-      link: `/affaires/${id}`,
+      link: `/${slug}/affaires/${id}`,
       icon: 'information' as const,
       label: t('navigation.informations'),
       isActive: !isComparison,
     },
     {
-      link: `/affaires/${id}/comparaison`,
+      link: `/${slug}/affaires/${id}/comparaison`,
       icon: 'fingerprint' as const,
       label: t('navigation.tracesAndFingerprints'),
       isActive: isComparison,

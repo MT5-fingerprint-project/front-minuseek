@@ -1,0 +1,49 @@
+# Déploiement continu DEV : chaque merge sur main build le bundle Vite (vars
+# dev bakées) et le synchronise vers le bucket front.
+# Secret requis : GCP_SA_KEY_DEV (clé JSON deploy-ci@dev-minuseek).
+name: deploy-dev
+
+on:
+  push:
+    branches: [main]
+
+concurrency: deploy-dev
+
+env:
+  BUCKET: minuseek-front-dev
+  VITE_API_URL: https://api-dev.minuseek.fr/api
+  VITE_KEYCLOAK_URL: https://auth-dev.minuseek.fr
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY_DEV }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Sync bucket with cache policy
+        run: |
+          gcloud storage rsync --recursive --delete-unmatched-destination-objects \
+            dist "gs://$BUCKET"
+          gcloud storage objects update "gs://$BUCKET/assets/**" \
+            --cache-control="public,max-age=31536000,immutable"
+          gcloud storage objects update "gs://$BUCKET/index.html" \
+            --cache-control="no-cache"
