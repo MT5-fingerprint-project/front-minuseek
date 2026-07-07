@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { API_URL } from '@/features/shared/constants/global.constants'
-import { DATA_API_URL } from '@/features/shared/constants/global.constants'
 
 
 const createApiClient = (baseURL: string) => {
@@ -35,4 +34,3 @@ const createApiClient = (baseURL: string) => {
 
 
 export const apiClient = createApiClient(API_URL)
-export const dataApiClient = createApiClient(DATA_API_URL)

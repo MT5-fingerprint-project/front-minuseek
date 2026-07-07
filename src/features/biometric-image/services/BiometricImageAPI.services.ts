@@ -53,11 +53,14 @@ export const BiometricImageAPI = {
       })
   },
 
-  saveMatchings: (
+  compare: (
     traceId: string,
-    matchings: { referencePrintId: string; score: number; match: boolean }[],
+    input: { caseId: string; referencePrintIds: string[] },
   ) =>
     apiClient
-      .post(`/traces/${traceId}/matchings`, { matchings })
-      .then((res) => res.data),
+      .post<{ matchings: { referencePrintId: string; score: number; match: boolean }[] }>(
+        `/traces/${traceId}/compare`,
+        input,
+      )
+      .then((res) => res.data.matchings),
 }

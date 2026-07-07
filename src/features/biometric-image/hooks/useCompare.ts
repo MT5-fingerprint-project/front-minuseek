@@ -1,11 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { DataAPI } from '@/features/biometric-image/services/DataAPI.services'
 import { BiometricImageAPI } from '@/features/biometric-image/services/BiometricImageAPI.services'
 import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
-import type { DataCompareResult } from '@/features/biometric-image/types/data'
+
+type MatchingResult = { referencePrintId: string; score: number; match: boolean }
 
 type UseCompareOptions = {
-  onSuccess?: (results: DataCompareResult[]) => void
+  onSuccess?: (results: MatchingResult[]) => void
   onError?: () => void
 }
 
@@ -22,28 +22,18 @@ export function useCompare(options?: UseCompareOptions) {
       trace: BiometricImage
       referencePrints: BiometricImage[]
     }) =>
-      DataAPI.compare({
-        case_id: caseId,
-        trace_id: trace.id,
-        reference_print_ids: referencePrints.map((r) => r.id),
+      BiometricImageAPI.compare(trace.id, {
+        caseId,
+        referencePrintIds: referencePrints.map((r) => r.id),
       }),
 
-    onSuccess: async (data, { trace, caseId }) => {
-      await BiometricImageAPI.saveMatchings(
-        trace.id,
-        data.results.map((r) => ({
-          referencePrintId: r.reference_print,
-          score: r.score,
-          match: r.match,
-        })),
-      )
-
+    onSuccess: async (results, { caseId }) => {
       // Invalidate reference-prints so the carousel re-fetches with scores
       await queryClient.invalidateQueries({
         queryKey: ['biometric-images', 'reference-prints', caseId],
       })
 
-      options?.onSuccess?.(data.results)
+      options?.onSuccess?.(results)
     },
     onError: options?.onError,
   })
