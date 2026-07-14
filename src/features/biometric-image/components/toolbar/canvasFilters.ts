@@ -87,8 +87,8 @@ export const ANNOTATION_TOOLS: AnnotationTool[] = [
   { icon: 'penTrace'   as IconName, label: 'biometricImage.toolbar.tools.pencil',     tool: 'pencil'      as AnnotationToolType },
 ]
 
-// Palette de couleurs prédéfinies partagée par les outils d'annotation
+// color palette for annotation tools, always keep Green, Yellow, Red, Orange as the first 4 colors (GYRO standard)
 export const ANNOTATION_COLORS = [
-  '#ef4444', '#f59e0b', '#22c55e', '#3b82f6',
-  '#a855f7', '#ec4899', '#ffffff', '#000000',
+  '#00FF11', '#FFD400', '#FF0000', '#FF8800',
+  '#3b82f6', '#a855f7', '#ffffff', '#000000',
 ]
