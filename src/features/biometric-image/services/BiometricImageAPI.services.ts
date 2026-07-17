@@ -25,6 +25,7 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     caseId: dto.caseId,
     createdAt: dto.createdAt,
     updatedAt: dto.updatedAt,
+    matchings: dto.matchings ?? [],
   }
 }
 
@@ -51,4 +52,15 @@ export const BiometricImageAPI = {
         return mapDtoToBiometricImage(dto)
       })
   },
+
+  compare: (
+    traceId: string,
+    input: { caseId: string; referencePrintIds: string[] },
+  ) =>
+    apiClient
+      .post<{ matchings: { referencePrintId: string; score: number; match: boolean }[] }>(
+        `/traces/${traceId}/compare`,
+        input,
+      )
+      .then((res) => res.data.matchings),
 }

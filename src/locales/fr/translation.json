@@ -56,7 +56,8 @@
       "referencePrintsWindow": "Empreintes",
       "referencePrintsWindowWithFile": "Empreintes - {{fileName}}",
       "selectTrace": "Sélectionnez une trace dans le carousel pour l'afficher ici",
-      "selectReferencePrint": "Sélectionnez une empreinte de référence pour l'afficher ici"
+      "selectReferencePrint": "Sélectionnez une empreinte de référence pour l'afficher ici",
+      "analyzeButton": "Analyse IA"
     },
     "form": {
       "createTitle": "Créer une affaire",
