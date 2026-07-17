@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { ResizableHandle, ResizablePanelGroup } from '@/features/shared/ui/resizable'
 import { useComparisonWindow } from '@/features/investigation-case/hooks/useComparisonWindow'
@@ -15,10 +15,10 @@ export default function InvestigationCaseComparisonPage() {
   const { data: referencePrints = [] } = useBiometricImages('reference-prints', id ?? '')
   const compare = useCompare()
 
-  const runCompare = useCallback(() => {
+  const runCompare = () => {
     if (!trace.selectedTrace || referencePrints.length === 0 || !id) return
     compare.mutate({ caseId: id, trace: trace.selectedTrace, referencePrints })
-  }, [trace.selectedTrace, referencePrints, id])
+  }
 
   if (!id) return null
 

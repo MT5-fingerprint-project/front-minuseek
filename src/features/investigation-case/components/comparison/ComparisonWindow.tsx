@@ -76,7 +76,7 @@ export default function ComparisonWindow({
             {isComparing
               ? <Loader2 size={13} className="animate-spin" />
               : <Sparkle size={13} />}
-            Analyse IA
+            {t('investigationCase.comparison.analyzeButton')}
           </Button>
         </>
       )}

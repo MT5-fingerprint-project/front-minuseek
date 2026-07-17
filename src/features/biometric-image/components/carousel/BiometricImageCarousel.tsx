@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { useBiometricImages } from '@/features/biometric-image/hooks/useBiometricImages'
+import { sortByMatchingScore } from '@/features/biometric-image/lib/matchingScore'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
 import BiometricImageCarouselView from '@/features/biometric-image/components/carousel/BiometricImageCarouselView'
 
@@ -22,11 +23,7 @@ export default function BiometricImageCarousel({
 
   const sortedImages = useMemo(() => {
     if (!selectedTraceId || type !== 'reference-prints') return images
-    return [...images].sort((a, b) => {
-      const scoreA = a.matchings.find((m) => m.traceId === selectedTraceId)?.score ?? -1
-      const scoreB = b.matchings.find((m) => m.traceId === selectedTraceId)?.score ?? -1
-      return scoreB - scoreA
-    })
+    return sortByMatchingScore(images, selectedTraceId)
   }, [images, selectedTraceId, type])
 
   return (
