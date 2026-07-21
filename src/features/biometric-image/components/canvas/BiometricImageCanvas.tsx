@@ -63,6 +63,7 @@ export default function BiometricImageCanvas({
                 stageSize={size}
                 filters={effectiveFilters}
                 draggable={activeTool === null}
+                viewScale={view.scale}
                 onLayoutChange={setImageLayout}
               />
             </Layer>

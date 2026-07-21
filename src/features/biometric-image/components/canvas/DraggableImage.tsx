@@ -38,18 +38,21 @@ type DraggableImageProps = {
   stageSize: { width: number; height: number }
   filters?: CanvasFilters
   draggable?: boolean
+  viewScale?: number
   onLayoutChange?: (layout: ImageLayout) => void
 }
 
-export default function DraggableImage({ url, stageSize, filters, draggable = true, onLayoutChange }: DraggableImageProps) {
+export default function DraggableImage({
+  url,
+  stageSize,
+  filters,
+  draggable = true,
+  viewScale = 1,
+  onLayoutChange,
+}: DraggableImageProps) {
   const image = useImage(url)
   const imageRef = useRef<Konva.Image>(null)
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null)
-
-  useEffect(() => {
-    imageRef.current?.cache()
-    imageRef.current?.getLayer()?.batchDraw()
-  }, [filters])
 
   const activeKeys = Object.keys(filters ?? {}).filter((k) => (filters?.[k] ?? 0) !== 0)
 
@@ -89,6 +92,25 @@ export default function DraggableImage({ url, stageSize, filters, draggable = tr
   const offsetY = height / 2
   const baseX = position?.x ?? centered.x + width / 2
   const baseY = position?.y ?? centered.y + height / 2
+
+  const hasFilter = konvaFilters.length > 0
+
+  const zoomLevel = Math.max(1, Math.ceil(viewScale)) // le zoom courant, arrondi, jamais < 1
+  const sourceResolution = scale > 0 ? 1 / scale : 1 // combien la source est plus grande que l'affichage
+  const cachePixelRatio = Math.min(zoomLevel, sourceResolution)
+
+  // Sans filtre : pas de cache -> res native.
+  // Avec filtre : cache obligatoire ajusté à la résolution d'affichage.
+  useEffect(() => {
+    const node = imageRef.current
+    if (!node) return
+    if (hasFilter) {
+      node.cache({ pixelRatio: cachePixelRatio })
+    } else {
+      node.clearCache()
+    }
+    node.getLayer()?.batchDraw()
+  }, [image, filters, hasFilter, cachePixelRatio])
 
   useEffect(() => {
     if (!image) return
