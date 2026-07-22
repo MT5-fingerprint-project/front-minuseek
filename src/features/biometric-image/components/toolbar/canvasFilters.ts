@@ -27,6 +27,41 @@ export const DEFAULT_FILTERS: CanvasFilters = {}
 
 export const FILTER_DEFAULTS = { min: -100, max: 100, unit: '%', origin: 'center' } as const
 
+// ─── Custom filters ─────────────────────────────────────────────────────────────
+const Brightness: Filter = function (imageData) {
+  const data = imageData.data
+  const factor = 1 + (Number(this.getAttr('brightnessAmount')) || 0)
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = data[i] * factor
+    data[i + 1] = data[i + 1] * factor
+    data[i + 2] = data[i + 2] * factor
+  }
+}
+
+const Saturation: Filter = function (imageData) {
+  const data = imageData.data
+  const sat = 1 + (Number(this.getAttr('saturationAmount')) || 0)
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i]
+    const g = data[i + 1]
+    const b = data[i + 2]
+    const gray = 0.299 * r + 0.587 * g + 0.114 * b
+    data[i] = gray + (r - gray) * sat
+    data[i + 1] = gray + (g - gray) * sat
+    data[i + 2] = gray + (b - gray) * sat
+  }
+}
+
+const Contrast: Filter = function (imageData) {
+  const data = imageData.data
+  const factor = 1 + (Number(this.getAttr('contrastAmount')) || 0)
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = (data[i] - 128) * factor + 128
+    data[i + 1] = (data[i + 1] - 128) * factor + 128
+    data[i + 2] = (data[i + 2] - 128) * factor + 128
+  }
+}
+
 // ─── Per-filter metadata ───────────────────────────────────────────────────────
 // Single source of truth: label key, icon, and Konva binding for each filterKey
 
@@ -34,17 +69,17 @@ export const FILTER_META: Record<string, { labelKey: string; icon: IconName; kon
   brightness: {
     labelKey: 'biometricImage.toolbar.tools.luminosity',
     icon: 'luminosity',
-    konva: { type: 'filter', filter: Konva.Filters.Brighten, prop: 'brightness', scale: 1 / 100 },
+    konva: { type: 'filter', filter: Brightness, prop: 'brightnessAmount', scale: 1 / 100 },
   },
   contrast: {
     labelKey: 'biometricImage.toolbar.tools.contrast',
     icon: 'contrast',
-    konva: { type: 'filter', filter: Konva.Filters.Contrast, prop: 'contrast', scale: 1 },
+    konva: { type: 'filter', filter: Contrast, prop: 'contrastAmount', scale: 1 / 100 },
   },
   saturation: {
     labelKey: 'biometricImage.toolbar.tools.saturation',
     icon: 'invertColors',
-    konva: { type: 'filter', filter: Konva.Filters.HSL, prop: 'saturation', scale: 1 / 100 },
+    konva: { type: 'filter', filter: Saturation, prop: 'saturationAmount', scale: 1 / 100 },
   },
   inversion: {
     labelKey: 'biometricImage.toolbar.tools.invertColors',
