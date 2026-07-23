@@ -14,7 +14,12 @@
       "showFiles": "Afficher l'import",
       "hideFiles": "Masquer l'import",
       "showLayers": "Afficher les calques",
-      "hideLayers": "Masquer les calques"
+      "hideLayers": "Masquer les calques",
+      "showGrid": "Afficher la grille",
+      "hideGrid": "Masquer la grille",
+      "doubleWindow": "Double fenêtre (à venir)",
+      "undo": "Annuler (à venir)",
+      "redo": "Rétablir (à venir)"
     }
   },
   "navigation": {
@@ -32,7 +37,9 @@
       "CLOSED": "Fermée"
     },
     "list": {
-      "title": "Mes affaires",
+      "title": "Vos affaires",
+      "subtitle": "Créez et retrouvez toutes vos affaires ici.",
+      "create": "Nouvelle affaire",
       "addNew": "Ajouter une nouvelle affaire"
     },
     "card": {
@@ -55,8 +62,8 @@
       "tracesWindowWithFile": "Traces - {{fileName}}",
       "referencePrintsWindow": "Empreintes",
       "referencePrintsWindowWithFile": "Empreintes - {{fileName}}",
-      "selectTrace": "Sélectionnez une trace dans le carousel pour l'afficher ici",
-      "selectReferencePrint": "Sélectionnez une empreinte de référence pour l'afficher ici",
+      "selectTrace": "Visualisez et éditez vos traces ici",
+      "selectReferencePrint": "Visualisez et éditez vos empreintes ici",
       "analyzeButton": "Analyse IA"
     },
     "form": {
@@ -150,6 +157,7 @@
   "auth": {
     "connecting": "Connexion en cours…",
     "logout": "Déconnexion",
+    "account": "Compte",
     "tenantRequired": {
       "title": "Organisation requise",
       "message": "Accédez à l'application via l'adresse de votre organisation."
