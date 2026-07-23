@@ -46,11 +46,6 @@ export default function DraggableImage({ url, stageSize, filters, draggable = tr
   const imageRef = useRef<Konva.Image>(null)
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null)
 
-  useEffect(() => {
-    imageRef.current?.cache()
-    imageRef.current?.getLayer()?.batchDraw()
-  }, [filters])
-
   const activeKeys = Object.keys(filters ?? {}).filter((k) => (filters?.[k] ?? 0) !== 0)
 
   const konvaFilters = activeKeys.flatMap((k) => {
@@ -64,6 +59,20 @@ export default function DraggableImage({ url, stageSize, filters, draggable = tr
       return [[def.prop, filters![k] * def.scale]]
     }),
   )
+
+  // Konva n'applique les filtres que sur un node caché : on (re)cache quand un
+  // filtre est actif, on vide le cache sinon (rendu brut net, réversible à 0).
+  const filterSignature = JSON.stringify(filterProps)
+  useEffect(() => {
+    const node = imageRef.current
+    if (!node || !image) return
+    if (konvaFilters.length > 0) {
+      node.cache()
+    } else {
+      node.clearCache()
+    }
+    node.getLayer()?.batchDraw()
+  }, [image, konvaFilters.length, filterSignature])
 
   // Transforms — go as direct Konva node props
   const transformProps = Object.fromEntries(
