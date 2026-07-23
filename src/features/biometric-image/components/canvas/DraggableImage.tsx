@@ -37,11 +37,19 @@ type DraggableImageProps = {
   url: string
   stageSize: { width: number; height: number }
   filters?: CanvasFilters
-  draggable?: boolean
+  isDraggable?: boolean
+  viewScale?: number
   onLayoutChange?: (layout: ImageLayout) => void
 }
 
-export default function DraggableImage({ url, stageSize, filters, draggable = true, onLayoutChange }: DraggableImageProps) {
+export default function DraggableImage({
+  url,
+  stageSize,
+  filters,
+  isDraggable = true,
+  viewScale = 1,
+  onLayoutChange,
+}: DraggableImageProps) {
   const image = useImage(url)
   const imageRef = useRef<Konva.Image>(null)
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null)
@@ -99,6 +107,25 @@ export default function DraggableImage({ url, stageSize, filters, draggable = tr
   const baseX = position?.x ?? centered.x + width / 2
   const baseY = position?.y ?? centered.y + height / 2
 
+  const hasFilter = konvaFilters.length > 0
+
+  const zoomLevel = Math.max(1, Math.ceil(viewScale)) // le zoom courant, arrondi, jamais < 1
+  const sourceResolution = scale > 0 ? 1 / scale : 1 // combien la source est plus grande que l'affichage
+  const cachePixelRatio = Math.min(zoomLevel, sourceResolution)
+
+  // Sans filtre : pas de cache -> res native.
+  // Avec filtre : cache obligatoire ajusté à la résolution d'affichage.
+  useEffect(() => {
+    const node = imageRef.current
+    if (!node) return
+    if (hasFilter) {
+      node.cache({ pixelRatio: cachePixelRatio })
+    } else {
+      node.clearCache()
+    }
+    node.getLayer()?.batchDraw()
+  }, [image, filters, hasFilter, cachePixelRatio])
+
   useEffect(() => {
     if (!image) return
     onLayoutChange?.({ x: baseX, y: baseY, offsetX, offsetY, scaleX, scaleY: 1, rotation })
@@ -117,7 +144,7 @@ export default function DraggableImage({ url, stageSize, filters, draggable = tr
       height={height}
       offsetX={offsetX}
       offsetY={offsetY}
-      draggable={draggable}
+      draggable={isDraggable}
       onDragMove={(e) => setPosition({ x: e.target.x(), y: e.target.y() })}
       onDragEnd={(e) => setPosition({ x: e.target.x(), y: e.target.y() })}
       filters={konvaFilters}
