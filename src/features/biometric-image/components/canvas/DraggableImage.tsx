@@ -37,7 +37,7 @@ type DraggableImageProps = {
   url: string
   stageSize: { width: number; height: number }
   filters?: CanvasFilters
-  draggable?: boolean
+  isDraggable?: boolean
   viewScale?: number
   onLayoutChange?: (layout: ImageLayout) => void
 }
@@ -46,7 +46,7 @@ export default function DraggableImage({
   url,
   stageSize,
   filters,
-  draggable = true,
+  isDraggable = true,
   viewScale = 1,
   onLayoutChange,
 }: DraggableImageProps) {
@@ -130,7 +130,7 @@ export default function DraggableImage({
       height={height}
       offsetX={offsetX}
       offsetY={offsetY}
-      draggable={draggable}
+      draggable={isDraggable}
       onDragMove={(e) => setPosition({ x: e.target.x(), y: e.target.y() })}
       onDragEnd={(e) => setPosition({ x: e.target.x(), y: e.target.y() })}
       filters={konvaFilters}
