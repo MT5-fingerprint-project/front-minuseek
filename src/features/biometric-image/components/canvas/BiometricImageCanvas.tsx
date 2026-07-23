@@ -3,6 +3,7 @@ import { Stage, Layer } from 'react-konva'
 import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
 import DraggableImage, { type ImageLayout } from '@/features/biometric-image/components/canvas/DraggableImage'
 import AnnotationLayer from '@/features/biometric-image/components/canvas/AnnotationLayer'
+import CanvasGridOverlay from '@/features/biometric-image/components/canvas/CanvasGridOverlay'
 import CanvasToolbar from '@/features/biometric-image/components/toolbar/CanvasToolbar'
 import LayersPanelContainer from '@/features/biometric-image/components/layers/LayersPanelContainer'
 import { useCanvasView, type CanvasZoomHandle } from '@/features/biometric-image/components/canvas/useCanvasView'
@@ -78,24 +79,7 @@ export default function BiometricImageCanvas({
               hoveredLayerId={hoveredLayerId}
             />
           </Stage>
-          {isGridVisible && (
-            <div className="absolute inset-0 pointer-events-none">
-              {['33.333%', '66.666%'].map((pos) => (
-                <div
-                  key={`v-${pos}`}
-                  className="absolute top-0 bottom-0 w-px bg-red-medium"
-                  style={{ left: pos }}
-                />
-              ))}
-              {['33.333%', '66.666%'].map((pos) => (
-                <div
-                  key={`h-${pos}`}
-                  className="absolute left-0 right-0 h-px bg-red-medium"
-                  style={{ top: pos }}
-                />
-              ))}
-            </div>
-          )}
+          {isGridVisible && <CanvasGridOverlay />}
           {isToolbarVisible && (
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
               <CanvasToolbar
@@ -115,9 +99,14 @@ export default function BiometricImageCanvas({
           )}
         </>
       ) : (
-        <div className="flex h-full items-center justify-center p-6 text-lg font-semibold text-grey-medium-1">
-          {placeholder}
-        </div>
+        <>
+          {isGridVisible && <CanvasGridOverlay />}
+          <div className="relative flex h-full items-center justify-center p-6">
+            <span className="rounded bg-white px-3 py-1 text-center text-lg font-semibold text-grey-medium-1">
+              {placeholder}
+            </span>
+          </div>
+        </>
       )}
     </div>
   )

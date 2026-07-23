@@ -82,7 +82,7 @@ export default function ComparisonWindow({
           <Button
             type="button"
             variant="outline"
-            size="xs"
+            size="small"
             disabled={isComparing}
             onClick={onAnalyze}
             className={cn(
