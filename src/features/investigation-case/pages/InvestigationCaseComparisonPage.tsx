@@ -23,7 +23,7 @@ export default function InvestigationCaseComparisonPage() {
   if (!id) return null
 
   return (
-    <ResizablePanelGroup orientation="horizontal" className="h-full min-h-[500px] gap-1.5">
+    <ResizablePanelGroup orientation="horizontal" className="h-full min-h-[500px]">
       <ComparisonWindow
         side="left"
         type="traces"
@@ -34,7 +34,7 @@ export default function InvestigationCaseComparisonPage() {
         isComparing={compare.isPending}
         onAnalyze={runCompare}
       />
-      <ResizableHandle withHandle />
+      <ResizableHandle withHandle className="w-2 bg-transparent" />
       <ComparisonWindow
         side="right"
         type="reference-prints"

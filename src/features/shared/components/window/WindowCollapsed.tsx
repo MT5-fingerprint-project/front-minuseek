@@ -18,7 +18,7 @@ export default function WindowCollapsed({ onToggleCollapse, onActivate }: Window
           title={t('common.window.expand')}
           className="rounded p-1 hover:bg-white/15"
         >
-          <Icon name="sidebarFill" size={24} color="currentColor" />
+          <Icon name="sidebarOutline" size={24} color="currentColor" />
         </button>
       </div>
       <div className="flex-1" />
