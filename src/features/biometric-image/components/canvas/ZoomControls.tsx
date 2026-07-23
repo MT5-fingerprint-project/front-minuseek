@@ -12,25 +12,25 @@ export default function ZoomControls({ scale, onZoomIn, onZoomOut }: ZoomControl
   const { t } = useTranslation()
 
   return (
-    <div className="flex items-center gap-1 rounded-full border bg-white px-1.5 py-0.5 shadow-sm">
+    <div className="flex items-center gap-1 rounded-full bg-grey-light-1 px-2 py-1">
       <button
         type="button"
         onClick={onZoomOut}
         title={t('biometricImage.zoom.out')}
-        className="rounded p-0.5 text-muted-foreground hover:text-foreground"
+        className="rounded p-0.5 text-grey-medium-2 hover:text-grey-dark"
       >
-        <Icon name="zoomOut" size={18} color="currentColor" />
+        <Icon name="zoomOut" size={20} color="currentColor" />
       </button>
-      <span className="min-w-10 text-center text-xs tabular-nums">
+      <span className="min-w-10 text-center text-xs font-medium tabular-nums text-grey-dark">
         {Math.round(scale * 100)}%
       </span>
       <button
         type="button"
         onClick={onZoomIn}
         title={t('biometricImage.zoom.in')}
-        className="rounded p-0.5 text-muted-foreground hover:text-foreground"
+        className="rounded p-0.5 text-grey-medium-2 hover:text-grey-dark"
       >
-        <Icon name="zoomIn" size={18} color="currentColor" />
+        <Icon name="zoomIn" size={20} color="currentColor" />
       </button>
     </div>
   )

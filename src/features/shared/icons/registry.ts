@@ -16,6 +16,8 @@ import FileExport from './file-export.svg?react'
 import Fingerprint from './fingerprint.svg?react'
 import FingerprintCheck from './fingerprint-check.svg?react'
 import Folder from './folder.svg?react'
+import Grid from './grid.svg?react'
+import GridOff from './grid-off.svg?react'
 import Home from './home.svg?react'
 import Image from './image.svg?react'
 import Import from './import.svg?react'
@@ -26,6 +28,7 @@ import InvertColors from './invert-colors.svg?react'
 import Layers from './layers.svg?react'
 import LayersOff from './layers-off.svg?react'
 import Location from './location.svg?react'
+import Logout from './logout.svg?react'
 import Luminosity from './luminosity.svg?react'
 import Menu from './menu.svg?react'
 import Mirror from './mirror.svg?react'
@@ -77,6 +80,8 @@ export const icons = {
   fingerprint: Fingerprint,
   fingerprintCheck: FingerprintCheck,
   folder: Folder,
+  grid: Grid,
+  gridOff: GridOff,
   home: Home,
   image: Image,
   import: Import,
@@ -87,6 +92,7 @@ export const icons = {
   layers: Layers,
   layersOff: LayersOff,
   location: Location,
+  logout: Logout,
   luminosity: Luminosity,
   menu: Menu,
   mirror: Mirror,

@@ -9,7 +9,8 @@ import { queryClient } from './features/shared/lib/queryClient.ts'
 import { Toaster } from './features/shared/ui/sonner.tsx'
 import TenantAuthBoundary from './features/shared/auth/TenantAuthBoundary.tsx'
 import TenantRequiredPage from './features/shared/components/TenantRequiredPage.tsx'
-import CaseLayout from './layouts/CaseLayout.tsx'
+import CasePageLayout from './layouts/CasePageLayout.tsx'
+import CaseComparisonLayout from './layouts/CaseComparisonLayout.tsx'
 import InvestigationCasesPage from './features/investigation-case/pages/InvestigationCasesPage.tsx'
 import InvestigationCaseDetailsPage from './features/investigation-case/pages/InvestigationCaseDetailsPage.tsx'
 import InvestigationCaseComparisonPage from './features/investigation-case/pages/InvestigationCaseComparisonPage.tsx'
@@ -24,10 +25,16 @@ const router = createBrowserRouter([
       { path: 'affaires', element: <InvestigationCasesPage /> },
       {
         path: 'affaires/:id',
-        element: <CaseLayout />,
         children: [
-          { index: true, element: <InvestigationCaseDetailsPage /> },
-          { path: 'comparaison', element: <InvestigationCaseComparisonPage /> },
+          {
+            element: <CasePageLayout />,
+            children: [{ index: true, element: <InvestigationCaseDetailsPage /> }],
+          },
+          {
+            path: 'comparaison',
+            element: <CaseComparisonLayout />,
+            children: [{ index: true, element: <InvestigationCaseComparisonPage /> }],
+          },
         ],
       },
     ],
@@ -39,7 +46,7 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <RouterProvider router={router} />
       <Toaster richColors position="top-right" />
-      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-left"  />
+      <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
     </QueryClientProvider>
   </StrictMode>
 )

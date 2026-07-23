@@ -1,0 +1,60 @@
+import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Icon } from '@/features/shared/icons'
+import { cn } from '@/features/shared/lib/utils'
+import { useClickOutside } from '@/features/shared/hooks/useClickOutside'
+import { useAuth } from '@/features/shared/auth/auth-context'
+
+type NavFooterProps = {
+  isCollapsed?: boolean
+}
+
+/** Pied de navbar : bouton compte ouvrant un mini-menu (déconnexion, + d'actions à venir). */
+export default function NavFooter({ isCollapsed = false }: NavFooterProps) {
+  const { t } = useTranslation()
+  const { username, logout } = useAuth()
+  const [isMenuOpen, setMenuOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  useClickOutside(containerRef, () => setMenuOpen(false), { enabled: isMenuOpen })
+
+  const label = username ?? t('auth.account')
+
+  return (
+    <div ref={containerRef} className="relative px-4">
+      {isMenuOpen && (
+        <div
+          role="menu"
+          className="absolute bottom-full left-4 mb-2 min-w-44 overflow-hidden rounded-sm bg-white text-blue-dark-2 shadow-lg"
+        >
+          <button
+            type="button"
+            role="menuitem"
+            onClick={() => {
+              setMenuOpen(false)
+              logout()
+            }}
+            className="flex w-full items-center gap-1.5 px-3 py-2 text-sm hover:bg-grey-light-1"
+          >
+            <Icon name="logout" size={20} color="currentColor" />
+            {t('auth.logout')}
+          </button>
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={() => setMenuOpen((open) => !open)}
+        title={label}
+        aria-label={label}
+        aria-haspopup="menu"
+        aria-expanded={isMenuOpen}
+        className={cn(
+          'flex items-center gap-2 rounded-md p-2 text-grey-light-2 transition-colors hover:bg-white/10',
+          !isCollapsed && 'text-sm',
+        )}
+      >
+        <Icon name="personProfile" size={24} color="grey-light-2" />
+        {!isCollapsed && <span className="capitalize">{label}</span>}
+      </button>
+    </div>
+  )
+}

@@ -14,7 +14,12 @@
       "showFiles": "Afficher l'import",
       "hideFiles": "Masquer l'import",
       "showLayers": "Afficher les calques",
-      "hideLayers": "Masquer les calques"
+      "hideLayers": "Masquer les calques",
+      "showGrid": "Afficher la grille",
+      "hideGrid": "Masquer la grille",
+      "doubleWindow": "Double fenêtre (à venir)",
+      "undo": "Annuler (à venir)",
+      "redo": "Rétablir (à venir)"
     }
   },
   "navigation": {
@@ -32,13 +37,15 @@
       "CLOSED": "Fermée"
     },
     "list": {
-      "title": "Mes affaires",
+      "title": "Vos affaires",
+      "subtitle": "Créez et retrouvez toutes vos affaires ici.",
+      "create": "Nouvelle affaire",
       "addNew": "Ajouter une nouvelle affaire"
     },
     "card": {
       "title": "Affaire N°{{caseNumber}}",
       "pvNumber": "PV N°{{pvNumber}}",
-      "createdOn": "Créé le {{date}}"
+      "createdOn": "Créée le {{date}}"
     },
     "details": {
       "title": "Affaire n°{{caseNumber}}",
@@ -55,23 +62,27 @@
       "tracesWindowWithFile": "Traces - {{fileName}}",
       "referencePrintsWindow": "Empreintes",
       "referencePrintsWindowWithFile": "Empreintes - {{fileName}}",
-      "selectTrace": "Sélectionnez une trace dans le carousel pour l'afficher ici",
-      "selectReferencePrint": "Sélectionnez une empreinte de référence pour l'afficher ici",
+      "selectTrace": "Visualisez et éditez vos traces ici",
+      "selectReferencePrint": "Visualisez et éditez vos empreintes ici",
       "analyzeButton": "Analyse IA"
     },
     "form": {
-      "createTitle": "Créer une affaire",
+      "createTitle": "Nouvelle affaire",
       "createDescription": "Renseignez les informations de la nouvelle affaire.",
+      "sections": {
+        "general": "Informations générales",
+        "context": "Contexte"
+      },
       "submit": "Créer l'affaire",
       "submitting": "Création…",
       "fields": {
         "caseNumber": {
           "label": "Numéro d'affaire",
-          "placeholder": "ex: 2026-004"
+          "placeholder": "123456"
         },
         "pvNumber": {
-          "label": "Numéro du PV",
-          "placeholder": "ex: PV-2026-004"
+          "label": "Numéro de PV",
+          "placeholder": "2026/123456"
         },
         "description": {
           "label": "Description",
@@ -150,6 +161,7 @@
   "auth": {
     "connecting": "Connexion en cours…",
     "logout": "Déconnexion",
+    "account": "Compte",
     "tenantRequired": {
       "title": "Organisation requise",
       "message": "Accédez à l'application via l'adresse de votre organisation."

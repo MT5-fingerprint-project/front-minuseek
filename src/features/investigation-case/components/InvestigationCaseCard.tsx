@@ -1,8 +1,8 @@
 import type { InvestigationCase } from '@/features/investigation-case/types/investigationCase'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/features/shared/ui/card'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
+import NotchedCardFrame from '@/features/investigation-case/components/NotchedCardFrame'
 import { Icon } from '@/features/shared/icons'
 
 export default function InvestigationCaseCard({ investigationCase }: { investigationCase: InvestigationCase }) {
@@ -11,24 +11,23 @@ export default function InvestigationCaseCard({ investigationCase }: { investiga
   const formattedDate = new Date(investigationCase.createdAt).toLocaleDateString(i18n.language)
 
   return (
-    <Link to={`/${slug}/affaires/${investigationCase.id}`} className="min-h-44">
-      <Card key={investigationCase.id} className="h-full">
-        <CardHeader className="justify-items-start">
+    <Link to={`/${slug}/affaires/${investigationCase.id}`} className="group relative block size-[200px]">
+      <NotchedCardFrame />
+      <div className="relative flex h-full flex-col justify-between px-3 pt-3 pb-4">
+        <div className="flex flex-col gap-1">
           <CaseStatusBadge status={investigationCase.status} />
-          <CardTitle className="text-lg font-semibold">
+          <p className="mt-2 text-base font-semibold text-blue-dark-2">
             {t('investigationCase.card.title', { caseNumber: investigationCase.caseNumber })}
-          </CardTitle>
-          <CardDescription>
+          </p>
+          <p className="text-sm text-grey-medium-2">
             {t('investigationCase.card.pvNumber', { pvNumber: investigationCase.pvNumber })}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-1">
-          <div className="text-xs text-muted-foreground flex items-center gap-2">
-            <Icon name="dateStart" size={20} color="var(--color-grey-medium-1)" />
-            <span>{t('investigationCase.card.createdOn', { date: formattedDate })}</span>
-          </div>
-        </CardContent>
-      </Card>
+          </p>
+        </div>
+        <div className="flex items-center gap-2 text-xs text-grey-medium-2">
+          <Icon name="dateStart" size={18} color="var(--color-grey-medium-1)" />
+          <span>{t('investigationCase.card.createdOn', { date: formattedDate })}</span>
+        </div>
+      </div>
     </Link>
   )
 }

@@ -1,3 +1,4 @@
+import { Icon } from '@/features/shared/icons'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/features/shared/ui/button'
 import {
@@ -29,15 +30,17 @@ export default function InvestigationCaseCreateForm({ isOpen, onClose, onSubmit 
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-2xl rounded-md">
         <DialogHeader>
-          <DialogTitle>{t('investigationCase.form.createTitle')}</DialogTitle>
-          <DialogDescription>{t('investigationCase.form.createDescription')}</DialogDescription>
+          <DialogTitle className="text-2xl font-medium text-grey-medium-2">
+            {t('investigationCase.form.createTitle')}
+          </DialogTitle>
+          <DialogDescription className="sr-only">{t('investigationCase.form.createDescription')}</DialogDescription>
         </DialogHeader>
 
         <form
           id="create-case-form"
-          className="grid gap-4"
+          className="grid gap-6"
           noValidate
           onSubmit={(e) => {
             e.preventDefault()
@@ -45,72 +48,87 @@ export default function InvestigationCaseCreateForm({ isOpen, onClose, onSubmit 
             form.handleSubmit()
           }}
         >
-          <form.Field
-            name="caseNumber"
-            children={(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>{t('investigationCase.form.fields.caseNumber.label')}</FieldLabel>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    placeholder={t('investigationCase.form.fields.caseNumber.placeholder')}
-                    aria-invalid={isInvalid}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              )
-            }}
-          />
+          <section className="grid gap-4">
+            <h3 className="text-lg font-medium text-blue-dark-2">{t('investigationCase.form.sections.general')}</h3>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <form.Field
+                name="caseNumber"
+                children={(field) => {
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        {t('investigationCase.form.fields.caseNumber.label')}
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) => field.handleChange(event.target.value)}
+                        placeholder={t('investigationCase.form.fields.caseNumber.placeholder')}
+                        aria-invalid={isInvalid}
+                      />
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                    </Field>
+                  )
+                }}
+              />
 
-          <form.Field
-            name="pvNumber"
-            children={(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>{t('investigationCase.form.fields.pvNumber.label')}</FieldLabel>
-                  <Input
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    placeholder={t('investigationCase.form.fields.pvNumber.placeholder')}
-                    aria-invalid={isInvalid}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              )
-            }}
-          />
+              <form.Field
+                name="pvNumber"
+                children={(field) => {
+                  const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        {t('investigationCase.form.fields.pvNumber.label')}
+                      </FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(event) => field.handleChange(event.target.value)}
+                        placeholder={t('investigationCase.form.fields.pvNumber.placeholder')}
+                        aria-invalid={isInvalid}
+                      />
+                      {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                    </Field>
+                  )
+                }}
+              />
+            </div>
+          </section>
 
-          <form.Field
-            name="description"
-            children={(field) => {
-              const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
-              return (
-                <Field data-invalid={isInvalid}>
-                  <FieldLabel htmlFor={field.name}>{t('investigationCase.form.fields.description.label')}</FieldLabel>
-                  <Textarea
-                    id={field.name}
-                    name={field.name}
-                    rows={4}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(event) => field.handleChange(event.target.value)}
-                    placeholder={t('investigationCase.form.fields.description.placeholder')}
-                    aria-invalid={isInvalid}
-                  />
-                  {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                </Field>
-              )
-            }}
-          />
+          <section className="grid gap-4">
+            <h3 className="text-lg font-medium text-blue-dark-2">{t('investigationCase.form.sections.context')}</h3>
+            <form.Field
+              name="description"
+              children={(field) => {
+                const isInvalid = field.state.meta.isTouched && !field.state.meta.isValid
+                return (
+                  <Field data-invalid={isInvalid}>
+                    <FieldLabel htmlFor={field.name}>
+                      {t('investigationCase.form.fields.description.label')}
+                    </FieldLabel>
+                    <Textarea
+                      id={field.name}
+                      name={field.name}
+                      rows={4}
+                      className="min-h-28"
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(event) => field.handleChange(event.target.value)}
+                      placeholder={t('investigationCase.form.fields.description.placeholder')}
+                      aria-invalid={isInvalid}
+                    />
+                    {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                  </Field>
+                )
+              }}
+            />
+          </section>
 
           {submitError && <p className="text-sm text-destructive">{submitError}</p>}
         </form>
@@ -122,8 +140,9 @@ export default function InvestigationCaseCreateForm({ isOpen, onClose, onSubmit 
           <form.Subscribe
             selector={(state) => state.isSubmitting}
             children={(isSubmitting) => (
-              <Button type="submit" form="create-case-form" disabled={isSubmitting}>
+              <Button variant="blue" type="submit" form="create-case-form" disabled={isSubmitting}>
                 {isSubmitting ? t('investigationCase.form.submitting') : t('investigationCase.form.submit')}
+                <Icon name="plus" size={24} color="white" />
               </Button>
             )}
           />

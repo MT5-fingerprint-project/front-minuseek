@@ -12,6 +12,7 @@ export function useComparisonWindow() {
   const [isCollapsed, setCollapsed] = useState(false)
   const [isFilesVisible, setFilesVisible] = useState(true)
   const [isLayersVisible, setLayersVisible] = useState(false)
+  const [isGridVisible, setGridVisible] = useState(false)
   const [scale, setScale] = useState(1)
   const [selectedTrace, setSelectedTrace] = useState<BiometricImage>()
 
@@ -34,6 +35,8 @@ export function useComparisonWindow() {
     isLayersVisible,
     toggleLayers: () => setLayersVisible((v) => !v),
     closeLayersPanel: () => setLayersVisible(false),
+    isGridVisible,
+    toggleGrid: () => setGridVisible((v) => !v),
     scale,
     setScale,
     selectedTrace,

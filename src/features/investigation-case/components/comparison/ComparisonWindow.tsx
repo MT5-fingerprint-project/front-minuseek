@@ -4,6 +4,7 @@ import { cn } from '@/features/shared/lib/utils'
 import { ResizablePanel } from '@/features/shared/ui/resizable'
 import { Button } from '@/features/shared/ui/button'
 import WorkbenchWindow from '@/features/shared/components/window/WorkbenchWindow'
+import WindowActionButton from '@/features/shared/components/window/WindowActionButton'
 import { BiometricImageCarousel, BiometricImageCanvas } from '@/features/biometric-image'
 import ZoomControls from '@/features/biometric-image/components/canvas/ZoomControls'
 import RecenterButton from '@/features/biometric-image/components/canvas/RecenterControl'
@@ -58,35 +59,52 @@ export default function ComparisonWindow({
     ? t(keys.withFile, { fileName: w.selectedTrace.fileName })
     : t(keys.base)
 
-  const footer = w.selectedTrace && (
-    <div className="flex items-center gap-2">
-      {side === 'left' && (
-        <>
-          <RecenterButton onClick={() => w.zoomRef.current?.recenter()} />
+  const footer = (
+    <>
+      {/* Groupe gauche : zoom + recentrage + grille */}
+      <div className="flex items-center gap-1">
+        <ZoomControls
+          scale={w.scale}
+          onZoomIn={() => w.zoomRef.current?.zoomIn()}
+          onZoomOut={() => w.zoomRef.current?.zoomOut()}
+        />
+        <RecenterButton onClick={() => w.zoomRef.current?.recenter()} />
+        <WindowActionButton
+          tone="footer"
+          icon={w.isGridVisible ? 'gridOff' : 'grid'}
+          label={t(w.isGridVisible ? 'common.window.hideGrid' : 'common.window.showGrid')}
+          onClick={w.toggleGrid}
+        />
+      </div>
+      {/* Groupe droite : analyse IA (fenêtre traces) + annuler/rétablir + calques */}
+      <div className="flex items-center gap-1">
+        {side === 'left' && w.selectedTrace && (
           <Button
             type="button"
             variant="outline"
-            size="xs"
+            size="small"
             disabled={isComparing}
             onClick={onAnalyze}
             className={cn(
-              'relative overflow-hidden rounded-full border-blue-medium-1/40 text-blue-medium-1 hover:border-blue-medium-1 hover:bg-blue-medium-1 hover:text-white',
+              'relative mr-1 overflow-hidden rounded-full border-blue-medium-1/40 text-blue-medium-1 hover:border-blue-medium-1 hover:bg-blue-medium-1 hover:text-white',
             )}
           >
-            {isComparing
-              ? <Loader2 size={13} className="animate-spin" />
-              : <Sparkle size={13} />}
+            {isComparing ? <Loader2 size={13} className="animate-spin" /> : <Sparkle size={13} />}
             {t('investigationCase.comparison.analyzeButton')}
           </Button>
-        </>
-      )}
-      <ZoomControls
-        scale={w.scale}
-        onZoomIn={() => w.zoomRef.current?.zoomIn()}
-        onZoomOut={() => w.zoomRef.current?.zoomOut()}
-      />
-      {side === 'right' && <RecenterButton onClick={() => w.zoomRef.current?.recenter()} />}
-    </div>
+        )}
+        <WindowActionButton tone="footer" icon="redo" label={t('common.window.redo')} />
+        <WindowActionButton tone="footer" icon="undo" label={t('common.window.undo')} />
+        <span data-layers-toggle>
+          <WindowActionButton
+            tone="footer"
+            icon={w.isLayersVisible ? 'layersOff' : 'layers'}
+            label={t(w.isLayersVisible ? 'common.window.hideLayers' : 'common.window.showLayers')}
+            onClick={w.toggleLayers}
+          />
+        </span>
+      </div>
+    </>
   )
 
   return (
@@ -103,33 +121,29 @@ export default function ComparisonWindow({
         icon={ICON[type]}
         isCollapsed={w.isCollapsed}
         onToggleCollapse={w.toggle}
-        collapseDirection={side === 'left' ? 'left' : 'right'}
         isActive={isActive}
         onActivate={onActivate}
         isFilesVisible={w.isFilesVisible}
         onToggleFiles={w.toggleFiles}
-        isLayersVisible={w.isLayersVisible}
-        onToggleLayers={w.toggleLayers}
         footer={footer}
       >
         {w.isFilesVisible && (
-          <div className="border-b p-2">
-            <BiometricImageCarousel
-              type={type}
-              caseId={caseId}
-              selectedId={w.selectedTrace?.id}
-              onSelect={w.setSelectedTrace}
-              selectedTraceId={selectedTraceId}
-            />
-          </div>
+          <BiometricImageCarousel
+            type={type}
+            caseId={caseId}
+            selectedId={w.selectedTrace?.id}
+            onSelect={w.setSelectedTrace}
+            selectedTraceId={selectedTraceId}
+          />
         )}
-        <div className="min-h-0 flex-1 p-4">
+        <div className="min-h-0 flex-1 p-2">
           <div className="h-full overflow-hidden rounded-sm border border-grey-light-2">
             <BiometricImageCanvas
               image={w.selectedTrace}
               placeholder={t(`investigationCase.comparison.select${type === 'traces' ? 'Trace' : 'ReferencePrint'}`)}
               isToolbarVisible={isActive}
               isLayersVisible={w.isLayersVisible}
+              isGridVisible={w.isGridVisible}
               onCloseLayers={w.closeLayersPanel}
               zoomHandleRef={w.zoomRef}
               onScaleChange={w.setScale}
