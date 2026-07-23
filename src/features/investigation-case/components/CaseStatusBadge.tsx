@@ -15,7 +15,7 @@ export function CaseStatusBadge({ status }: { status: InvestigationCaseStatus })
   return (
     <span
       className={cn(
-        'inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium leading-[16px]',
+        'inline-flex w-fit items-center rounded-full border px-3 py-1 text-sm font-medium leading-[16px]',
         styles[status]
       )}
     >

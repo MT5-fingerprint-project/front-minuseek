@@ -1,8 +1,8 @@
 import { Plus } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Card, CardContent } from '@/features/shared/ui/card'
 import { Spinner } from '@/features/shared/ui/spinner'
 import InvestigationCaseCard from '@/features/investigation-case/components/InvestigationCaseCard'
+import NotchedCardFrame from '@/features/investigation-case/components/NotchedCardFrame'
 import type { InvestigationCase } from '@/features/investigation-case/types/investigationCase'
 
 type InvestigationCasesListProps = {
@@ -19,20 +19,19 @@ export default function InvestigationCasesList({
   const { t } = useTranslation()
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <Card
-        className="border-2 border-dashed bg-transparent shadow-none cursor-pointer hover:bg-muted"
-        role="button"
-        tabIndex={0}
-        onClick={onAddClick}
-      >
-        <CardContent className="flex h-full min-h-44 flex-col items-center justify-center gap-3 text-muted-foreground">
-          <div className="flex size-10 items-center justify-center rounded-full border">
-            <Plus className="size-5" />
-          </div>
-          <span className="text-sm font-medium">{t('investigationCase.list.addNew')}</span>
-        </CardContent>
-      </Card>
+    <div className="flex flex-wrap gap-4">
+      {investigationCases?.length === 0 && (
+        <button
+          type="button"
+          onClick={onAddClick}
+          className="group relative block size-[200px] cursor-pointer text-center"
+        >
+          <NotchedCardFrame dashed />
+          <span className="relative flex h-full items-center justify-center px-6 text-base font-medium text-blue-dark-1">
+            <Plus className="mr-1 inline size-5 align-[-4px]" />
+            {t('investigationCase.list.addNew')}
+          </span>
+        </button>)}
 
       {isLoading ? (
         <Spinner className="size-6" />
