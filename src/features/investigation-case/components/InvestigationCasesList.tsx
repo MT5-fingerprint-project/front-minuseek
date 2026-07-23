@@ -31,7 +31,8 @@ export default function InvestigationCasesList({
             <Plus className="mr-1 inline size-5 align-[-4px]" />
             {t('investigationCase.list.addNew')}
           </span>
-        </button>)}
+        </button>
+      )}
 
       {isLoading ? (
         <Spinner className="size-6" />

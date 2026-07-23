@@ -45,7 +45,7 @@
     "card": {
       "title": "Affaire N°{{caseNumber}}",
       "pvNumber": "PV N°{{pvNumber}}",
-      "createdOn": "Créé le {{date}}"
+      "createdOn": "Créée le {{date}}"
     },
     "details": {
       "title": "Affaire n°{{caseNumber}}",
