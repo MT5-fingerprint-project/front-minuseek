@@ -33,7 +33,7 @@ export default function BiometricImageEmptyPlaceholder({
         type="button"
         disabled={upload.isPending}
         onClick={() => inputRef.current?.click()}
-        className="outline-muted flex w-full items-center justify-center rounded-lg bg-white p-2 transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex w-full items-center justify-center p-2 transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
       >
         <div className="flex min-h-[107px] items-center justify-center gap-2">
           <ImageUp className="size-6 text-blue-medium-1" />

@@ -18,6 +18,7 @@ type BiometricImageCanvasProps = {
   placeholder: string
   isToolbarVisible?: boolean
   isLayersVisible?: boolean
+  isGridVisible?: boolean
   onCloseLayers?: () => void
   zoomHandleRef?: React.RefObject<CanvasZoomHandle | null>
   onScaleChange?: (scale: number) => void
@@ -28,6 +29,7 @@ export default function BiometricImageCanvas({
   placeholder,
   isToolbarVisible = true,
   isLayersVisible = false,
+  isGridVisible = false,
   onCloseLayers,
   zoomHandleRef,
   onScaleChange,
@@ -76,6 +78,24 @@ export default function BiometricImageCanvas({
               hoveredLayerId={hoveredLayerId}
             />
           </Stage>
+          {isGridVisible && (
+            <div className="absolute inset-0 pointer-events-none">
+              {['33.333%', '66.666%'].map((pos) => (
+                <div
+                  key={`v-${pos}`}
+                  className="absolute top-0 bottom-0 w-px bg-red-medium"
+                  style={{ left: pos }}
+                />
+              ))}
+              {['33.333%', '66.666%'].map((pos) => (
+                <div
+                  key={`h-${pos}`}
+                  className="absolute left-0 right-0 h-px bg-red-medium"
+                  style={{ top: pos }}
+                />
+              ))}
+            </div>
+          )}
           {isToolbarVisible && (
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
               <CanvasToolbar
@@ -95,7 +115,7 @@ export default function BiometricImageCanvas({
           )}
         </>
       ) : (
-        <div className="flex h-full items-center justify-center p-6 text-sm text-muted-foreground">
+        <div className="flex h-full items-center justify-center p-6 text-lg font-semibold text-grey-medium-1">
           {placeholder}
         </div>
       )}

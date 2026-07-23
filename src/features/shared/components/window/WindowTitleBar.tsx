@@ -6,32 +6,35 @@ import WindowActionButton from '@/features/shared/components/window/WindowAction
 type WindowTitleBarProps = {
   title: string
   icon: IconName
-  /** Custom action buttons; defaults to placeholder icons for now */
+  /** Custom action buttons; insérés avant le placeholder double-fenêtre */
   actions?: ReactNode
-  /** When provided, shows an import/importOff toggle as the first action */
+  /** Réduit la fenêtre sur le côté (icône sidebar) */
+  onToggleCollapse?: () => void
+  /** When provided, shows an import/importOff toggle */
   isFilesVisible?: boolean
   onToggleFiles?: () => void
-  /** When provided, shows a layers toggle as the last action */
-  isLayersVisible?: boolean
-  onToggleLayers?: () => void
 }
 
 export default function WindowTitleBar({
   title,
   icon,
   actions,
+  onToggleCollapse,
   isFilesVisible,
   onToggleFiles,
-  isLayersVisible,
-  onToggleLayers,
 }: WindowTitleBarProps) {
   const { t } = useTranslation()
 
   return (
-    <div className="flex items-center gap-2 bg-blue-medium-1 px-3 py-2 text-white">
-      <Icon name={icon} size={24} color="currentColor" />
-      <span className="truncate text-sm font-medium">{title}</span>
-      <div className="ml-auto flex items-center gap-1">
+    <div className="flex items-center justify-between gap-8 bg-blue-medium-2 px-3 py-2 text-white">
+      <div className="flex items-center gap-1">
+        <Icon name={icon} size={24} color="currentColor" />
+        <span className="truncate text-sm font-medium">{title}</span>
+      </div>
+      <div className="flex items-center">
+        {onToggleCollapse && (
+          <WindowActionButton icon="sidebarFill" label={t('common.window.reduce')} onClick={onToggleCollapse} />
+        )}
         {onToggleFiles && (
           <WindowActionButton
             icon={isFilesVisible ? 'importOff' : 'import'}
@@ -39,29 +42,10 @@ export default function WindowTitleBar({
             onClick={onToggleFiles}
           />
         )}
-        {actions ?? <PlaceholderActions />}
-        {onToggleLayers && (
-          <span data-layers-toggle>
-            <WindowActionButton
-              icon={isLayersVisible ? 'layersOff' : 'layers'}
-              label={t(isLayersVisible ? 'common.window.hideLayers' : 'common.window.showLayers')}
-              onClick={onToggleLayers}
-            />
-          </span>
-        )}
+        {actions}
+        {/* Double fenêtre : pas encore implémenté (placeholder visuel) */}
+        <WindowActionButton icon="windowOn" label={t('common.window.doubleWindow')} />
       </div>
     </div>
-  )
-}
-
-const PLACEHOLDER_ACTIONS: IconName[] = ['redo', 'undo']
-
-function PlaceholderActions() {
-  return (
-    <>
-      {PLACEHOLDER_ACTIONS.map((name) => (
-        <WindowActionButton key={name} icon={name} label="À venir" />
-      ))}
-    </>
   )
 }

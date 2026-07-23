@@ -35,7 +35,7 @@ export default function BiometricImageCarouselView({
   }
 
   return (
-    <div className="outline-muted flex w-full items-center gap-2 rounded-lg bg-white p-2">
+    <div className="flex w-full items-center gap-2 p-2">
       <BiometricImageImportButton type={type} caseId={caseId} onUploadSuccess={onUploadSuccess} />
 
       {isLoading ? (
