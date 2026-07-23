@@ -67,18 +67,22 @@
       "analyzeButton": "Analyse IA"
     },
     "form": {
-      "createTitle": "Créer une affaire",
+      "createTitle": "Nouvelle affaire",
       "createDescription": "Renseignez les informations de la nouvelle affaire.",
+      "sections": {
+        "general": "Informations générales",
+        "context": "Contexte"
+      },
       "submit": "Créer l'affaire",
       "submitting": "Création…",
       "fields": {
         "caseNumber": {
           "label": "Numéro d'affaire",
-          "placeholder": "ex: 2026-004"
+          "placeholder": "123456"
         },
         "pvNumber": {
-          "label": "Numéro du PV",
-          "placeholder": "ex: PV-2026-004"
+          "label": "Numéro de PV",
+          "placeholder": "2026/123456"
         },
         "description": {
           "label": "Description",
