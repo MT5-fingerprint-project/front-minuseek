@@ -25,14 +25,16 @@ export default function HitButton({ isHit, disabled, onClick }: HitButtonProps) 
       title={title}
       aria-pressed={isHit}
       className={cn(
-        'flex h-10 w-10 items-center justify-center rounded-lg border shadow-sm transition-colors',
-        disabled && 'cursor-not-allowed border-blue-light-1 bg-transparent opacity-50',
-        !disabled && !isHit && 'border-blue-medium-2 bg-white hover:bg-blue-light-2',
-        !disabled && isHit && 'border-blue-medium-2 bg-blue-medium-2'
+        'inline-flex items-center gap-1 rounded-full px-3 py-1 font-medium text-white shadow-sm ring-[5px] ring-white transition-colors',
+        !disabled && !isHit && 'bg-grey-medium-2 hover:bg-grey-dark',
+        !disabled && isHit && 'bg-green-medium',
+        disabled && 'cursor-not-allowed bg-grey-medium-1'
       )}
     >
-      {isHit && <Icon name="fingerprintCheck" size={20} color="white" />}
-      {disabled && <Icon name="fingerprint" size={20} />}
+      <span className={cn('text-base leading-none', disabled && 'opacity-70')}>
+        {t('investigationCase.comparison.hitLabel')}
+      </span>
+      <Icon name="fingerprint" size={20} color="white" className={cn(disabled && 'opacity-70')} />
     </button>
   )
 }
