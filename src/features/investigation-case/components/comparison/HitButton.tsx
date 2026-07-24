@@ -34,7 +34,13 @@ export default function HitButton({ isHit, disabled, onClick }: HitButtonProps) 
       <span className={cn('text-base leading-none', disabled && 'opacity-70')}>
         {t('investigationCase.comparison.hitLabel')}
       </span>
-      <Icon name="fingerprint" size={20} color="white" className={cn(disabled && 'opacity-70')} />
+      <Icon
+        name={isHit ? 'fingerprintCheck' : 'fingerprintOff'}
+        size={20}
+        color="white"
+        aria-hidden
+        className={cn(disabled && 'opacity-70')}
+      />
     </button>
   )
 }

@@ -15,6 +15,7 @@ import DateStart from './date-start.svg?react'
 import FileExport from './file-export.svg?react'
 import Fingerprint from './fingerprint.svg?react'
 import FingerprintCheck from './fingerprint-check.svg?react'
+import FingerprintOff from './fingerprint-off.svg?react'
 import Folder from './folder.svg?react'
 import Grid from './grid.svg?react'
 import GridOff from './grid-off.svg?react'
@@ -79,6 +80,7 @@ export const icons = {
   fileExport: FileExport,
   fingerprint: Fingerprint,
   fingerprintCheck: FingerprintCheck,
+  fingerprintOff: FingerprintOff,
   folder: Folder,
   grid: Grid,
   gridOff: GridOff,
