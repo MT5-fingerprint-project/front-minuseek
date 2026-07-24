@@ -14,6 +14,7 @@ import CaseComparisonLayout from './layouts/CaseComparisonLayout.tsx'
 import InvestigationCasesPage from './features/investigation-case/pages/InvestigationCasesPage.tsx'
 import InvestigationCaseDetailsPage from './features/investigation-case/pages/InvestigationCaseDetailsPage.tsx'
 import InvestigationCaseComparisonPage from './features/investigation-case/pages/InvestigationCaseComparisonPage.tsx'
+import DetachedReferencePrintsPage from './features/investigation-case/pages/DetachedReferencePrintsPage.tsx'
 
 const router = createBrowserRouter([
   { path: '/', element: <TenantRequiredPage /> },
@@ -33,7 +34,10 @@ const router = createBrowserRouter([
           {
             path: 'comparaison',
             element: <CaseComparisonLayout />,
-            children: [{ index: true, element: <InvestigationCaseComparisonPage /> }],
+            children: [
+              { index: true, element: <InvestigationCaseComparisonPage /> },
+              { path: 'empreintes', element: <DetachedReferencePrintsPage /> },
+            ],
           },
         ],
       },

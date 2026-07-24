@@ -13,6 +13,9 @@ type WindowTitleBarProps = {
   /** When provided, shows an import/importOff toggle */
   isFilesVisible?: boolean
   onToggleFiles?: () => void
+  /** When provided, shows a detach/attach toggle (ouvre le panneau dans une nouvelle fenêtre) */
+  isDetached?: boolean
+  onToggleDetach?: () => void
 }
 
 export default function WindowTitleBar({
@@ -22,6 +25,8 @@ export default function WindowTitleBar({
   onToggleCollapse,
   isFilesVisible,
   onToggleFiles,
+  isDetached,
+  onToggleDetach,
 }: WindowTitleBarProps) {
   const { t } = useTranslation()
 
@@ -43,8 +48,13 @@ export default function WindowTitleBar({
           />
         )}
         {actions}
-        {/* Double fenêtre : pas encore implémenté (placeholder visuel) */}
-        <WindowActionButton icon="windowOn" label={t('common.window.doubleWindow')} />
+        {onToggleDetach && (
+          <WindowActionButton
+            icon={isDetached ? 'windowOff' : 'windowOn'}
+            label={t(isDetached ? 'common.window.attachWindow' : 'common.window.detachWindow')}
+            onClick={onToggleDetach}
+          />
+        )}
       </div>
     </div>
   )
