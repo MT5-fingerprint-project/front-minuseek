@@ -64,7 +64,12 @@
       "referencePrintsWindowWithFile": "Empreintes - {{fileName}}",
       "selectTrace": "Visualisez et éditez vos traces ici",
       "selectReferencePrint": "Visualisez et éditez vos empreintes ici",
-      "analyzeButton": "Analyse IA"
+      "analyzeButton": "Analyse IA",
+      "hitButton": "Déclarer un hit (cette empreinte correspond à cette trace)",
+      "hitButtonActive": "Hit déclaré — cliquer pour retirer",
+      "hitButtonDisabled": "Posez au moins 12 minuties sur la trace et sur l'empreinte pour déclarer un hit",
+      "hitInsufficientMinutiae": "12 minuties requises sur la trace et sur l'empreinte pour déclarer un hit",
+      "hitError": "Impossible de mettre à jour le hit"
     },
     "form": {
       "createTitle": "Nouvelle affaire",
