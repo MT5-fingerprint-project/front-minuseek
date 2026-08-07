@@ -4,8 +4,12 @@ import { ResizableHandle, ResizablePanelGroup } from '@/features/shared/ui/resiz
 import { useComparisonWindow } from '@/features/investigation-case/hooks/useComparisonWindow'
 import { useDetachedWindow } from '@/features/shared/hooks/useDetachedWindow'
 import ComparisonWindow from '@/features/investigation-case/components/comparison/ComparisonWindow'
+import HitButton from '@/features/investigation-case/components/comparison/HitButton'
 import { useBiometricImages } from '@/features/biometric-image/hooks/useBiometricImages'
 import { useCompare } from '@/features/biometric-image/hooks/useCompare'
+import { useLayers } from '@/features/biometric-image/hooks/useLayers'
+import { useHits, useToggleHit } from '@/features/biometric-image/hooks/useHits'
+import { countMinutiae, REQUIRED_MINUTIAE } from '@/features/biometric-image/lib/minutiae'
 
 export default function InvestigationCaseComparisonPage() {
   const { slug, id } = useParams<{ slug: string; id: string }>()
@@ -17,6 +21,20 @@ export default function InvestigationCaseComparisonPage() {
   const { data: referencePrints = [] } = useBiometricImages('reference-prints', id ?? '')
   const compare = useCompare()
 
+  const traceId = trace.selectedTrace?.id
+  const referenceId = reference.selectedTrace?.id
+
+  const { data: traceLayers } = useLayers(traceId)
+  const { data: referenceLayers } = useLayers(referenceId)
+  const { data: hitReferenceIds } = useHits(traceId)
+  const toggleHit = useToggleHit(traceId)
+
+  const isHit = !!referenceId && (hitReferenceIds?.includes(referenceId) ?? false)
+  const hasEnoughMinutiae =
+    countMinutiae(traceLayers) >= REQUIRED_MINUTIAE &&
+    countMinutiae(referenceLayers) >= REQUIRED_MINUTIAE
+  const isHitDisabled = !traceId || !referenceId || !hasEnoughMinutiae || toggleHit.isPending
+
   const runCompare = () => {
     if (!trace.selectedTrace || referencePrints.length === 0 || !id) return
     compare.mutate({ caseId: id, trace: trace.selectedTrace, referencePrints })
@@ -25,6 +43,9 @@ export default function InvestigationCaseComparisonPage() {
   const detachReference = () => {
     if (!slug || !id) return
     referenceWindow.open(`${window.location.origin}/${slug}/affaires/${id}/comparaison/empreintes`)
+  const onToggleHit = () => {
+    if (!id || !referenceId) return
+    toggleHit.mutate({ caseId: id, referencePrintId: referenceId, isHit })
   }
 
   if (!id) return null
@@ -41,21 +62,24 @@ export default function InvestigationCaseComparisonPage() {
         isComparing={compare.isPending}
         onAnalyze={runCompare}
       />
-      {!referenceWindow.isOpen && (
-        <>
-          <ResizableHandle withHandle className="w-2 bg-transparent" />
-          <ComparisonWindow
-            side="right"
-            type="reference-prints"
-            caseId={id}
-            isActive={activeWindow === 'reference'}
-            onActivate={() => setActiveWindow('reference')}
-            window={reference}
-            selectedTraceId={trace.selectedTrace?.id}
-            onToggleDetach={detachReference}
-          />
-        </>
-      )}
+      <ResizableHandle withHandle className="w-2 bg-transparent">
+        {/* Ancré sur le séparateur → suit le drag ; posé vers le bas. */}
+        <div
+          className="pointer-events-auto absolute bottom-8 left-1/2 z-20 -translate-x-1/2 -translate-y-full"
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          <HitButton isHit={isHit} disabled={isHitDisabled} onClick={onToggleHit} />
+        </div>
+      </ResizableHandle>
+      <ComparisonWindow
+        side="right"
+        type="reference-prints"
+        caseId={id}
+        isActive={activeWindow === 'reference'}
+        onActivate={() => setActiveWindow('reference')}
+        window={reference}
+        selectedTraceId={trace.selectedTrace?.id}
+      />
     </ResizablePanelGroup>
   )
 }
