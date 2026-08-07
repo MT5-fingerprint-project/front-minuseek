@@ -17,7 +17,8 @@
       "hideLayers": "Masquer les calques",
       "showGrid": "Afficher la grille",
       "hideGrid": "Masquer la grille",
-      "doubleWindow": "Double fenêtre (à venir)",
+      "detachWindow": "Ouvrir dans une nouvelle fenêtre",
+      "attachWindow": "Fermer la fenêtre détachée",
       "undo": "Annuler (à venir)",
       "redo": "Rétablir (à venir)"
     }

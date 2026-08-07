@@ -9,13 +9,17 @@ type WorkbenchWindowProps = {
   icon?: IconName
   /** Action buttons in the title bar, insérées avant le placeholder double-fenêtre */
   actions?: ReactNode
-  isCollapsed: boolean
-  onToggleCollapse: () => void
+  /** Réduire la fenêtre (icône sidebar) : uniquement en mode panneau redimensionnable */
+  isCollapsed?: boolean
+  onToggleCollapse?: () => void
   isActive?: boolean
   onActivate?: () => void
   /** When provided, shows an import/importOff toggle in the title bar */
   isFilesVisible?: boolean
   onToggleFiles?: () => void
+  /** When provided, shows a detach/attach toggle in the title bar */
+  isDetached?: boolean
+  onToggleDetach?: () => void
   /** Footer content (rendu sur toute la largeur du pied de fenêtre) */
   footer?: ReactNode
   children: ReactNode
@@ -25,15 +29,17 @@ export default function WorkbenchWindow({
   title,
   icon = 'trace',
   actions,
-  isCollapsed,
+  isCollapsed = false,
   onToggleCollapse,
   onActivate,
   isFilesVisible,
   onToggleFiles,
+  isDetached,
+  onToggleDetach,
   footer,
   children,
 }: WorkbenchWindowProps) {
-  if (isCollapsed) {
+  if (isCollapsed && onToggleCollapse) {
     return <WindowCollapsed onToggleCollapse={onToggleCollapse} onActivate={onActivate} />
   }
 
@@ -49,6 +55,8 @@ export default function WorkbenchWindow({
         onToggleCollapse={onToggleCollapse}
         isFilesVisible={isFilesVisible}
         onToggleFiles={onToggleFiles}
+        isDetached={isDetached}
+        onToggleDetach={onToggleDetach}
       />
       <div className="flex min-h-0 flex-1 flex-col">{children}</div>
       <WindowFooter footer={footer} />
