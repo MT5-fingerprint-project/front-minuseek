@@ -187,18 +187,18 @@
       "fields": {
         "lastName": {
           "label": "Nom",
-          "placeholder": "Écrivez-ici"
+          "placeholder": "Dupont"
         },
         "firstName": {
           "label": "Prénom",
-          "placeholder": "Écrivez-ici"
+          "placeholder": "Camille"
         },
         "birthDate": {
           "label": "Date de naissance"
         },
         "birthPlace": {
           "label": "Lieu de naissance",
-          "placeholder": "Écrivez-ici"
+          "placeholder": "Lyon"
         },
         "sex": {
           "label": "Genre",
@@ -206,7 +206,7 @@
         },
         "phoneNumber": {
           "label": "Numéro de téléphone",
-          "placeholder": "Écrivez-ici"
+          "placeholder": "0612345678"
         },
         "type": {
           "label": "Type de sujet",
@@ -214,11 +214,11 @@
         },
         "firstParentName": {
           "label": "Parent 1",
-          "placeholder": "Nom et prénom"
+          "placeholder": "Marie Dupont"
         },
         "secondParentName": {
           "label": "Parent 2",
-          "placeholder": "Nom et prénom"
+          "placeholder": "Pierre Dupont"
         }
       }
     },
