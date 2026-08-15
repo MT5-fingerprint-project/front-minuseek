@@ -10,9 +10,11 @@ const endpointByType: Record<BiometricImageType, string> = {
   'reference-prints': '/reference-prints',
 }
 
-type UploadInput = {
+export type UploadInput = {
   caseId: string
   file: File
+  subjectId?: string
+  position?: string
 }
 
 function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
@@ -23,6 +25,8 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     status: dto.status,
     score: dto.score,
     caseId: dto.caseId,
+    subjectId: dto.subjectId ?? null,
+    position: dto.position ?? null,
     createdAt: dto.createdAt,
     updatedAt: dto.updatedAt,
     matchings: dto.matchings ?? [],
@@ -38,10 +42,12 @@ export const BiometricImageAPI = {
   remove: (type: BiometricImageType, id: string) =>
     apiClient.delete(`${endpointByType[type]}/${id}`).then((res) => res.data),
 
-  upload: (type: BiometricImageType, { caseId, file }: UploadInput) => {
+  upload: (type: BiometricImageType, { caseId, file, subjectId, position }: UploadInput) => {
     const formData = new FormData()
     formData.append('caseId', caseId)
     formData.append('file', file)
+    if (subjectId) formData.append('subjectId', subjectId)
+    if (position) formData.append('position', position)
 
     return apiClient
       .post<BiometricImageDto | { data: BiometricImageDto }>(endpointByType[type], formData, {

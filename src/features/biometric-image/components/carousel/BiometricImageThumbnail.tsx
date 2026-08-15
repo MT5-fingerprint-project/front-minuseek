@@ -15,7 +15,12 @@ import {
   AlertDialogTrigger,
 } from '@/features/shared/ui/alert-dialog'
 import { useDeleteBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
-import type { BiometricImage, BiometricImageType, MatchingScore } from '@/features/biometric-image/types/biometricImage'
+import type {
+  BiometricImage,
+  BiometricImageDecoration,
+  BiometricImageType,
+  MatchingScore,
+} from '@/features/biometric-image/types/biometricImage'
 
 type BiometricImageThumbnailProps = {
   image: BiometricImage
@@ -24,6 +29,7 @@ type BiometricImageThumbnailProps = {
   isSelected: boolean
   onSelect: () => void
   matching?: MatchingScore
+  decoration?: BiometricImageDecoration
 }
 
 export default function BiometricImageThumbnail({
@@ -33,9 +39,11 @@ export default function BiometricImageThumbnail({
   isSelected,
   onSelect,
   matching,
+  decoration,
 }: BiometricImageThumbnailProps) {
   const { t } = useTranslation()
   const deleteImage = useDeleteBiometricImage(type, caseId)
+  const label = decoration?.label ?? image.fileName
 
   return (
     <div className="relative">
@@ -46,12 +54,14 @@ export default function BiometricImageThumbnail({
           aria-pressed={isSelected}
           className={cn(
             'relative h-[107px] w-[73px] shrink-0 overflow-hidden rounded outline-offset-[-1px]',
+            decoration?.borderColor && 'border-2',
             isSelected && 'shadow-[0_0_4px_rgba(9,16,41,0.25)] outline-2 outline-orange-medium'
           )}
+          style={decoration?.borderColor ? { borderColor: decoration.borderColor } : undefined}
         >
           <img
             src={image.url}
-            alt={image.fileName}
+            alt={label}
             loading="lazy"
             decoding="async"
             className="block h-full w-full object-cover"
@@ -69,17 +79,17 @@ export default function BiometricImageThumbnail({
             </Badge>
           )}
           <span className="absolute inset-x-0 bottom-0 truncate bg-[rgba(9,16,41,0.7)] px-0.5 py-0.5 text-center text-xs font-light text-white">
-            {image.fileName}
+            {label}
           </span>
         </TooltipTrigger>
-        <TooltipContent className="break-all">{image.fileName}</TooltipContent>
+        <TooltipContent className="break-all">{label}</TooltipContent>
       </Tooltip>
 
       <AlertDialog>
         <AlertDialogTrigger
           type="button"
           disabled={deleteImage.isPending}
-          aria-label={t('biometricImage.delete.aria', { fileName: image.fileName })}
+          aria-label={t('biometricImage.delete.aria', { fileName: label })}
           onClick={(event) => event.stopPropagation()}
           className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/85 disabled:opacity-50"
         >

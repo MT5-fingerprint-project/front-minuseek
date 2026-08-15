@@ -1,7 +1,11 @@
 import { useTranslation } from 'react-i18next'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/features/shared/ui/carousel'
 import { getMatching } from '@/features/biometric-image/lib/matchingScore'
-import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
+import type {
+  BiometricImage,
+  BiometricImageDecoration,
+  BiometricImageType,
+} from '@/features/biometric-image/types/biometricImage'
 import BiometricImageThumbnail from '@/features/biometric-image/components/carousel/BiometricImageThumbnail'
 import BiometricImageImportButton from '@/features/biometric-image/components/carousel/BiometricImageImportButton'
 import BiometricImageEmptyPlaceholder from '@/features/biometric-image/components/carousel/BiometricImageEmptyPlaceholder'
@@ -16,6 +20,7 @@ type BiometricImageCarouselViewProps = {
   onSelect: (image: BiometricImage) => void
   onUploadSuccess?: (image: BiometricImage) => void
   selectedTraceId?: string
+  decorations?: Record<string, BiometricImageDecoration>
 }
 
 export default function BiometricImageCarouselView({
@@ -27,6 +32,7 @@ export default function BiometricImageCarouselView({
   onSelect,
   onUploadSuccess,
   selectedTraceId,
+  decorations,
 }: BiometricImageCarouselViewProps) {
   const { t } = useTranslation()
 
@@ -62,6 +68,7 @@ export default function BiometricImageCarouselView({
                     isSelected={image.id === selectedId}
                     onSelect={() => onSelect(image)}
                     matching={getMatching(image, selectedTraceId)}
+                    decoration={decorations?.[image.id]}
                   />
                 </CarouselItem>
               ))}

@@ -12,6 +12,8 @@ const makeFixture = (id: string, fileName: string): BiometricImage => ({
   status: 'RECEIVED',
   score: null,
   caseId: 'fixture-case-id',
+  subjectId: null,
+  position: null,
   createdAt: baseTimestamp,
   updatedAt: baseTimestamp,
   matchings: [],
