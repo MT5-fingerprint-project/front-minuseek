@@ -43,6 +43,8 @@ export default function InvestigationCaseComparisonPage() {
   const detachReference = () => {
     if (!slug || !id) return
     referenceWindow.open(`${window.location.origin}/${slug}/affaires/${id}/comparaison/empreintes`)
+  }
+
   const onToggleHit = () => {
     if (!id || !referenceId) return
     toggleHit.mutate({ caseId: id, referencePrintId: referenceId, isHit })
@@ -62,24 +64,29 @@ export default function InvestigationCaseComparisonPage() {
         isComparing={compare.isPending}
         onAnalyze={runCompare}
       />
-      <ResizableHandle withHandle className="w-2 bg-transparent">
-        {/* Ancré sur le séparateur → suit le drag ; posé vers le bas. */}
-        <div
-          className="pointer-events-auto absolute bottom-8 left-1/2 z-20 -translate-x-1/2 -translate-y-full"
-          onMouseDown={(e) => e.stopPropagation()}
-        >
-          <HitButton isHit={isHit} disabled={isHitDisabled} onClick={onToggleHit} />
-        </div>
-      </ResizableHandle>
-      <ComparisonWindow
-        side="right"
-        type="reference-prints"
-        caseId={id}
-        isActive={activeWindow === 'reference'}
-        onActivate={() => setActiveWindow('reference')}
-        window={reference}
-        selectedTraceId={trace.selectedTrace?.id}
-      />
+      {!referenceWindow.isOpen && (
+        <>
+          <ResizableHandle withHandle className="w-2 bg-transparent">
+            {/* Ancré sur le séparateur → suit le drag ; posé vers le bas. */}
+            <div
+              className="pointer-events-auto absolute bottom-8 left-1/2 z-20 -translate-x-1/2 -translate-y-full"
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <HitButton isHit={isHit} disabled={isHitDisabled} onClick={onToggleHit} />
+            </div>
+          </ResizableHandle>
+          <ComparisonWindow
+            side="right"
+            type="reference-prints"
+            caseId={id}
+            isActive={activeWindow === 'reference'}
+            onActivate={() => setActiveWindow('reference')}
+            window={reference}
+            selectedTraceId={trace.selectedTrace?.id}
+            onToggleDetach={detachReference}
+          />
+        </>
+      )}
     </ResizablePanelGroup>
   )
 }
