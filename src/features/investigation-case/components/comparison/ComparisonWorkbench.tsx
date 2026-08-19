@@ -5,6 +5,7 @@ import { Button } from '@/features/shared/ui/button'
 import WorkbenchWindow from '@/features/shared/components/window/WorkbenchWindow'
 import WindowActionButton from '@/features/shared/components/window/WindowActionButton'
 import { BiometricImageCarousel, BiometricImageCanvas } from '@/features/biometric-image'
+import type { BiometricImageDecoration } from '@/features/biometric-image/types/biometricImage'
 import ZoomControls from '@/features/biometric-image/components/canvas/ZoomControls'
 import RecenterButton from '@/features/biometric-image/components/canvas/RecenterControl'
 import type { ComparisonWindowState } from '@/features/investigation-case/hooks/useComparisonWindow'
@@ -41,6 +42,8 @@ export type ComparisonWorkbenchProps = {
   /** Rendu du bouton détacher/rattacher (double fenêtre) */
   isDetached?: boolean
   onToggleDetach?: () => void
+  /** Habillage des vignettes du carrousel par id d'image (libellé, bordure) */
+  imageDecorations?: Record<string, BiometricImageDecoration>
 }
 
 /**
@@ -62,6 +65,7 @@ export default function ComparisonWorkbench({
   isCollapsed,
   isDetached,
   onToggleDetach,
+  imageDecorations,
 }: ComparisonWorkbenchProps) {
   const { t } = useTranslation()
   const keys = TITLES[type]
@@ -137,6 +141,7 @@ export default function ComparisonWorkbench({
           selectedId={w.selectedTrace?.id}
           onSelect={w.setSelectedTrace}
           selectedTraceId={selectedTraceId}
+          decorations={imageDecorations}
         />
       )}
       <div className="min-h-0 flex-1 p-2">

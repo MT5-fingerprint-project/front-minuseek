@@ -9,7 +9,7 @@ type CaseFrameProps = {
   /** Navbar réduite (mode comparateur) */
   navbarCollapsed?: boolean
   /** Entrée de navigation active */
-  activeNav: 'info' | 'comparison'
+  activeNav: 'info' | 'subjects' | 'comparison'
   children: ReactNode
 }
 
@@ -25,6 +25,12 @@ export default function CaseFrame({ navbarCollapsed = false, activeNav, children
       icon: 'information' as const,
       label: t('navigation.informations'),
       isActive: activeNav === 'info',
+    },
+    {
+      link: `/${slug}/affaires/${id}/sujets`,
+      icon: 'personGroup' as const,
+      label: t('navigation.subjects'),
+      isActive: activeNav === 'subjects',
     },
     {
       link: `/${slug}/affaires/${id}/comparaison`,

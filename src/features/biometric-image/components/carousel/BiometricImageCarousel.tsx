@@ -1,7 +1,11 @@
 import { useMemo } from 'react'
 import { useBiometricImages } from '@/features/biometric-image/hooks/useBiometricImages'
 import { sortByMatchingScore } from '@/features/biometric-image/lib/matchingScore'
-import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
+import type {
+  BiometricImage,
+  BiometricImageDecoration,
+  BiometricImageType,
+} from '@/features/biometric-image/types/biometricImage'
 import BiometricImageCarouselView from '@/features/biometric-image/components/carousel/BiometricImageCarouselView'
 
 type BiometricImageCarouselProps = {
@@ -10,6 +14,7 @@ type BiometricImageCarouselProps = {
   selectedId: string | undefined
   onSelect: (image: BiometricImage) => void
   selectedTraceId?: string
+  decorations?: Record<string, BiometricImageDecoration>
 }
 
 export default function BiometricImageCarousel({
@@ -18,6 +23,7 @@ export default function BiometricImageCarousel({
   selectedId,
   onSelect,
   selectedTraceId,
+  decorations,
 }: BiometricImageCarouselProps) {
   const { data: images = [], isPending } = useBiometricImages(type, caseId)
 
@@ -36,6 +42,7 @@ export default function BiometricImageCarousel({
       onSelect={onSelect}
       onUploadSuccess={onSelect}
       selectedTraceId={selectedTraceId}
+      decorations={decorations}
     />
   )
 }

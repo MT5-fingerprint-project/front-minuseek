@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { useQueryClient } from '@tanstack/react-query'
 import { ResizableHandle, ResizablePanelGroup } from '@/features/shared/ui/resizable'
 import { useComparisonWindow } from '@/features/investigation-case/hooks/useComparisonWindow'
+import { useReferencePrintDecorations } from '@/features/investigation-case/hooks/useReferencePrintDecorations'
 import { useDetachedWindow } from '@/features/shared/hooks/useDetachedWindow'
 import ComparisonWindow from '@/features/investigation-case/components/comparison/ComparisonWindow'
+import ComparisonWorkbench from '@/features/investigation-case/components/comparison/ComparisonWorkbench'
 import HitButton from '@/features/investigation-case/components/comparison/HitButton'
-import { useBiometricImages } from '@/features/biometric-image/hooks/useBiometricImages'
+import { biometricImageKeys, useBiometricImages } from '@/features/biometric-image/hooks/useBiometricImages'
 import { useCompare } from '@/features/biometric-image/hooks/useCompare'
-import { useLayers } from '@/features/biometric-image/hooks/useLayers'
+import { layerKeys, useLayers } from '@/features/biometric-image/hooks/useLayers'
 import { useHits, useToggleHit } from '@/features/biometric-image/hooks/useHits'
 import { countMinutiae, REQUIRED_MINUTIAE } from '@/features/biometric-image/lib/minutiae'
 
@@ -16,9 +19,16 @@ export default function InvestigationCaseComparisonPage() {
   const [activeWindow, setActiveWindow] = useState<'trace' | 'reference'>()
   const trace = useComparisonWindow()
   const reference = useComparisonWindow()
-  const referenceWindow = useDetachedWindow('minuseek-reference-prints')
+  const queryClient = useQueryClient()
+  // La popup est une instance d'app à part (cache React Query indépendant) : au
+  // rattachement, on invalide ce qu'elle a pu modifier pour refléter ses édits.
+  const referenceWindow = useDetachedWindow('minuseek-reference-prints', () => {
+    queryClient.invalidateQueries({ queryKey: layerKeys.all })
+    queryClient.invalidateQueries({ queryKey: biometricImageKeys.list('reference-prints', id ?? '') })
+  })
 
   const { data: referencePrints = [] } = useBiometricImages('reference-prints', id ?? '')
+  const referenceDecorations = useReferencePrintDecorations(id ?? '')
   const compare = useCompare()
 
   const traceId = trace.selectedTrace?.id
@@ -40,17 +50,42 @@ export default function InvestigationCaseComparisonPage() {
     compare.mutate({ caseId: id, trace: trace.selectedTrace, referencePrints })
   }
 
-  const detachReference = () => {
-    if (!slug || !id) return
-    referenceWindow.open(`${window.location.origin}/${slug}/affaires/${id}/comparaison/empreintes`)
-  }
-
   const onToggleHit = () => {
     if (!id || !referenceId) return
     toggleHit.mutate({ caseId: id, referencePrintId: referenceId, isHit })
   }
 
+  const isReferenceDetached = referenceWindow.isOpen
+
+  const toggleDetachReference = () => {
+    if (isReferenceDetached) {
+      referenceWindow.close()
+      return
+    }
+    if (!slug || !id) return
+    referenceWindow.open(`${window.location.origin}/${slug}/affaires/${id}/comparaison/empreintes`)
+  }
+
   if (!id) return null
+
+  // Empreintes détachées dans leur propre fenêtre : les traces prennent toute la
+  // largeur ; la fermeture de la popup (détectée par useDetachedWindow) restaure le split.
+  if (isReferenceDetached) {
+    return (
+      <div className="h-full min-h-[500px]">
+        <ComparisonWorkbench
+          side="left"
+          type="traces"
+          caseId={id}
+          isActive
+          onActivate={() => setActiveWindow('trace')}
+          window={trace}
+          isComparing={compare.isPending}
+          onAnalyze={runCompare}
+        />
+      </div>
+    )
+  }
 
   return (
     <ResizablePanelGroup orientation="horizontal" className="h-full min-h-[500px]">
@@ -64,29 +99,26 @@ export default function InvestigationCaseComparisonPage() {
         isComparing={compare.isPending}
         onAnalyze={runCompare}
       />
-      {!referenceWindow.isOpen && (
-        <>
-          <ResizableHandle withHandle className="w-2 bg-transparent">
-            {/* Ancré sur le séparateur → suit le drag ; posé vers le bas. */}
-            <div
-              className="pointer-events-auto absolute bottom-8 left-1/2 z-20 -translate-x-1/2 -translate-y-full"
-              onMouseDown={(e) => e.stopPropagation()}
-            >
-              <HitButton isHit={isHit} disabled={isHitDisabled} onClick={onToggleHit} />
-            </div>
-          </ResizableHandle>
-          <ComparisonWindow
-            side="right"
-            type="reference-prints"
-            caseId={id}
-            isActive={activeWindow === 'reference'}
-            onActivate={() => setActiveWindow('reference')}
-            window={reference}
-            selectedTraceId={trace.selectedTrace?.id}
-            onToggleDetach={detachReference}
-          />
-        </>
-      )}
+      <ResizableHandle withHandle className="w-2 bg-transparent">
+        {/* Ancré sur le séparateur → suit le drag ; posé vers le bas. */}
+        <div
+          className="pointer-events-auto absolute bottom-8 left-1/2 z-20 -translate-x-1/2 -translate-y-full"
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          <HitButton isHit={isHit} disabled={isHitDisabled} onClick={onToggleHit} />
+        </div>
+      </ResizableHandle>
+      <ComparisonWindow
+        side="right"
+        type="reference-prints"
+        caseId={id}
+        isActive={activeWindow === 'reference'}
+        onActivate={() => setActiveWindow('reference')}
+        window={reference}
+        selectedTraceId={trace.selectedTrace?.id}
+        onToggleDetach={toggleDetachReference}
+        imageDecorations={referenceDecorations}
+      />
     </ResizablePanelGroup>
   )
 }

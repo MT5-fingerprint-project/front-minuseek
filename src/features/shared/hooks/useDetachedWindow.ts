@@ -34,10 +34,18 @@ function popupFeatures(width: number, height: number) {
  * `localStorage.accessToken` partagé). Suit l'état ouvert/fermé et détecte la
  * fermeture de la popup (croix de l'OS ou `window.close()` depuis la popup) par
  * polling de `window.closed`. La popup est refermée si le composant hôte est démonté.
+ *
+ * `onClose` est appelé à chaque fermeture effective (explicite via `close()` ou
+ * détectée par polling) — la popup est une instance d'app séparée (cache React
+ * Query indépendant), c'est le point d'accroche pour resynchroniser l'hôte.
  */
-export function useDetachedWindow(name: string) {
+export function useDetachedWindow(name: string, onClose?: () => void) {
   const ref = useRef<Window | null>(null)
   const [isOpen, setIsOpen] = useState(false)
+  const onCloseRef = useRef(onClose)
+  useEffect(() => {
+    onCloseRef.current = onClose
+  }, [onClose])
 
   const open = useCallback(
     (url: string, features: string = popupFeatures(DEFAULT_WIDTH, DEFAULT_HEIGHT)) => {
@@ -55,9 +63,11 @@ export function useDetachedWindow(name: string) {
   )
 
   const close = useCallback(() => {
-    ref.current?.close()
+    if (!ref.current) return
+    ref.current.close()
     ref.current = null
     setIsOpen(false)
+    onCloseRef.current?.()
   }, [])
 
   // Détecte la fermeture de la popup (croix OS ou window.close côté popup)
@@ -67,6 +77,7 @@ export function useDetachedWindow(name: string) {
       if (ref.current?.closed) {
         ref.current = null
         setIsOpen(false)
+        onCloseRef.current?.()
       }
     }, 500)
     return () => window.clearInterval(timer)

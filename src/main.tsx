@@ -13,6 +13,8 @@ import CasePageLayout from './layouts/CasePageLayout.tsx'
 import CaseComparisonLayout from './layouts/CaseComparisonLayout.tsx'
 import InvestigationCasesPage from './features/investigation-case/pages/InvestigationCasesPage.tsx'
 import InvestigationCaseDetailsPage from './features/investigation-case/pages/InvestigationCaseDetailsPage.tsx'
+import InvestigationCaseSubjectsPage from './features/investigation-case/pages/InvestigationCaseSubjectsPage.tsx'
+import SubjectDetailsPage from './features/investigation-case/pages/SubjectDetailsPage.tsx'
 import InvestigationCaseComparisonPage from './features/investigation-case/pages/InvestigationCaseComparisonPage.tsx'
 import DetachedReferencePrintsPage from './features/investigation-case/pages/DetachedReferencePrintsPage.tsx'
 
@@ -30,6 +32,14 @@ const router = createBrowserRouter([
           {
             element: <CasePageLayout />,
             children: [{ index: true, element: <InvestigationCaseDetailsPage /> }],
+          },
+          {
+            path: 'sujets',
+            element: <CasePageLayout activeNav="subjects" />,
+            children: [
+              { index: true, element: <InvestigationCaseSubjectsPage /> },
+              { path: ':subjectId', element: <SubjectDetailsPage /> },
+            ],
           },
           {
             path: 'comparaison',

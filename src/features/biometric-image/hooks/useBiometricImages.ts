@@ -1,7 +1,7 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
-import { BiometricImageAPI } from '@/features/biometric-image/services/BiometricImageAPI.services'
+import { BiometricImageAPI, type UploadInput } from '@/features/biometric-image/services/BiometricImageAPI.services'
 import type { BiometricImageType } from '@/features/biometric-image/types/biometricImage'
 
 export const biometricImageKeys = {
@@ -45,7 +45,7 @@ export function useUploadBiometricImage(type: BiometricImageType, options?: UseU
   const { t } = useTranslation()
 
   return useMutation({
-    mutationFn: (input: { caseId: string; file: File }) => BiometricImageAPI.upload(type, input),
+    mutationFn: (input: UploadInput) => BiometricImageAPI.upload(type, input),
     onSuccess: (image, variables) => {
       queryClient.invalidateQueries({ queryKey: biometricImageKeys.list(type, variables.caseId) })
       toast.success(t('biometricImage.upload.success'))

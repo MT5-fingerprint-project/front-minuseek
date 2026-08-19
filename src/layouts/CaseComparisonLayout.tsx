@@ -5,7 +5,7 @@ import CaseFrame from './CaseFrame'
 export default function CaseComparisonLayout() {
   return (
     <CaseFrame navbarCollapsed activeNav="comparison">
-      <div className="flex-1">
+      <div className="min-w-0 flex-1">
         <Outlet />
       </div>
     </CaseFrame>

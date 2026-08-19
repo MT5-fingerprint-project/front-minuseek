@@ -1,5 +1,6 @@
 import { useParams } from 'react-router-dom'
 import { useComparisonWindow } from '@/features/investigation-case/hooks/useComparisonWindow'
+import { useReferencePrintDecorations } from '@/features/investigation-case/hooks/useReferencePrintDecorations'
 import ComparisonWorkbench from '@/features/investigation-case/components/comparison/ComparisonWorkbench'
 
 /**
@@ -11,6 +12,7 @@ import ComparisonWorkbench from '@/features/investigation-case/components/compar
 export default function DetachedReferencePrintsPage() {
   const { id } = useParams<{ id: string }>()
   const reference = useComparisonWindow()
+  const referenceDecorations = useReferencePrintDecorations(id ?? '')
 
   if (!id) return null
 
@@ -25,6 +27,7 @@ export default function DetachedReferencePrintsPage() {
         window={reference}
         isDetached
         onToggleDetach={() => window.close()}
+        imageDecorations={referenceDecorations}
       />
     </div>
   )

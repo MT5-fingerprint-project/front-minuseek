@@ -28,6 +28,7 @@
     "navigationLabel": "Navigation",
     "backToCases": "Retour aux affaires",
     "informations": "Informations",
+    "subjects": "Sujets",
     "tracesAndFingerprints": "Traces & empreintes"
   },
   "investigationCase": {
@@ -108,6 +109,129 @@
     },
     "success": {
       "created": "Affaire créée avec succès"
+    }
+  },
+  "subject": {
+    "sex": {
+      "MALE": "Homme",
+      "FEMALE": "Femme"
+    },
+    "type": {
+      "CLOSE_ASSOCIATE": "Familier",
+      "PERSON_OF_INTEREST": "Mis en cause"
+    },
+    "list": {
+      "title": "Sujets de l'affaire n°{{caseNumber}}",
+      "summary": "{{closeAssociates}} et {{personsOfInterest}}",
+      "closeAssociateCount_one": "{{count}} familier",
+      "closeAssociateCount_other": "{{count}} familiers",
+      "personOfInterestCount_one": "{{count}} mis en cause",
+      "personOfInterestCount_other": "{{count}} mis en cause",
+      "add": "Ajouter un sujet",
+      "closeAssociates": "Familiers",
+      "personsOfInterest": "Mis en cause",
+      "empty": "Aucun sujet pour l'instant",
+      "bornOn": "Né.e le {{date}}"
+    },
+    "details": {
+      "back": "Retour aux sujets",
+      "createdAt": "Créé.e le {{date}}",
+      "informations": "Informations personnelles",
+      "birthDate": "Date de naissance :",
+      "birthPlace": "Lieu de naissance :",
+      "sex": "Genre :",
+      "phone": "Téléphone :",
+      "firstParent": "Parent 1 :",
+      "secondParent": "Parent 2 :",
+      "notProvided": "Non renseigné"
+    },
+    "prints": {
+      "title": "Empreintes",
+      "leftHand": "Main gauche",
+      "rightHand": "Main droite",
+      "positions": {
+        "THUMB": "Pouce",
+        "INDEX": "Index",
+        "MIDDLE": "Majeur",
+        "RING": "Annulaire",
+        "LITTLE": "Auriculaire",
+        "PALM": "Paume"
+      },
+      "import": "Importer l'empreinte : {{position}}",
+      "delete": "Supprimer l'empreinte : {{position}}",
+      "printLabel": "{{name}} - {{position}}",
+      "fullPositions": {
+        "LEFT_THUMB": "Pouce gauche",
+        "LEFT_INDEX": "Index gauche",
+        "LEFT_MIDDLE": "Majeur gauche",
+        "LEFT_RING": "Annulaire gauche",
+        "LEFT_LITTLE": "Auriculaire gauche",
+        "LEFT_PALM": "Paume gauche",
+        "RIGHT_THUMB": "Pouce droit",
+        "RIGHT_INDEX": "Index droit",
+        "RIGHT_MIDDLE": "Majeur droit",
+        "RIGHT_RING": "Annulaire droit",
+        "RIGHT_LITTLE": "Auriculaire droit",
+        "RIGHT_PALM": "Paume droite"
+      }
+    },
+    "form": {
+      "createTitle": "Nouveau sujet",
+      "createDescription": "Renseignez les informations du nouveau sujet.",
+      "sections": {
+        "general": "Informations générales",
+        "parents": "Parents"
+      },
+      "submit": "Créer le sujet",
+      "submitting": "Création…",
+      "fields": {
+        "lastName": {
+          "label": "Nom",
+          "placeholder": "Dupont"
+        },
+        "firstName": {
+          "label": "Prénom",
+          "placeholder": "Camille"
+        },
+        "birthDate": {
+          "label": "Date de naissance"
+        },
+        "birthPlace": {
+          "label": "Lieu de naissance",
+          "placeholder": "Lyon"
+        },
+        "sex": {
+          "label": "Genre",
+          "placeholder": "Choisissez une option"
+        },
+        "phoneNumber": {
+          "label": "Numéro de téléphone",
+          "placeholder": "0612345678"
+        },
+        "type": {
+          "label": "Type de sujet",
+          "placeholder": "Choisissez une option"
+        },
+        "firstParentName": {
+          "label": "Parent 1",
+          "placeholder": "Marie Dupont"
+        },
+        "secondParentName": {
+          "label": "Parent 2",
+          "placeholder": "Pierre Dupont"
+        }
+      }
+    },
+    "validation": {
+      "lastNameRequired": "Le nom est requis",
+      "firstNameRequired": "Le prénom est requis",
+      "birthDateRequired": "La date de naissance est requise",
+      "birthPlaceRequired": "Le lieu de naissance est requis",
+      "sexRequired": "Le genre est requis",
+      "typeRequired": "Le type de sujet est requis"
+    },
+    "success": {
+      "created": "Sujet créé avec succès"
     }
   },
   "biometricImage": {
