@@ -29,7 +29,9 @@
     "backToCases": "Retour aux affaires",
     "informations": "Informations",
     "subjects": "Sujets",
-    "tracesAndFingerprints": "Traces & empreintes"
+    "tracesAndFingerprints": "Traces & empreintes",
+    "history": "Historique",
+    "reports": "Rapports"
   },
   "investigationCase": {
     "status": {
@@ -298,5 +300,68 @@
       "message": "Accédez à l'application via l'adresse de votre organisation."
     },
     "error": "Impossible de contacter le service d'authentification."
+  },
+  "auditTrail": {
+    "title": "Historique du dossier",
+    "subtitle": "Chronologie des actes enregistrés, du plus récent au plus ancien.",
+    "empty": "Aucun événement enregistré pour ce dossier.",
+    "entry": {
+      "byline": "par {{actor}} — le {{date}} à {{time}}",
+      "showDetail": "Voir le détail",
+      "hideDetail": "Masquer le détail"
+    },
+    "evidenceClass": {
+      "OBSERVED": "Observé",
+      "DECLARED": "Déclaré"
+    },
+    "eventType": {
+      "TENANT_PROVISIONED": "Laboratoire créé",
+      "CASE_OPENED": "Dossier ouvert",
+      "CASE_STATUS_CHANGED": "Statut du dossier modifié",
+      "TRACE_UPLOADED": "Trace déposée",
+      "TRACE_QUALIFIED": "Trace qualifiée",
+      "TRACE_DELETED": "Trace supprimée",
+      "REFERENCE_PRINT_UPLOADED": "Empreinte de référence déposée",
+      "REFERENCE_PRINT_DELETED": "Empreinte de référence supprimée",
+      "LAYER_CREATED": "Calque ajouté",
+      "LAYER_UPDATED": "Calque modifié",
+      "LAYER_DELETED": "Calque supprimé",
+      "COMPARISON_EXECUTED": "Comparaison lancée",
+      "HIT_RECORDED": "Correspondance déclarée",
+      "HIT_REMOVED": "Correspondance retirée",
+      "PIECE_VIEWED": "Pièce consultée",
+      "FILE_DOWNLOAD_URL_ISSUED": "Téléchargement autorisé",
+      "REPORT_GENERATED": "Rapport généré",
+      "CHAIN_ANCHORED": "Chaîne horodatée"
+    },
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "position": "Page {{page}} sur {{pageCount}}"
+    }
+  },
+  "reporting": {
+    "title": "Rapports du dossier",
+    "subtitle": "Documents scellés, générés à partir de l'état du dossier au moment de l'édition.",
+    "listTitle": "Rapports scellés",
+    "empty": "Aucun rapport généré pour ce dossier.",
+    "sealed": "Scellé",
+    "download": "Télécharger",
+    "byline": "par {{actor}} — le {{date}} à {{time}}",
+    "sealNotice": "L'empreinte SHA-256 affichée sous chaque rapport est celle enregistrée dans la chaîne d'audit : elle doit correspondre au fichier téléchargé.",
+    "type": {
+      "TECHNICAL": "Rapport technique",
+      "TRACEABILITY": "Annexe de traçabilité"
+    },
+    "generate": {
+      "TECHNICAL": "Générer le rapport technique",
+      "TRACEABILITY": "Générer l'annexe de traçabilité"
+    },
+    "success": {
+      "generated": "Rapport généré et scellé."
+    },
+    "errors": {
+      "downloadFailed": "Téléchargement impossible."
+    }
   }
 }

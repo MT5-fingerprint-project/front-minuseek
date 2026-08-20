@@ -9,7 +9,7 @@ type CaseFrameProps = {
   /** Navbar réduite (mode comparateur) */
   navbarCollapsed?: boolean
   /** Entrée de navigation active */
-  activeNav: 'info' | 'subjects' | 'comparison'
+  activeNav: 'info' | 'subjects' | 'comparison' | 'history' | 'reports'
   children: ReactNode
 }
 
@@ -37,6 +37,18 @@ export default function CaseFrame({ navbarCollapsed = false, activeNav, children
       icon: 'fingerprint' as const,
       label: t('navigation.tracesAndFingerprints'),
       isActive: activeNav === 'comparison',
+    },
+    {
+      link: `/${slug}/affaires/${id}/historique`,
+      icon: 'calendar' as const,
+      label: t('navigation.history'),
+      isActive: activeNav === 'history',
+    },
+    {
+      link: `/${slug}/affaires/${id}/rapports`,
+      icon: 'fileExport' as const,
+      label: t('navigation.reports'),
+      isActive: activeNav === 'reports',
     },
   ]
 
