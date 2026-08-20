@@ -1,4 +1,3 @@
-/** Métadonnées de l'enveloppe paginée du back (PageDto). */
 export type PaginationMeta = {
   page: number
   limit: number
@@ -8,7 +7,6 @@ export type PaginationMeta = {
   hasNextPage: boolean
 }
 
-/** Enveloppe de réponse paginée renvoyée par l'API ({ data, meta }). */
 export type PaginatedResponse<T> = {
   data: T[]
   meta: PaginationMeta

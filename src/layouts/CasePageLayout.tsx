@@ -13,7 +13,7 @@ type CasePageLayoutProps = {
 export default function CasePageLayout({ activeNav = 'info' }: CasePageLayoutProps) {
   return (
     <CaseFrame activeNav={activeNav}>
-      <div className="flex-1 rounded-md bg-grey-light-1 px-25 py-16">
+      <div className="min-h-full flex-1 self-start rounded-md bg-grey-light-1 px-25 py-16">
         <Outlet />
       </div>
     </CaseFrame>

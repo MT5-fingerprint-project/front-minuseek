@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
 import type { IconName } from '@/features/shared/icons'
 import { Badge } from '@/features/shared/ui/badge'
+import { Button } from '@/features/shared/ui/button'
 import type { AuditEventType, CaseAuditEvent } from '@/features/audit-trail/types/auditEvent'
 
 const EVENT_ICONS: Record<AuditEventType, IconName> = {
@@ -56,14 +57,16 @@ function CaseHistoryEntry({ event }: { event: CaseAuditEvent }) {
         <p className="text-xs text-muted-foreground">{byline}</p>
         {hasPayload && (
           <div className="flex flex-col items-start gap-1">
-            <button
+            <Button
               type="button"
-              className="text-xs text-blue-medium-1 underline-offset-2 hover:underline"
+              variant="link"
+              size="small"
+              className="p-0 text-xs text-blue-medium-1 underline-offset-2"
               aria-expanded={isPayloadVisible}
               onClick={() => setIsPayloadVisible(!isPayloadVisible)}
             >
               {isPayloadVisible ? t('auditTrail.entry.hideDetail') : t('auditTrail.entry.showDetail')}
-            </button>
+            </Button>
             {isPayloadVisible && (
               <pre className="w-full overflow-x-auto rounded-sm bg-grey-light-1 p-3 text-xs">
                 {JSON.stringify(event.payload, null, 2)}
