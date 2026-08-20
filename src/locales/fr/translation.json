@@ -30,7 +30,8 @@
     "informations": "Informations",
     "subjects": "Sujets",
     "tracesAndFingerprints": "Traces & empreintes",
-    "history": "Historique"
+    "history": "Historique",
+    "reports": "Rapports"
   },
   "investigationCase": {
     "status": {
@@ -337,6 +338,30 @@
       "previous": "Précédent",
       "next": "Suivant",
       "position": "Page {{page}} sur {{pageCount}}"
+    }
+  },
+  "reporting": {
+    "title": "Rapports du dossier",
+    "subtitle": "Documents scellés, générés à partir de l'état du dossier au moment de l'édition.",
+    "listTitle": "Rapports scellés",
+    "empty": "Aucun rapport généré pour ce dossier.",
+    "sealed": "Scellé",
+    "download": "Télécharger",
+    "byline": "par {{actor}} — le {{date}} à {{time}}",
+    "sealNotice": "L'empreinte SHA-256 affichée sous chaque rapport est celle enregistrée dans la chaîne d'audit : elle doit correspondre au fichier téléchargé.",
+    "type": {
+      "TECHNICAL": "Rapport technique",
+      "TRACEABILITY": "Annexe de traçabilité"
+    },
+    "generate": {
+      "TECHNICAL": "Générer le rapport technique",
+      "TRACEABILITY": "Générer l'annexe de traçabilité"
+    },
+    "success": {
+      "generated": "Rapport généré et scellé."
+    },
+    "errors": {
+      "downloadFailed": "Téléchargement impossible."
     }
   }
 }
