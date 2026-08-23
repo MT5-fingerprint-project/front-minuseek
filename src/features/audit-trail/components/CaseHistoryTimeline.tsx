@@ -21,8 +21,6 @@ const EVENT_ICONS: Record<AuditEventType, IconName> = {
   COMPARISON_EXECUTED: 'compare',
   HIT_RECORDED: 'fingerprintCheck',
   HIT_REMOVED: 'fingerprint',
-  PIECE_VIEWED: 'show',
-  FILE_DOWNLOAD_URL_ISSUED: 'fileExport',
   REPORT_GENERATED: 'fileExport',
   CHAIN_ANCHORED: 'verified',
 }
