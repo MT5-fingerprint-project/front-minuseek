@@ -62,7 +62,13 @@
       "pvNumber": "Numéro de PV :",
       "openedAt": "Date ouverture :",
       "context": "Contexte",
-      "summary": "Résumé des faits :"
+      "summary": "Résumé des faits :",
+      "tabs": {
+        "case": "Le dossier"
+      },
+      "edit": "Modifier",
+      "operator": "Opérateur :",
+      "noOperator": "Non attribué"
     },
     "comparison": {
       "title": "Comparaison - Affaire N°{{id}}",
@@ -85,7 +91,8 @@
       "createDescription": "Renseignez les informations de la nouvelle affaire.",
       "sections": {
         "general": "Informations générales",
-        "context": "Contexte"
+        "context": "Contexte",
+        "operator": "Opérateur"
       },
       "submit": "Créer l'affaire",
       "submitting": "Création…",
@@ -105,8 +112,24 @@
         "location": {
           "label": "Localisation",
           "placeholder": "ex: 59 rue nationale, 75013 Paris"
+        },
+        "operator": {
+          "label": "Opérateur en charge de l'affaire",
+          "hint": "Choisir un collègue lui confie le suivi de l'affaire.",
+          "loading": "Chargement des comptes du service…",
+          "searchLabel": "Rechercher un compte du service",
+          "searchPlaceholder": "Rechercher un nom ou un matricule…",
+          "noResult": "Aucun compte ne correspond à cette recherche.",
+          "moreResults": "Seuls les {{count}} premiers comptes sont affichés, précisez la recherche.",
+          "noCandidate": "Aucun autre compte actif dans ce service.",
+          "unavailable": "Impossible de charger les comptes du service.",
+          "unassigned": "Non attribué"
         }
-      }
+      },
+      "editTitle": "Modifier l'affaire",
+      "editDescription": "Corrigez les informations de l'affaire n°{{caseNumber}}.",
+      "editSubmit": "Enregistrer",
+      "editSubmitting": "Enregistrement…"
     },
     "validation": {
       "caseNumberRequired": "Le numéro d'affaire est requis",
@@ -114,7 +137,21 @@
       "locationRequired": "La localisation est requise"
     },
     "success": {
-      "created": "Affaire créée avec succès"
+      "created": "Affaire créée avec succès",
+      "corrected": "Affaire modifiée"
+    },
+    "handoverDialog": {
+      "title": "Confier cette affaire ?",
+      "description": "{{name}} devient l'opérateur de cette affaire et en assure le suivi.",
+      "descriptionLosingAccess": "{{name}} devient l'opérateur de cette affaire. Vous n'y aurez plus accès : vous serez renvoyé vers la liste des affaires.",
+      "confirm": "Confier l'affaire"
+    },
+    "errors": {
+      "correctionFailed": "Impossible d'enregistrer ces modifications",
+      "unknownOperator": "Le compte désigné n'existe pas dans ce service, ou y est désactivé",
+      "operatorChangeNotAllowed": "Seuls l'opérateur en place et le responsable de service peuvent confier cette affaire",
+      "caseNotFound": "Cette affaire est introuvable",
+      "caseClosed": "Cette affaire est close : elle n'est plus modifiable"
     }
   },
   "subject": {
