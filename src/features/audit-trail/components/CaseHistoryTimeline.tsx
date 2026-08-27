@@ -17,6 +17,8 @@ const EVENT_ICONS: Record<AuditEventType, IconName> = {
   TRACE_DELETED: 'close',
   REFERENCE_PRINT_UPLOADED: 'importPlus',
   REFERENCE_PRINT_DELETED: 'fingerprintOff',
+  TRACE_RESTORED: 'undo',
+  REFERENCE_PRINT_RESTORED: 'undo',
   LAYER_CREATED: 'layers',
   LAYER_UPDATED: 'pen',
   LAYER_DELETED: 'layersOff',

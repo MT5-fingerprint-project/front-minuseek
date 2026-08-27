@@ -11,6 +11,7 @@ import {
 } from '@/features/investigation-case/hooks/useInvestigationCases'
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
 import InvestigationCaseEditForm from '@/features/investigation-case/components/InvestigationCaseEditForm'
+import WithdrawnPiecesSection from '@/features/investigation-case/components/WithdrawnPiecesSection'
 import {
   operatorNameOf,
   type InvestigationCaseCorrections,
@@ -119,6 +120,8 @@ export default function InvestigationCaseDetailsPage() {
               </div>
             </section>
           )}
+
+          <WithdrawnPiecesSection caseId={investigationCase.id} />
         </TabsContent>
       </Tabs>
 

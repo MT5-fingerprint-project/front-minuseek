@@ -2,6 +2,14 @@ export type BiometricImageType = 'traces' | 'reference-prints'
 
 export type BiometricImageStatus = 'RECEIVED' | 'PROCESSING' | 'PROCESSED' | 'FAILED'
 
+export type WithdrawalMotive = 'DUPLICATE' | 'MISFILED' | 'WRONG_ATTRIBUTION'
+
+/** `WRONG_ATTRIBUTION` n'a de sens que pour une empreinte rattachée à une personne. */
+export const WITHDRAWAL_MOTIVES: Record<BiometricImageType, WithdrawalMotive[]> = {
+  traces: ['DUPLICATE', 'MISFILED'],
+  'reference-prints': ['DUPLICATE', 'MISFILED', 'WRONG_ATTRIBUTION'],
+}
+
 export interface BiometricImageDecoration {
   label?: string
   borderColor?: string
@@ -26,6 +34,8 @@ export interface BiometricImage {
   createdAt: string
   updatedAt: string
   matchings: MatchingScore[]
+  withdrawnAt: string | null
+  withdrawalMotive: WithdrawalMotive | null
 }
 
 export interface BiometricImageDto {
@@ -40,4 +50,6 @@ export interface BiometricImageDto {
   createdAt: string
   updatedAt: string
   matchings: MatchingScore[]
+  withdrawnAt?: string | null
+  withdrawalMotive?: WithdrawalMotive | null
 }

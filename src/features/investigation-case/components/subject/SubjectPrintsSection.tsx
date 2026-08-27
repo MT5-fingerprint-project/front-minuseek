@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
 import {
   useBiometricImages,
-  useDeleteBiometricImage,
+  useWithdrawBiometricImage,
   useUploadBiometricImage,
 } from '@/features/biometric-image/hooks/useBiometricImages'
 import SubjectPrintSlot from '@/features/investigation-case/components/subject/SubjectPrintSlot'
@@ -19,7 +19,7 @@ export default function SubjectPrintsSection({ caseId, subjectId }: SubjectPrint
   const { t } = useTranslation()
   const { data: referencePrints = [] } = useBiometricImages('reference-prints', caseId)
   const uploadPrint = useUploadBiometricImage('reference-prints')
-  const deletePrint = useDeleteBiometricImage('reference-prints', caseId)
+  const withdrawPrint = useWithdrawBiometricImage('reference-prints', caseId)
 
   const printsByPosition = new Map(
     referencePrints.filter((print) => print.subjectId === subjectId).map((print) => [print.position, print])
@@ -53,7 +53,7 @@ export default function SubjectPrintsSection({ caseId, subjectId }: SubjectPrint
                       print={printsByPosition.get(position)}
                       isUploading={isUploading}
                       onUpload={(file) => uploadPrint.mutate({ caseId, file, subjectId, position })}
-                      onDelete={(printId) => deletePrint.mutate(printId)}
+                      onWithdraw={(printId, motive) => withdrawPrint.mutate({ id: printId, motive })}
                     />
                   )
                 })}

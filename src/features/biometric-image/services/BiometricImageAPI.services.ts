@@ -3,6 +3,7 @@ import type {
   BiometricImage,
   BiometricImageDto,
   BiometricImageType,
+  WithdrawalMotive,
 } from '@/features/biometric-image/types/biometricImage'
 
 const endpointByType: Record<BiometricImageType, string> = {
@@ -30,17 +31,27 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     createdAt: dto.createdAt,
     updatedAt: dto.updatedAt,
     matchings: dto.matchings ?? [],
+    withdrawnAt: dto.withdrawnAt ?? null,
+    withdrawalMotive: dto.withdrawalMotive ?? null,
   }
 }
 
 export const BiometricImageAPI = {
-  getAll: (type: BiometricImageType, caseId: string) =>
+  getAll: (type: BiometricImageType, caseId: string, options?: { withdrawn?: boolean }) =>
     apiClient
-      .get<{ data: BiometricImageDto[] }>(endpointByType[type], { params: { caseId } })
+      .get<{ data: BiometricImageDto[] }>(endpointByType[type], {
+        // Le pipe du back ne transforme pas : le drapeau part en chaîne.
+        params: { caseId, ...(options?.withdrawn ? { withdrawn: 'true' } : {}) },
+      })
       .then((res) => res.data.data.map(mapDtoToBiometricImage)),
 
-  remove: (type: BiometricImageType, id: string) =>
-    apiClient.delete(`${endpointByType[type]}/${id}`).then((res) => res.data),
+  withdraw: (type: BiometricImageType, id: string, motive: WithdrawalMotive) =>
+    apiClient
+      .post(`${endpointByType[type]}/${id}/withdraw`, { motive })
+      .then((res) => res.data),
+
+  restore: (type: BiometricImageType, id: string) =>
+    apiClient.post(`${endpointByType[type]}/${id}/restore`).then((res) => res.data),
 
   upload: (type: BiometricImageType, { caseId, file, subjectId, position }: UploadInput) => {
     const formData = new FormData()
