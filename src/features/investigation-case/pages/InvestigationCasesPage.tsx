@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
 import { H1 } from '@/features/shared/ui/typography'
 import { Button } from '@/features/shared/ui/button'
-import CasesHeader from '@/features/investigation-case/components/CasesHeader'
+import AppHeader from '@/features/shared/components/AppHeader'
 import InvestigationCaseCreateForm from '@/features/investigation-case/components/InvestigationCaseCreateForm'
 import InvestigationCasesList from '@/features/investigation-case/components/InvestigationCasesList'
 import {
@@ -20,7 +20,7 @@ export default function InvestigationCasesPage() {
 
   return (
     <div className="flex flex-col">
-      <CasesHeader />
+      <AppHeader />
       <div className="flex flex-col gap-10 px-32 py-6">
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between gap-4">

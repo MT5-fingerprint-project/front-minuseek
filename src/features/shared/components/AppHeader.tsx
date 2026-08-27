@@ -4,8 +4,8 @@ import { Icon } from '@/features/shared/icons'
 import { useClickOutside } from '@/features/shared/hooks/useClickOutside'
 import { useAuth } from '@/features/shared/auth/auth-context'
 
-/** En-tête de la page liste des affaires : logo + bouton compte (menu déconnexion). */
-export default function CasesHeader() {
+/** En-tête des pages de niveau service : logo + bouton compte (menu déconnexion). */
+export default function AppHeader() {
   const { t } = useTranslation()
   const { username, logout } = useAuth()
   const [isMenuOpen, setMenuOpen] = useState(false)
