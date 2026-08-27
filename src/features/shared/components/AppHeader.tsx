@@ -10,6 +10,7 @@ import { cn } from '@/features/shared/lib/utils'
 const SERVICE_NAV = [
   { path: 'affaires', icon: 'folder', labelKey: 'navigation.cases' },
   { path: 'utilisateurs', icon: 'personGroup', labelKey: 'navigation.users' },
+  { path: 'parametres', icon: 'settings', labelKey: 'navigation.settings' },
 ] as const
 
 export default function AppHeader() {
