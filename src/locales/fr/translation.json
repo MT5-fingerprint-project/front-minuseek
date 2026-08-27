@@ -43,7 +43,7 @@
       "OPEN": "Ouverte",
       "IN_PROGRESS": "En cours",
       "UNDER_REVIEW": "En vérification",
-      "CLOSED": "Fermée"
+      "CLOSED": "Clôturée"
     },
     "list": {
       "title": "Vos affaires",
@@ -161,6 +161,19 @@
         "traces": "Trace",
         "reference-prints": "Empreinte de référence"
       }
+    },
+    "closure": {
+      "close": "Clore le dossier",
+      "reopen": "Rouvrir le dossier",
+      "confirmTitle": "Clore le dossier n°{{caseNumber}} ?",
+      "confirmDescription": "Le travail technique est déclaré terminé. Le dossier reste consultable, mais plus aucune pièce ne peut y être déposée ni modifiée. Les rapports déjà édités ne sont pas modifiés.",
+      "confirmAction": "Clore",
+      "reasonLabel": "Motif de la réouverture",
+      "reasonPlaceholder": "Réquisition complémentaire du 12 septembre 2026",
+      "destroyedPrintsWarning": "Les empreintes de familiers détruites à la clôture ne sont pas restituées.",
+      "banner": "Dossier clos — consultation seule",
+      "closed": "Dossier clos",
+      "reopened": "Dossier rouvert"
     }
   },
   "subject": {

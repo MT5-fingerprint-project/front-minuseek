@@ -40,6 +40,16 @@ export const InvestigationCaseAPI = {
 
   getById: (id: string) => apiClient.get<InvestigationCase>(`/investigation-cases/${id}`).then((res) => res.data),
 
+  close: (id: string) =>
+    apiClient
+      .post<InvestigationCase>(`/investigation-cases/${id}/closure`)
+      .then((res) => res.data),
+
+  reopen: (id: string, reason: string) =>
+    apiClient
+      .post<InvestigationCase>(`/investigation-cases/${id}/reopening`, { reason })
+      .then((res) => res.data),
+
   correct: (id: string, corrections: InvestigationCaseCorrections) =>
     apiClient
       .patch<void>(`/investigation-cases/${id}`, corrections)

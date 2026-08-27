@@ -42,6 +42,35 @@ export function useCreateInvestigationCase() {
   })
 }
 
+export function useCloseInvestigationCase(id: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: () => InvestigationCaseAPI.close(id),
+    onSuccess: () => {
+      // Le badge de statut paraît aussi dans la liste des affaires.
+      queryClient.invalidateQueries({ queryKey: investigationCaseKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: investigationCaseKeys.detail(id) })
+      toast.success(t('investigationCase.closure.closed'))
+    },
+  })
+}
+
+export function useReopenInvestigationCase(id: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: (reason: string) => InvestigationCaseAPI.reopen(id, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: investigationCaseKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: investigationCaseKeys.detail(id) })
+      toast.success(t('investigationCase.closure.reopened'))
+    },
+  })
+}
+
 export function useCorrectInvestigationCase(id: string) {
   const queryClient = useQueryClient()
   const { t } = useTranslation()

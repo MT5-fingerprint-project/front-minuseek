@@ -3,6 +3,7 @@ import { Icon } from '@/features/shared/icons'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/features/shared/ui/button'
 import { useUploadBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
+import { useCaseIsClosed } from '@/features/investigation-case/hooks/useCaseIsClosed'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
 
 type BiometricImageImportButtonProps = {
@@ -19,12 +20,15 @@ export default function BiometricImageImportButton({
   const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
   const upload = useUploadBiometricImage(type, { onSuccess: onUploadSuccess })
+  const isCaseClosed = useCaseIsClosed(caseId)
 
   const handleFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? [])
     event.target.value = ''
     for (const file of files) await upload.mutateAsync({ caseId, file })
   }
+
+  if (isCaseClosed) return null
 
   return (
     <>

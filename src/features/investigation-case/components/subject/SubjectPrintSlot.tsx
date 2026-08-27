@@ -15,6 +15,7 @@ type SubjectPrintSlotProps = {
   isUploading: boolean
   onUpload: (file: File) => void
   onWithdraw: (printId: string, motive: WithdrawalMotive) => void
+  isReadOnly: boolean
 }
 
 export default function SubjectPrintSlot({
@@ -23,6 +24,7 @@ export default function SubjectPrintSlot({
   isUploading,
   onUpload,
   onWithdraw,
+  isReadOnly,
 }: SubjectPrintSlotProps) {
   const { t } = useTranslation()
   const inputId = useId()
@@ -32,6 +34,7 @@ export default function SubjectPrintSlot({
       {print ? (
         <div className="group relative aspect-square overflow-hidden rounded-xs">
           <img src={print.url} alt={label} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+          {!isReadOnly && (
           <WithdrawPieceDialog
             type="reference-prints"
             onConfirm={(motive) => onWithdraw(print.id, motive)}
@@ -45,7 +48,10 @@ export default function SubjectPrintSlot({
               </button>
             }
           />
+          )}
         </div>
+      ) : isReadOnly ? (
+        <div className="flex aspect-square items-center justify-center rounded-xs border border-dashed border-grey-light-2" />
       ) : (
         <label
           htmlFor={inputId}
