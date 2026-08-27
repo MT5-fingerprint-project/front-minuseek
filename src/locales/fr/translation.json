@@ -318,6 +318,7 @@
       "TENANT_PROVISIONED": "Laboratoire créé",
       "CASE_OPENED": "Dossier ouvert",
       "CASE_STATUS_CHANGED": "Statut du dossier modifié",
+      "CASE_OPERATOR_CHANGED": "Dossier confié à un autre opérateur",
       "TRACE_UPLOADED": "Trace déposée",
       "TRACE_QUALIFIED": "Trace qualifiée",
       "TRACE_DELETED": "Trace supprimée",

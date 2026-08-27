@@ -10,6 +10,7 @@ const EVENT_ICONS: Record<AuditEventType, IconName> = {
   TENANT_PROVISIONED: 'personGroup',
   CASE_OPENED: 'folder',
   CASE_STATUS_CHANGED: 'information',
+  CASE_OPERATOR_CHANGED: 'personGroup',
   TRACE_UPLOADED: 'import',
   TRACE_QUALIFIED: 'check',
   TRACE_DELETED: 'close',
