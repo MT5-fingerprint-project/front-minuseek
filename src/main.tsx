@@ -19,6 +19,7 @@ import InvestigationCaseComparisonPage from './features/investigation-case/pages
 import DetachedReferencePrintsPage from './features/investigation-case/pages/DetachedReferencePrintsPage.tsx'
 import CaseHistoryPage from './features/audit-trail/pages/CaseHistoryPage.tsx'
 import CaseReportsPage from './features/reporting/pages/CaseReportsPage.tsx'
+import ServiceUsersPage from './features/users/pages/ServiceUsersPage.tsx'
 
 const router = createBrowserRouter([
   { path: '/', element: <TenantRequiredPage /> },
@@ -28,6 +29,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <InvestigationCasesPage /> },
       { path: 'affaires', element: <InvestigationCasesPage /> },
+      { path: 'utilisateurs', element: <ServiceUsersPage /> },
       {
         path: 'affaires/:id',
         children: [

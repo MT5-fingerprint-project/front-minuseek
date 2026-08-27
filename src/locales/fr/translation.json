@@ -31,7 +31,11 @@
     "subjects": "Sujets",
     "tracesAndFingerprints": "Traces & empreintes",
     "history": "Historique",
-    "reports": "Rapports"
+    "reports": "Rapports",
+    "home": "Retour à l'accueil",
+    "serviceNavigation": "Navigation du service",
+    "cases": "Affaires",
+    "users": "Utilisateurs"
   },
   "investigationCase": {
     "status": {
@@ -361,6 +365,104 @@
     },
     "errors": {
       "downloadFailed": "Téléchargement impossible."
+    }
+  },
+  "users": {
+    "list": {
+      "title": "Utilisateurs",
+      "subtitle": "Les comptes de votre service, leur rôle et leur état.",
+      "empty": "Aucun compte dans ce service.",
+      "noMatch": "Aucun compte ne correspond à ces critères.",
+      "error": "Impossible de charger les comptes du service.",
+      "restricted": "Cette page est réservée au responsable de service.",
+      "you": "(vous)"
+    },
+    "filters": {
+      "searchPlaceholder": "Rechercher un nom ou un matricule…",
+      "searchLabel": "Rechercher un compte",
+      "roleLabel": "Filtrer par rôle",
+      "gradeLabel": "Filtrer par grade",
+      "statusLabel": "Filtrer par état",
+      "anyRole": "Tous les rôles",
+      "anyGrade": "Tous les grades",
+      "anyStatus": "Tous les états"
+    },
+    "table": {
+      "lastName": "Nom",
+      "firstName": "Prénom",
+      "role": "Rôle",
+      "grade": "Grade",
+      "serviceNumber": "Matricule",
+      "status": "État",
+      "actions": "Actions"
+    },
+    "roles": {
+      "ADMIN": "Responsable de service",
+      "OPERATOR": "Opérateur",
+      "EXPERT": "Expert"
+    },
+    "status": {
+      "ACTIVE": "Actif",
+      "DISABLED": "Désactivé"
+    },
+    "actions": {
+      "edit": "Modifier",
+      "deactivate": "Désactiver",
+      "reactivate": "Réactiver",
+      "menu": "Actions sur le compte de {{name}}"
+    },
+    "pagination": {
+      "total_one": "{{count}} compte",
+      "total_other": "{{count}} comptes",
+      "position": "Page {{page}} sur {{pageCount}}",
+      "previous": "Précédent",
+      "next": "Suivant"
+    },
+    "deactivateDialog": {
+      "title": "Désactiver ce compte ?",
+      "description": "{{name}} ne pourra plus se connecter. Le compte reste dans la liste avec ses actes au journal, et vous pouvez le réactiver depuis la même ligne.",
+      "confirm": "Désactiver"
+    },
+    "form": {
+      "title": "Corriger le profil",
+      "description": "Le nom, le prénom, le grade et le matricule de {{name}}. Le rôle ({{role}}) ne se change pas ici.",
+      "submit": "Enregistrer",
+      "submitting": "Enregistrement…",
+      "fields": {
+        "lastName": {
+          "label": "Nom",
+          "placeholder": "Dupont"
+        },
+        "firstName": {
+          "label": "Prénom",
+          "placeholder": "Camille"
+        },
+        "grade": {
+          "label": "Grade",
+          "placeholder": "Capitaine"
+        },
+        "serviceNumber": {
+          "label": "Matricule",
+          "placeholder": "PTS-0007"
+        }
+      }
+    },
+    "validation": {
+      "lastNameRequired": "Le nom est requis",
+      "firstNameRequired": "Le prénom est requis",
+      "gradeRequired": "Le grade est requis",
+      "serviceNumberRequired": "Le matricule est requis"
+    },
+    "success": {
+      "deactivated": "Compte désactivé",
+      "reactivated": "Compte réactivé",
+      "profileUpdated": "Profil corrigé"
+    },
+    "errors": {
+      "deactivateFailed": "Impossible de désactiver ce compte",
+      "reactivateFailed": "Impossible de réactiver ce compte",
+      "updateFailed": "Impossible d'enregistrer ce profil",
+      "serviceNumberTaken": "Ce matricule est déjà porté par un autre compte du service"
     }
   }
 }
