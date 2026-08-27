@@ -1,22 +1,69 @@
 import { useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
 import { useClickOutside } from '@/features/shared/hooks/useClickOutside'
+import { useCurrentUser } from '@/features/shared/hooks/useCurrentUser'
 import { useAuth } from '@/features/shared/auth/auth-context'
+import { cn } from '@/features/shared/lib/utils'
 
-/** En-tête des pages de niveau service : logo + bouton compte (menu déconnexion). */
+const SERVICE_NAV = [
+  { path: 'affaires', icon: 'folder', labelKey: 'navigation.cases' },
+  { path: 'utilisateurs', icon: 'personGroup', labelKey: 'navigation.users' },
+] as const
+
 export default function AppHeader() {
   const { t } = useTranslation()
-  const { username, logout } = useAuth()
+  const { slug, username, logout } = useAuth()
+  const { pathname } = useLocation()
+  const { data: currentUser } = useCurrentUser()
   const [isMenuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   useClickOutside(menuRef, () => setMenuOpen(false), { enabled: isMenuOpen })
 
   const label = username ?? t('auth.account')
+  const isServiceManager = currentUser?.role === 'ADMIN'
+
+  function isCurrentSection(path: string): boolean {
+    const sectionPath = `/${slug}/${path}`
+    const isServiceIndex = pathname === `/${slug}` && path === 'affaires'
+    return isServiceIndex || pathname === sectionPath || pathname.startsWith(`${sectionPath}/`)
+  }
 
   return (
-    <header className="flex items-center justify-between px-6 py-4 text-blue-dark-2">
-      <span className="text-2xl font-light">MINUSEEK</span>
+    <header className="flex items-center justify-between gap-6 px-6 py-4 text-blue-dark-2">
+      <div className="flex items-center gap-10">
+        <Link
+          to={`/${slug}`}
+          aria-label={t('navigation.home')}
+          className="text-2xl font-light transition-colors hover:text-blue-medium-1"
+        >
+          MINUSEEK
+        </Link>
+
+        {isServiceManager && (
+          <nav aria-label={t('navigation.serviceNavigation')} className="flex items-center gap-1">
+            {SERVICE_NAV.map((entry) => {
+              const isCurrent = isCurrentSection(entry.path)
+              return (
+                <Link
+                  key={entry.path}
+                  to={`/${slug}/${entry.path}`}
+                  aria-current={isCurrent ? 'page' : undefined}
+                  className={cn(
+                    'flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors',
+                    isCurrent ? 'bg-blue-light-1 font-medium' : 'hover:bg-grey-light-1'
+                  )}
+                >
+                  <Icon name={entry.icon} size={18} color="currentColor" />
+                  {t(entry.labelKey)}
+                </Link>
+              )
+            })}
+          </nav>
+        )}
+      </div>
+
       <div ref={menuRef} className="relative">
         <button
           type="button"

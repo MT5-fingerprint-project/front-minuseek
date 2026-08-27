@@ -31,7 +31,11 @@
     "subjects": "Sujets",
     "tracesAndFingerprints": "Traces & empreintes",
     "history": "Historique",
-    "reports": "Rapports"
+    "reports": "Rapports",
+    "home": "Retour à l'accueil",
+    "serviceNavigation": "Navigation du service",
+    "cases": "Affaires",
+    "users": "Utilisateurs"
   },
   "investigationCase": {
     "status": {
