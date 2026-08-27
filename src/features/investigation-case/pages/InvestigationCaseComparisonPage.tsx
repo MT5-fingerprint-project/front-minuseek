@@ -49,8 +49,11 @@ export default function InvestigationCaseComparisonPage() {
   const isHitDisabled = !traceId || !referenceId || !hasEnoughMinutiae || toggleHit.isPending
 
   const runCompare = () => {
-    if (!trace.selectedTrace || referencePrints.length === 0 || !id) return
-    compare.mutate({ caseId: id, trace: trace.selectedTrace, referencePrints })
+    // Une empreinte détruite n'a plus de fichier : l'envoyer au moteur ferait
+    // remonter une erreur technique incompréhensible.
+    const comparable = referencePrints.filter((print) => print.imageDestroyedAt === null)
+    if (!trace.selectedTrace || comparable.length === 0 || !id) return
+    compare.mutate({ caseId: id, trace: trace.selectedTrace, referencePrints: comparable })
   }
 
   const onToggleHit = () => {

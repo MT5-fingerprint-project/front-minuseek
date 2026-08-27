@@ -3,6 +3,7 @@ import { Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
 import { Spinner } from '@/features/shared/ui/spinner'
+import DestroyedImagePlaceholder from '@/features/biometric-image/components/DestroyedImagePlaceholder'
 import WithdrawPieceDialog from '@/features/biometric-image/components/WithdrawPieceDialog'
 import type {
   BiometricImage,
@@ -31,9 +32,20 @@ export default function SubjectPrintSlot({
 
   return (
     <div className="flex flex-col gap-2 rounded-sm bg-white p-2">
-      {print ? (
+      {print?.imageDestroyedAt ? (
+        <DestroyedImagePlaceholder
+          destroyedAt={print.imageDestroyedAt}
+          className="aspect-square rounded-xs"
+        />
+      ) : print ? (
         <div className="group relative aspect-square overflow-hidden rounded-xs">
-          <img src={print.url} alt={label} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+          <img
+            src={print.url ?? undefined}
+            alt={label}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover"
+          />
           {!isReadOnly && (
           <WithdrawPieceDialog
             type="reference-prints"

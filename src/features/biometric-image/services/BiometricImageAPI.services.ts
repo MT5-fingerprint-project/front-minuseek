@@ -33,6 +33,7 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     matchings: dto.matchings ?? [],
     withdrawnAt: dto.withdrawnAt ?? null,
     withdrawalMotive: dto.withdrawalMotive ?? null,
+    imageDestroyedAt: dto.imageDestroyedAt ?? null,
   }
 }
 

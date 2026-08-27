@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '@/features/shared/lib/utils'
 import { Badge } from '@/features/shared/ui/badge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/features/shared/ui/tooltip'
+import DestroyedImagePlaceholder from '@/features/biometric-image/components/DestroyedImagePlaceholder'
 import WithdrawPieceDialog from '@/features/biometric-image/components/WithdrawPieceDialog'
 import { useWithdrawBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
 import type {
@@ -49,13 +50,21 @@ export default function BiometricImageThumbnail({
           )}
           style={decoration?.borderColor ? { borderColor: decoration.borderColor } : undefined}
         >
-          <img
-            src={image.url}
-            alt={label}
-            loading="lazy"
-            decoding="async"
-            className="block h-full w-full object-cover"
-          />
+          {image.imageDestroyedAt ? (
+            <DestroyedImagePlaceholder
+              destroyedAt={image.imageDestroyedAt}
+              iconSize={20}
+              className="h-full w-full"
+            />
+          ) : (
+            <img
+              src={image.url ?? undefined}
+              alt={label}
+              loading="lazy"
+              decoding="async"
+              className="block h-full w-full object-cover"
+            />
+          )}
           {matching !== undefined && (
             <Badge
               className={cn(
@@ -75,6 +84,7 @@ export default function BiometricImageThumbnail({
         <TooltipContent className="break-all">{label}</TooltipContent>
       </Tooltip>
 
+      {!image.imageDestroyedAt && (
       <WithdrawPieceDialog
         type={type}
         onConfirm={(motive) => withdrawImage.mutate({ id: image.id, motive })}
@@ -90,6 +100,7 @@ export default function BiometricImageThumbnail({
           </button>
         }
       />
+      )}
     </div>
   )
 }
