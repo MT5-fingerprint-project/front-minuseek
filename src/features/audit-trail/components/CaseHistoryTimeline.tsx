@@ -11,6 +11,7 @@ const EVENT_ICONS: Record<AuditEventType, IconName> = {
   CASE_OPENED: 'folder',
   CASE_STATUS_CHANGED: 'information',
   CASE_OPERATOR_CHANGED: 'personGroup',
+  CASE_UPDATED: 'pen',
   TRACE_UPLOADED: 'import',
   TRACE_QUALIFIED: 'check',
   TRACE_DELETED: 'close',

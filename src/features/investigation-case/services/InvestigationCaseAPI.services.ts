@@ -1,8 +1,36 @@
+import { isAxiosError } from 'axios'
 import { apiClient } from '@/features/shared/lib/apiClient'
 import type {
   InvestigationCase,
+  InvestigationCaseCorrections,
   InvestigationCaseCreateInput,
 } from '@/features/investigation-case/types/investigationCase'
+
+export type CaseCorrectionRefusal = 'unknownOperator' | 'operatorChangeNotAllowed' | 'caseNotFound' | 'caseClosed'
+
+export class CaseCorrectionRefusedError extends Error {
+  readonly refusal: CaseCorrectionRefusal
+
+  constructor(refusal: CaseCorrectionRefusal) {
+    super(refusal)
+    this.refusal = refusal
+  }
+}
+
+const REFUSAL_BY_STATUS: Record<number, CaseCorrectionRefusal | undefined> = {
+  403: 'operatorChangeNotAllowed',
+  404: 'caseNotFound',
+  409: 'caseClosed',
+}
+
+function refusalOf(status: number, corrections: InvestigationCaseCorrections): CaseCorrectionRefusal | undefined {
+  // Le 400 sert aussi au refus de validation : il ne parle du compte désigné que
+  // si l'appel en portait un.
+  if (status === 400) {
+    return corrections.operatorUserId !== undefined ? 'unknownOperator' : undefined
+  }
+  return REFUSAL_BY_STATUS[status]
+}
 
 export const InvestigationCaseAPI = {
   create: (caseData: InvestigationCaseCreateInput) =>
@@ -11,4 +39,16 @@ export const InvestigationCaseAPI = {
   getAll: () => apiClient.get<{ data: InvestigationCase[] }>('/investigation-cases').then((res) => res.data),
 
   getById: (id: string) => apiClient.get<InvestigationCase>(`/investigation-cases/${id}`).then((res) => res.data),
+
+  correct: (id: string, corrections: InvestigationCaseCorrections) =>
+    apiClient
+      .patch<void>(`/investigation-cases/${id}`, corrections)
+      .then(() => undefined)
+      .catch((error: unknown) => {
+        const refusal = isAxiosError(error) ? refusalOf(error.response?.status ?? 0, corrections) : undefined
+        if (refusal) {
+          throw new CaseCorrectionRefusedError(refusal)
+        }
+        throw error
+      }),
 }
