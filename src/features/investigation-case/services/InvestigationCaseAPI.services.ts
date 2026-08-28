@@ -1,6 +1,7 @@
 import { isAxiosError } from 'axios'
 import { apiClient } from '@/features/shared/lib/apiClient'
 import type {
+  CaseExpertiseDeclaration,
   InvestigationCase,
   InvestigationCaseCorrections,
   InvestigationCaseCreateInput,
@@ -48,6 +49,11 @@ export const InvestigationCaseAPI = {
   reopen: (id: string, reason: string) =>
     apiClient
       .post<InvestigationCase>(`/investigation-cases/${id}/reopening`, { reason })
+      .then((res) => res.data),
+
+  declareExpertise: (id: string, declaration: CaseExpertiseDeclaration) =>
+    apiClient
+      .post<InvestigationCase>(`/investigation-cases/${id}/expertise`, declaration)
       .then((res) => res.data),
 
   correct: (id: string, corrections: InvestigationCaseCorrections) =>

@@ -18,7 +18,7 @@ import { useDebouncedValue } from '@/features/shared/hooks/useDebouncedValue'
 import { useServiceUsers } from '@/features/users/hooks/useServiceUsers'
 import { NO_SERVICE_USERS_FILTER } from '@/features/users/types/serviceUser'
 import type { UserRole } from '@/features/shared/types/user'
-import { operatorNameOf } from '@/features/investigation-case/types/investigationCase'
+import { caseUserNameOf } from '@/features/investigation-case/types/investigationCase'
 
 const CANDIDATES_PER_SEARCH = 20
 
@@ -68,7 +68,7 @@ export default function OperatorPicker({
 
   const candidates: OperatorCandidate[] = (candidatesQuery.data?.data ?? [])
     .filter((account) => account.id !== excludedOperatorId)
-    .map((account) => ({ id: account.id, name: operatorNameOf(account), role: account.role }))
+    .map((account) => ({ id: account.id, name: caseUserNameOf(account), role: account.role }))
 
   const isTruncated = candidatesQuery.data?.meta.hasNextPage ?? false
 
