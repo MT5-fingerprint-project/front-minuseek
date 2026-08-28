@@ -64,10 +64,14 @@ export default function DraggableImage({
 
   const activeKeys = Object.keys(filters ?? {}).filter((k) => (filters?.[k] ?? 0) !== 0)
 
-  const konvaFilters = activeKeys.flatMap((k) => {
-    const def = FILTER_META[k]?.konva
-    return def?.type === 'filter' ? [def.filter] : []
-  })
+  const konvaFilters = [
+    ...new Set(
+      activeKeys.flatMap((k) => {
+        const def = FILTER_META[k]?.konva
+        return def?.type === 'filter' ? [def.filter] : []
+      }),
+    ),
+  ]
   const filterProps = Object.fromEntries(
     activeKeys.flatMap((k) => {
       const def = FILTER_META[k]?.konva
