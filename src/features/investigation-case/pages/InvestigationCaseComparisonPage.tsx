@@ -8,6 +8,8 @@ import { useDetachedWindow } from '@/features/shared/hooks/useDetachedWindow'
 import ComparisonWindow from '@/features/investigation-case/components/comparison/ComparisonWindow'
 import ComparisonWorkbench from '@/features/investigation-case/components/comparison/ComparisonWorkbench'
 import HitButton from '@/features/investigation-case/components/comparison/HitButton'
+import ClosedCaseBanner from '@/features/investigation-case/components/ClosedCaseBanner'
+import { useCaseIsClosed } from '@/features/investigation-case/hooks/useCaseIsClosed'
 import { biometricImageKeys, useBiometricImages } from '@/features/biometric-image/hooks/useBiometricImages'
 import { useCompare } from '@/features/biometric-image/hooks/useCompare'
 import { layerKeys, useLayers } from '@/features/biometric-image/hooks/useLayers'
@@ -38,6 +40,7 @@ export default function InvestigationCaseComparisonPage() {
   const { data: referenceLayers } = useLayers(referenceId)
   const { data: hitReferenceIds } = useHits(traceId)
   const toggleHit = useToggleHit(traceId)
+  const isCaseClosed = useCaseIsClosed(id ?? '')
 
   const isHit = !!referenceId && (hitReferenceIds?.includes(referenceId) ?? false)
   const hasEnoughMinutiae =
@@ -46,8 +49,11 @@ export default function InvestigationCaseComparisonPage() {
   const isHitDisabled = !traceId || !referenceId || !hasEnoughMinutiae || toggleHit.isPending
 
   const runCompare = () => {
-    if (!trace.selectedTrace || referencePrints.length === 0 || !id) return
-    compare.mutate({ caseId: id, trace: trace.selectedTrace, referencePrints })
+    // Une empreinte détruite n'a plus de fichier : l'envoyer au moteur ferait
+    // remonter une erreur technique incompréhensible.
+    const comparable = referencePrints.filter((print) => print.imageDestroyedAt === null)
+    if (!trace.selectedTrace || comparable.length === 0 || !id) return
+    compare.mutate({ caseId: id, trace: trace.selectedTrace, referencePrints: comparable })
   }
 
   const onToggleHit = () => {
@@ -72,7 +78,8 @@ export default function InvestigationCaseComparisonPage() {
   // largeur ; la fermeture de la popup (détectée par useDetachedWindow) restaure le split.
   if (isReferenceDetached) {
     return (
-      <div className="h-full min-h-[500px]">
+      <div className="flex h-full min-h-[500px] flex-col gap-2">
+        <ClosedCaseBanner caseId={id} />
         <ComparisonWorkbench
           side="left"
           type="traces"
@@ -88,7 +95,9 @@ export default function InvestigationCaseComparisonPage() {
   }
 
   return (
-    <ResizablePanelGroup orientation="horizontal" className="h-full min-h-[500px]">
+    <div className="flex h-full flex-col gap-2">
+      <ClosedCaseBanner caseId={id} />
+      <ResizablePanelGroup orientation="horizontal" className="h-full min-h-[500px]">
       <ComparisonWindow
         side="left"
         type="traces"
@@ -105,7 +114,9 @@ export default function InvestigationCaseComparisonPage() {
           className="pointer-events-auto absolute bottom-8 left-1/2 z-20 -translate-x-1/2 -translate-y-full"
           onMouseDown={(e) => e.stopPropagation()}
         >
-          <HitButton isHit={isHit} disabled={isHitDisabled} onClick={onToggleHit} />
+          {!isCaseClosed && (
+            <HitButton isHit={isHit} disabled={isHitDisabled} onClick={onToggleHit} />
+          )}
         </div>
       </ResizableHandle>
       <ComparisonWindow
@@ -119,6 +130,7 @@ export default function InvestigationCaseComparisonPage() {
         onToggleDetach={toggleDetachReference}
         imageDecorations={referenceDecorations}
       />
-    </ResizablePanelGroup>
+      </ResizablePanelGroup>
+    </div>
   )
 }

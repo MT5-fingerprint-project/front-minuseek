@@ -23,7 +23,8 @@ export interface MatchingScore {
 export interface BiometricImage {
   id: string
   fileName: string
-  url: string
+  /** Nulle quand l'image a été détruite : il n'y a plus rien à signer. */
+  url: string | null
   status: BiometricImageStatus
   score: number | null
   caseId: string
@@ -34,12 +35,13 @@ export interface BiometricImage {
   matchings: MatchingScore[]
   withdrawnAt: string | null
   withdrawalMotive: WithdrawalMotive | null
+  imageDestroyedAt: string | null
 }
 
 export interface BiometricImageDto {
   id: string
   path: string
-  url: string
+  url: string | null
   status: BiometricImageStatus
   score: number | null
   caseId: string
@@ -50,4 +52,5 @@ export interface BiometricImageDto {
   matchings: MatchingScore[]
   withdrawnAt?: string | null
   withdrawalMotive?: WithdrawalMotive | null
+  imageDestroyedAt?: string | null
 }

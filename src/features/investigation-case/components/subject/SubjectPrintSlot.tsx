@@ -3,6 +3,7 @@ import { Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
 import { Spinner } from '@/features/shared/ui/spinner'
+import DestroyedImagePlaceholder from '@/features/biometric-image/components/DestroyedImagePlaceholder'
 import WithdrawPieceDialog from '@/features/biometric-image/components/WithdrawPieceDialog'
 import type {
   BiometricImage,
@@ -15,6 +16,7 @@ type SubjectPrintSlotProps = {
   isUploading: boolean
   onUpload: (file: File) => void
   onWithdraw: (printId: string, motive: WithdrawalMotive) => void
+  isReadOnly: boolean
 }
 
 export default function SubjectPrintSlot({
@@ -23,15 +25,28 @@ export default function SubjectPrintSlot({
   isUploading,
   onUpload,
   onWithdraw,
+  isReadOnly,
 }: SubjectPrintSlotProps) {
   const { t } = useTranslation()
   const inputId = useId()
 
   return (
     <div className="flex flex-col gap-2 rounded-sm bg-white p-2">
-      {print ? (
+      {print?.imageDestroyedAt ? (
+        <DestroyedImagePlaceholder
+          destroyedAt={print.imageDestroyedAt}
+          className="aspect-square rounded-xs"
+        />
+      ) : print ? (
         <div className="group relative aspect-square overflow-hidden rounded-xs">
-          <img src={print.url} alt={label} loading="lazy" decoding="async" className="h-full w-full object-cover" />
+          <img
+            src={print.url ?? undefined}
+            alt={label}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover"
+          />
+          {!isReadOnly && (
           <WithdrawPieceDialog
             type="reference-prints"
             onConfirm={(motive) => onWithdraw(print.id, motive)}
@@ -45,7 +60,10 @@ export default function SubjectPrintSlot({
               </button>
             }
           />
+          )}
         </div>
+      ) : isReadOnly ? (
+        <div className="flex aspect-square items-center justify-center rounded-xs border border-dashed border-grey-light-2" />
       ) : (
         <label
           htmlFor={inputId}

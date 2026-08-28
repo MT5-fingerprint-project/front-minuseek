@@ -6,6 +6,7 @@ import { Button } from '@/features/shared/ui/button'
 import { Spinner } from '@/features/shared/ui/spinner'
 import { H1 } from '@/features/shared/ui/typography'
 import { useInvestigationCase } from '@/features/investigation-case/hooks/useInvestigationCases'
+import { useCaseIsClosed } from '@/features/investigation-case/hooks/useCaseIsClosed'
 import { useCreateSubject, useSubjects } from '@/features/investigation-case/hooks/useSubjects'
 import SubjectCreateForm from '@/features/investigation-case/components/subject/SubjectCreateForm'
 import SubjectTypeColumn from '@/features/investigation-case/components/subject/SubjectTypeColumn'
@@ -18,6 +19,7 @@ export default function InvestigationCaseSubjectsPage() {
   const { data: investigationCase } = useInvestigationCase(id ?? '')
   const { data: subjects = [], isPending } = useSubjects(id ?? '')
   const createSubject = useCreateSubject(id ?? '')
+  const isCaseClosed = useCaseIsClosed(id ?? '')
 
   if (isPending) return <Spinner className="size-6" />
 
@@ -38,10 +40,12 @@ export default function InvestigationCaseSubjectsPage() {
             })}
           </p>
         </div>
-        <Button type="button" variant="blue" onClick={() => setIsCreateDialogOpen(true)}>
-          {t('subject.list.add')}
-          <Icon name="plus" size={24} color="white" />
-        </Button>
+        {!isCaseClosed && (
+          <Button type="button" variant="blue" onClick={() => setIsCreateDialogOpen(true)}>
+            {t('subject.list.add')}
+            <Icon name="plus" size={24} color="white" />
+          </Button>
+        )}
       </div>
 
       <div className="flex flex-col gap-10 lg:flex-row">

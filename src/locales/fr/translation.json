@@ -43,7 +43,7 @@
       "OPEN": "Ouverte",
       "IN_PROGRESS": "En cours",
       "UNDER_REVIEW": "En vérification",
-      "CLOSED": "Fermée"
+      "CLOSED": "Clôturée"
     },
     "list": {
       "title": "Vos affaires",
@@ -161,6 +161,23 @@
         "traces": "Trace",
         "reference-prints": "Empreinte de référence"
       }
+    },
+    "closure": {
+      "close": "Clore le dossier",
+      "reopen": "Rouvrir le dossier",
+      "confirmTitle": "Clore le dossier n°{{caseNumber}} ?",
+      "confirmDescription": "Le travail technique est déclaré terminé. Le dossier reste consultable, mais plus aucune pièce ne peut y être déposée ni modifiée. Les rapports déjà édités ne sont pas modifiés.",
+      "confirmAction": "Clore",
+      "reasonLabel": "Motif de la réouverture",
+      "reasonPlaceholder": "Réquisition complémentaire du 12 septembre 2026",
+      "destroyedPrintsWarning": "Les empreintes de familiers détruites à la clôture ne sont pas restituées.",
+      "banner": "Dossier clos — consultation seule",
+      "closed": "Dossier clos",
+      "reopened": "Dossier rouvert",
+      "familiarPrintsDestroyed": "{{count}} empreinte(s) de familiers seront détruites définitivement.",
+      "detachedPrintsKept": "{{count}} empreinte(s) non rattachée(s) à une personne ne sont pas concernées.",
+      "recordsKept": "Les fiches des personnes et les rapports déjà édités ne sont pas modifiés.",
+      "destroyedPrintRefused": "Cette empreinte a été détruite : elle ne peut plus être comparée."
     }
   },
   "subject": {
@@ -342,6 +359,10 @@
       "success": "Pièce rétablie",
       "error": "Le rétablissement a échoué"
     },
+    "destroyed": {
+      "label": "Empreinte détruite le {{date}}",
+      "explanation": "Empreinte d'un familier, détruite à la clôture du dossier : ces empreintes ne sont relevées que pour écarter ses traces de l'enquête, et ne sont pas conservées ensuite."
+    },
     "nav": {
       "previous": "Voir les images précédentes",
       "next": "Voir les images suivantes"
@@ -390,7 +411,8 @@
       "REPORT_GENERATED": "Rapport généré",
       "CHAIN_ANCHORED": "Chaîne horodatée",
       "TRACE_RESTORED": "Trace rétablie au dossier",
-      "REFERENCE_PRINT_RESTORED": "Empreinte de référence rétablie au dossier"
+      "REFERENCE_PRINT_RESTORED": "Empreinte de référence rétablie au dossier",
+      "REFERENCE_PRINT_IMAGE_DESTROYED": "Empreinte de familier détruite"
     },
     "pagination": {
       "previous": "Précédent",

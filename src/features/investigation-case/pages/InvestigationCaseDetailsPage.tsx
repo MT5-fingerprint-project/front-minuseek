@@ -12,6 +12,8 @@ import {
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
 import InvestigationCaseEditForm from '@/features/investigation-case/components/InvestigationCaseEditForm'
 import WithdrawnPiecesSection from '@/features/investigation-case/components/WithdrawnPiecesSection'
+import CaseClosureActions from '@/features/investigation-case/components/CaseClosureActions'
+import ClosedCaseBanner from '@/features/investigation-case/components/ClosedCaseBanner'
 import {
   operatorNameOf,
   type InvestigationCaseCorrections,
@@ -68,11 +70,14 @@ export default function InvestigationCaseDetailsPage() {
             {t('investigationCase.details.title', { caseNumber: investigationCase.caseNumber })}
           </H1>
           <CaseStatusBadge status={investigationCase.status} />
+          <CaseClosureActions investigationCase={investigationCase} />
         </div>
         <p className="text-sm text-muted-foreground">
           {t('investigationCase.details.updatedAt', { date: updatedDate, time: updatedTime })}
         </p>
       </div>
+
+      <ClosedCaseBanner caseId={investigationCase.id} />
 
       <Tabs defaultValue={CASE_TAB}>
         <TabsList variant="line">

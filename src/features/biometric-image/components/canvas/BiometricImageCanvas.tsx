@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { Stage, Layer } from 'react-konva'
 import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
 import DraggableImage, { type ImageLayout } from '@/features/biometric-image/components/canvas/DraggableImage'
+import DestroyedImagePlaceholder from '@/features/biometric-image/components/DestroyedImagePlaceholder'
 import AnnotationLayer from '@/features/biometric-image/components/canvas/AnnotationLayer'
 import CanvasGridOverlay from '@/features/biometric-image/components/canvas/CanvasGridOverlay'
 import CanvasToolbar from '@/features/biometric-image/components/toolbar/CanvasToolbar'
@@ -46,9 +47,21 @@ export default function BiometricImageCanvas({
   const { data: layers = [] } = useLayers(image?.id)
   const annotationLayers = layers.filter((l) => l.type === 'ANNOTATION')
 
+  if (image?.imageDestroyedAt) {
+    return (
+      <div ref={containerRef} className="relative h-full w-full overflow-hidden">
+        <DestroyedImagePlaceholder
+          destroyedAt={image.imageDestroyedAt}
+          iconSize={48}
+          className="h-full w-full bg-transparent"
+        />
+      </div>
+    )
+  }
+
   return (
     <div ref={containerRef} className="relative h-full w-full overflow-hidden">
-      {image ? (
+      {image?.url ? (
         <>
           <Stage
             width={size.width}

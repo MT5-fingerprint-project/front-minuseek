@@ -6,6 +6,7 @@ import {
   useUploadBiometricImage,
 } from '@/features/biometric-image/hooks/useBiometricImages'
 import SubjectPrintSlot from '@/features/investigation-case/components/subject/SubjectPrintSlot'
+import { useCaseIsClosed } from '@/features/investigation-case/hooks/useCaseIsClosed'
 
 const FINGER_POSITIONS = ['THUMB', 'INDEX', 'MIDDLE', 'RING', 'LITTLE', 'PALM'] as const
 const HAND_SIDES = ['LEFT', 'RIGHT'] as const
@@ -20,6 +21,7 @@ export default function SubjectPrintsSection({ caseId, subjectId }: SubjectPrint
   const { data: referencePrints = [] } = useBiometricImages('reference-prints', caseId)
   const uploadPrint = useUploadBiometricImage('reference-prints')
   const withdrawPrint = useWithdrawBiometricImage('reference-prints', caseId)
+  const isCaseClosed = useCaseIsClosed(caseId)
 
   const printsByPosition = new Map(
     referencePrints.filter((print) => print.subjectId === subjectId).map((print) => [print.position, print])
@@ -54,6 +56,7 @@ export default function SubjectPrintsSection({ caseId, subjectId }: SubjectPrint
                       isUploading={isUploading}
                       onUpload={(file) => uploadPrint.mutate({ caseId, file, subjectId, position })}
                       onWithdraw={(printId, motive) => withdrawPrint.mutate({ id: printId, motive })}
+                      isReadOnly={isCaseClosed}
                     />
                   )
                 })}

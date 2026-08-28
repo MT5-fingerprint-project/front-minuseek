@@ -26,7 +26,7 @@ function WithdrawnPieceRow({ piece, type, caseId }: WithdrawnPieceRowProps) {
   return (
     <li className="flex items-center gap-4 rounded-sm bg-white px-3 py-2">
       <img
-        src={piece.url}
+        src={piece.url ?? undefined}
         alt={piece.fileName}
         loading="lazy"
         decoding="async"
