@@ -3,28 +3,27 @@ import { Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
 import { Spinner } from '@/features/shared/ui/spinner'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/features/shared/ui/alert-dialog'
-import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
+import WithdrawPieceDialog from '@/features/biometric-image/components/WithdrawPieceDialog'
+import type {
+  BiometricImage,
+  WithdrawalMotive,
+} from '@/features/biometric-image/types/biometricImage'
 
 type SubjectPrintSlotProps = {
   label: string
   print?: BiometricImage
   isUploading: boolean
   onUpload: (file: File) => void
-  onDelete: (printId: string) => void
+  onWithdraw: (printId: string, motive: WithdrawalMotive) => void
 }
 
-export default function SubjectPrintSlot({ label, print, isUploading, onUpload, onDelete }: SubjectPrintSlotProps) {
+export default function SubjectPrintSlot({
+  label,
+  print,
+  isUploading,
+  onUpload,
+  onWithdraw,
+}: SubjectPrintSlotProps) {
   const { t } = useTranslation()
   const inputId = useId()
 
@@ -33,27 +32,19 @@ export default function SubjectPrintSlot({ label, print, isUploading, onUpload, 
       {print ? (
         <div className="group relative aspect-square overflow-hidden rounded-xs">
           <img src={print.url} alt={label} loading="lazy" decoding="async" className="h-full w-full object-cover" />
-          <AlertDialog>
-            <AlertDialogTrigger
-              type="button"
-              aria-label={t('subject.prints.delete', { position: label })}
-              className="absolute inset-0 flex items-center justify-center bg-blue-dark-1/50 opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100"
-            >
-              <Trash2 className="size-7 text-white" />
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>{t('biometricImage.delete.confirmTitle')}</AlertDialogTitle>
-                <AlertDialogDescription>{t('biometricImage.delete.confirmDescription')}</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>{t('common.actions.cancel')}</AlertDialogCancel>
-                <AlertDialogAction variant="destructive" onClick={() => onDelete(print.id)}>
-                  {t('biometricImage.delete.confirmAction')}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          <WithdrawPieceDialog
+            type="reference-prints"
+            onConfirm={(motive) => onWithdraw(print.id, motive)}
+            trigger={
+              <button
+                type="button"
+                aria-label={t('subject.prints.withdraw', { position: label })}
+                className="absolute inset-0 flex items-center justify-center bg-blue-dark-1/50 opacity-0 transition-opacity focus-visible:opacity-100 group-hover:opacity-100"
+              >
+                <Trash2 className="size-7 text-white" />
+              </button>
+            }
+          />
         </div>
       ) : (
         <label

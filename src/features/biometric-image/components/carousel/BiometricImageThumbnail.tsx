@@ -3,18 +3,8 @@ import { useTranslation } from 'react-i18next'
 import { cn } from '@/features/shared/lib/utils'
 import { Badge } from '@/features/shared/ui/badge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/features/shared/ui/tooltip'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/features/shared/ui/alert-dialog'
-import { useDeleteBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
+import WithdrawPieceDialog from '@/features/biometric-image/components/WithdrawPieceDialog'
+import { useWithdrawBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
 import type {
   BiometricImage,
   BiometricImageDecoration,
@@ -42,7 +32,7 @@ export default function BiometricImageThumbnail({
   decoration,
 }: BiometricImageThumbnailProps) {
   const { t } = useTranslation()
-  const deleteImage = useDeleteBiometricImage(type, caseId)
+  const withdrawImage = useWithdrawBiometricImage(type, caseId)
   const label = decoration?.label ?? image.fileName
 
   return (
@@ -85,29 +75,21 @@ export default function BiometricImageThumbnail({
         <TooltipContent className="break-all">{label}</TooltipContent>
       </Tooltip>
 
-      <AlertDialog>
-        <AlertDialogTrigger
-          type="button"
-          disabled={deleteImage.isPending}
-          aria-label={t('biometricImage.delete.aria', { fileName: label })}
-          onClick={(event) => event.stopPropagation()}
-          className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/85 disabled:opacity-50"
-        >
-          <X className="size-3" />
-        </AlertDialogTrigger>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t('biometricImage.delete.confirmTitle')}</AlertDialogTitle>
-            <AlertDialogDescription>{t('biometricImage.delete.confirmDescription')}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t('common.actions.cancel')}</AlertDialogCancel>
-            <AlertDialogAction variant="destructive" onClick={() => deleteImage.mutate(image.id)}>
-              {t('biometricImage.delete.confirmAction')}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <WithdrawPieceDialog
+        type={type}
+        onConfirm={(motive) => withdrawImage.mutate({ id: image.id, motive })}
+        trigger={
+          <button
+            type="button"
+            disabled={withdrawImage.isPending}
+            aria-label={t('biometricImage.withdraw.aria', { fileName: label })}
+            onClick={(event) => event.stopPropagation()}
+            className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/85 disabled:opacity-50"
+          >
+            <X className="size-3" />
+          </button>
+        }
+      />
     </div>
   )
 }
