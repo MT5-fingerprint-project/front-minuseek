@@ -153,6 +153,14 @@
       "operatorChangeNotAllowed": "Seuls l'opérateur en place et le responsable de service peuvent confier cette affaire",
       "caseNotFound": "Cette affaire est introuvable",
       "caseClosed": "Cette affaire est close : elle n'est plus modifiable"
+    },
+    "withdrawn": {
+      "title": "Pièces retirées du dossier",
+      "withdrawnAt": "Retirée le {{date}} — {{motive}}",
+      "kind": {
+        "traces": "Trace",
+        "reference-prints": "Empreinte de référence"
+      }
     }
   },
   "subject": {
@@ -202,7 +210,6 @@
         "PALM": "Paume"
       },
       "import": "Importer l'empreinte : {{position}}",
-      "delete": "Supprimer l'empreinte : {{position}}",
       "printLabel": "{{name}} - {{position}}",
       "fullPositions": {
         "LEFT_THUMB": "Pouce gauche",
@@ -217,7 +224,8 @@
         "RIGHT_RING": "Annulaire droit",
         "RIGHT_LITTLE": "Auriculaire droit",
         "RIGHT_PALM": "Paume droite"
-      }
+      },
+      "withdraw": "Retirer du dossier l’empreinte {{position}}"
     },
     "form": {
       "createTitle": "Nouveau sujet",
@@ -320,13 +328,19 @@
         "pencil": "Crayon"
       }
     },
-    "delete": {
-      "success": "Image supprimée",
-      "error": "La suppression a échoué",
-      "aria": "Supprimer {{fileName}}",
-      "confirmTitle": "Supprimer cette image ?",
-      "confirmDescription": "Toutes les modifications apportées à cette image seront supprimées. Cette action est irréversible.",
-      "confirmAction": "Supprimer"
+    "withdraw": {
+      "success": "Pièce retirée du dossier",
+      "error": "Le retrait a échoué",
+      "aria": "Retirer {{fileName}} du dossier",
+      "confirmTitle": "Retirer cette pièce du dossier ?",
+      "confirmDescription": "La pièce sort du dossier de travail. Elle reste consultable dans les pièces retirées et pourra être rétablie. Le fichier n'est pas détruit.",
+      "motiveLabel": "Motif du retrait",
+      "confirmAction": "Retirer du dossier"
+    },
+    "restore": {
+      "action": "Rétablir",
+      "success": "Pièce rétablie",
+      "error": "Le rétablissement a échoué"
     },
     "nav": {
       "previous": "Voir les images précédentes",
@@ -364,17 +378,19 @@
       "CASE_UPDATED": "Informations du dossier corrigées",
       "TRACE_UPLOADED": "Trace déposée",
       "TRACE_QUALIFIED": "Trace qualifiée",
-      "TRACE_DELETED": "Trace supprimée",
+      "TRACE_DELETED": "Trace retirée du dossier",
       "REFERENCE_PRINT_UPLOADED": "Empreinte de référence déposée",
-      "REFERENCE_PRINT_DELETED": "Empreinte de référence supprimée",
+      "REFERENCE_PRINT_DELETED": "Empreinte de référence retirée du dossier",
       "LAYER_CREATED": "Calque ajouté",
       "LAYER_UPDATED": "Calque modifié",
       "LAYER_DELETED": "Calque supprimé",
       "COMPARISON_EXECUTED": "Comparaison lancée",
       "HIT_RECORDED": "Correspondance déclarée",
-      "HIT_REMOVED": "Correspondance retirée",
+      "HIT_REMOVED": "Identification retirée",
       "REPORT_GENERATED": "Rapport généré",
-      "CHAIN_ANCHORED": "Chaîne horodatée"
+      "CHAIN_ANCHORED": "Chaîne horodatée",
+      "TRACE_RESTORED": "Trace rétablie au dossier",
+      "REFERENCE_PRINT_RESTORED": "Empreinte de référence rétablie au dossier"
     },
     "pagination": {
       "previous": "Précédent",
@@ -558,5 +574,10 @@
     "errors": {
       "saveFailed": "Impossible d'enregistrer l'en-tête du service"
     }
+  },
+  "withdrawalMotive": {
+    "DUPLICATE": "Doublon d'une pièce déjà versée",
+    "MISFILED": "Pièce versée par erreur dans ce dossier",
+    "WRONG_ATTRIBUTION": "Rattachement erroné à une personne ou à un doigt"
   }
 }
