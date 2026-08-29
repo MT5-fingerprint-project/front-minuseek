@@ -500,6 +500,37 @@
       "notice": "Ce rapport portera votre signature : {{signer}}."
     }
   },
+  "publicVerification": {
+    "title": "Vérifier un document ou une image",
+    "intro": "Cette page vous a été mise à disposition par le service vous ayant remis vos documents. Elle vous permet de vérifier si les fichiers que vous déposez n'ont pas éta altérés par un tiers, et à quelle date. Elle ne partage aucune information sur le contenu du fichier, ni sur le dossier auquel il appartient.",
+    "stayLocal": "Le fichier ne quitte pas votre ordinateur : seule son empreinte numérique est envoyée.",
+    "pending": "Calcul de l'empreinte en cours…",
+    "another": "Vérifier un autre fichier",
+    "paperNotice": "La vérification porte sur un fichier. Un exemplaire imprimé ne peut pas être vérifié ici.",
+    "dropZone": {
+      "label": "Choisir un fichier, ou le faire glisser ici",
+      "hovered": "Relâchez pour vérifier ce fichier",
+      "hint": "Le rapport que vous avez reçu, ou l'une de ses images."
+    },
+    "kind": {
+      "TRACE": "une trace papillaire",
+      "REFERENCE_PRINT": "une empreinte de référence",
+      "REPORT": "un rapport"
+    },
+    "verdict": {
+      "sealed": "Scellé par {{laboratory}} le {{date}}",
+      "anchored": "Horodaté par une autorité extérieure le {{date}}",
+      "notAnchored": "Aucun horodatage extérieur n'a encore été apposé sur ce scellé.",
+      "earlierReport": "Un rapport antérieur a été établi sur le même dossier. Le document que vous détenez n'est pas le premier état des travaux.",
+      "newerReport": "Un rapport plus récent a été établi sur le même dossier. Le document que vous détenez est authentique, mais il n'est peut-être pas le dernier état des travaux.",
+      "unknown": "Ce fichier est inconnu de ce laboratoire. Aucun scellé ne lui correspond."
+    },
+    "errors": {
+      "unavailable": "La vérification n'a pas abouti. Réessayez dans un instant.",
+      "insecureContext": "La vérification n'a pas abouti. Réessayez dans un instant.",
+      "tooLarge": "Ce fichier est trop volumineux pour être vérifié dans le navigateur (limite : 100 Mo)."
+    }
+  },
   "users": {
     "list": {
       "title": "Utilisateurs",
