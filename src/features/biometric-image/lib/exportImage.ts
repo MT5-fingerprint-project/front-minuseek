@@ -2,12 +2,6 @@ import type Konva from 'konva'
 
 export const EXPORT_PIXEL_RATIO = 2
 
-/**
- * Rend la scène sur un fond blanc et l'encode en PNG. Passe par un canevas
- * intermédiaire plutôt que par `stage.toBlob` : ce dernier est typé trop
- * largement pour `URL.createObjectURL`, le canevas intermédiaire est ce qui
- * permet de peindre le fond, et `stage.toCanvas` est synchrone et bien typé.
- */
 export async function stageToPngBlob(stage: Konva.Stage): Promise<Blob> {
   const sourceCanvas = stage.toCanvas({ pixelRatio: EXPORT_PIXEL_RATIO })
 
