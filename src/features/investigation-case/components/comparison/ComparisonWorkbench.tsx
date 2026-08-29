@@ -1,24 +1,18 @@
-import { useEffect, useMemo } from 'react'
+import { useState } from 'react'
 import { Sparkle, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/features/shared/lib/utils'
 import { Button } from '@/features/shared/ui/button'
+import { Icon } from '@/features/shared/icons'
 import WorkbenchWindow from '@/features/shared/components/window/WorkbenchWindow'
 import WindowActionButton from '@/features/shared/components/window/WindowActionButton'
 import { BiometricImageCarousel, BiometricImageCanvas } from '@/features/biometric-image'
 import type { BiometricImageDecoration } from '@/features/biometric-image/types/biometricImage'
 import ZoomControls from '@/features/biometric-image/components/canvas/ZoomControls'
 import RecenterButton from '@/features/biometric-image/components/canvas/RecenterControl'
-import DisplayScaleControls, {
-  type PresetDisabledReason,
-} from '@/features/biometric-image/components/canvas/DisplayScaleControls'
-import { MIN_SCALE, MAX_SCALE } from '@/features/biometric-image/components/canvas/useCanvasView'
-import { useBiometricImages } from '@/features/biometric-image/hooks/useBiometricImages'
-import {
-  magnificationForViewScale,
-  magnificationOfPreset,
-  viewScaleForMagnification,
-} from '@/features/biometric-image/lib/displayScale'
+import ImageSizeDialog from '@/features/biometric-image/components/canvas/ImageSizeDialog'
+import { useBiometricImages, useCalibrateBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
+import { pxPerCmFromResolutionDpi } from '@/features/biometric-image/lib/imageSize'
 import type { ComparisonWindowState } from '@/features/investigation-case/hooks/useComparisonWindow'
 
 const TITLES = {
@@ -85,41 +79,10 @@ export default function ComparisonWorkbench({
   const { data: images } = useBiometricImages(type, caseId)
   const freshImage = images?.find((img) => img.id === w.selectedTrace?.id) ?? w.selectedTrace
   const resolutionDpi = freshImage?.resolutionDpi ?? null
+  const calibrate = useCalibrateBiometricImage(type, freshImage?.caseId ?? '')
+  const [isImageSizeDialogOpen, setIsImageSizeDialogOpen] = useState(false)
 
   const title = w.selectedTrace ? t(keys.withFile, { fileName: w.selectedTrace.fileName }) : t(keys.base)
-
-  const targetScaleForPreset = (magnification: number): number | null => {
-    if (resolutionDpi === null || !w.sourceGeometry) return null
-    return viewScaleForMagnification(magnification, resolutionDpi, w.sourceGeometry.fitScale)
-  }
-
-  const targetScale = useMemo(() => {
-    if (w.displayScalePreset === 'free') return null
-    return targetScaleForPreset(magnificationOfPreset(w.displayScalePreset))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [w.displayScalePreset, resolutionDpi, w.sourceGeometry])
-
-  useEffect(() => {
-    if (targetScale !== null) w.zoomRef.current?.setScale(targetScale)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [targetScale])
-
-  useEffect(() => {
-    if (resolutionDpi === null && w.displayScalePreset !== 'free') w.setDisplayScalePreset('free')
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resolutionDpi])
-
-  const disabledReasonFor = (magnification: number): PresetDisabledReason => {
-    if (resolutionDpi === null) return 'uncalibrated'
-    const target = targetScaleForPreset(magnification)
-    if (target !== null && (target < MIN_SCALE || target > MAX_SCALE)) return 'out-of-range'
-    return null
-  }
-
-  const magnification =
-    resolutionDpi !== null && w.sourceGeometry
-      ? magnificationForViewScale(w.scale, resolutionDpi, w.sourceGeometry.fitScale)
-      : null
 
   const footer = (
     <>
@@ -131,13 +94,19 @@ export default function ComparisonWorkbench({
           onZoomOut={() => w.zoomRef.current?.zoomOut()}
         />
         <RecenterButton onClick={() => w.zoomRef.current?.recenter()} />
-        <DisplayScaleControls
-          preset={w.displayScalePreset}
-          magnification={magnification}
-          disabledReason1to1={disabledReasonFor(1)}
-          disabledReason5to1={disabledReasonFor(5)}
-          onSelect={w.setDisplayScalePreset}
-        />
+        {w.selectedTrace && (
+          <button
+            type="button"
+            onClick={() => setIsImageSizeDialogOpen((open) => !open)}
+            title={t('biometricImage.imageSize.title')}
+            className="flex items-center gap-1 rounded-full bg-grey-light-1 px-2 py-1 text-xs font-medium text-grey-medium-2 hover:text-grey-dark"
+          >
+            {resolutionDpi !== null
+              ? t('biometricImage.imageSize.chip', { value: Math.round(pxPerCmFromResolutionDpi(resolutionDpi)) })
+              : t('biometricImage.imageSize.chipUncalibrated')}
+            <Icon name="pen" size={14} color="currentColor" />
+          </button>
+        )}
         <WindowActionButton
           tone="footer"
           icon={w.isGridVisible ? 'gridOff' : 'grid'}
@@ -201,7 +170,7 @@ export default function ComparisonWorkbench({
         />
       )}
       <div className="min-h-0 flex-1 p-2">
-        <div className="h-full overflow-hidden rounded-sm border border-grey-light-2">
+        <div className="relative h-full overflow-hidden rounded-sm border border-grey-light-2">
           <BiometricImageCanvas
             image={freshImage}
             type={type}
@@ -214,6 +183,20 @@ export default function ComparisonWorkbench({
             onScaleChange={w.handleScaleChange}
             onSourceGeometryChange={w.setSourceGeometry}
           />
+          {isImageSizeDialogOpen && w.sourceGeometry && (
+            <ImageSizeDialog
+              sourceWidth={w.sourceGeometry.sourceWidth}
+              sourceHeight={w.sourceGeometry.sourceHeight}
+              resolutionDpi={resolutionDpi}
+              isSaving={calibrate.isPending}
+              onValidate={(dpi) => {
+                if (!freshImage) return
+                calibrate.mutate({ id: freshImage.id, resolutionDpi: dpi })
+                setIsImageSizeDialogOpen(false)
+              }}
+              onClose={() => setIsImageSizeDialogOpen(false)}
+            />
+          )}
         </div>
       </div>
     </WorkbenchWindow>

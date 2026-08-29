@@ -372,6 +372,19 @@
       "magnification": "× {{value}}",
       "densityAssumption": "Grossissement par rapport à l'objet réel, en supposant un écran à 96 pixels par pouce"
     },
+    "imageSize": {
+      "title": "Taille d'image",
+      "width": "Largeur",
+      "height": "Hauteur",
+      "resolutionX": "Résolution X",
+      "resolutionY": "Résolution Y",
+      "pxPerCm": "px/cm",
+      "reset": "Réinitialiser",
+      "validate": "Valider",
+      "outOfRange": "{{value}} points par pouce est hors de l'intervalle accepté (50 à 10 000)",
+      "chip": "{{value}} px/cm",
+      "chipUncalibrated": "Non calibrée"
+    },
     "withdraw": {
       "success": "Pièce retirée du dossier",
       "error": "Le retrait a échoué",

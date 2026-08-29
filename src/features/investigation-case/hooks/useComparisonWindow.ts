@@ -1,11 +1,7 @@
 import { useRef, useState } from 'react'
 import { usePanelRef } from 'react-resizable-panels'
-import type {
-  CanvasZoomHandle,
-  ScaleChangeOrigin,
-} from '@/features/biometric-image/components/canvas/BiometricImageCanvas'
+import type { CanvasZoomHandle } from '@/features/biometric-image/components/canvas/BiometricImageCanvas'
 import type { SourceGeometry } from '@/features/biometric-image/components/canvas/DraggableImage'
-import type { DisplayScalePreset } from '@/features/biometric-image/lib/displayScale'
 import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
 
 export type ComparisonWindowState = ReturnType<typeof useComparisonWindow>
@@ -21,12 +17,11 @@ export function useComparisonWindow() {
   const [scale, setScale] = useState(1)
   const [selectedTrace, setSelectedTrace] = useState<BiometricImage>()
   const [sourceGeometry, setSourceGeometry] = useState<SourceGeometry | null>(null)
-  const [displayScalePreset, setDisplayScalePreset] = useState<DisplayScalePreset>('free')
 
-  const handleScaleChange = (nextScale: number, origin: ScaleChangeOrigin) => {
-    setScale(nextScale)
-    if (origin !== 'preset') setDisplayScalePreset('free')
-  }
+  // L'origine (molette/bouton/recentrage) n'a plus d'usage sur cette branche, qui
+  // remplace les préréglages 1:1/5:1 par le dialogue de taille manuel : un paramètre
+  // en moins reste assignable au type `(scale, origin) => void` attendu par le canevas.
+  const handleScaleChange = (nextScale: number) => setScale(nextScale)
 
   const toggle = () => {
     const panel = panelRef.current
@@ -54,8 +49,6 @@ export function useComparisonWindow() {
     handleScaleChange,
     sourceGeometry,
     setSourceGeometry,
-    displayScalePreset,
-    setDisplayScalePreset,
     selectedTrace,
     setSelectedTrace,
     toggle,
