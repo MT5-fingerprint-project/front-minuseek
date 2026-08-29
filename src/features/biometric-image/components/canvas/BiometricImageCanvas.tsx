@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react'
+import { useImperativeHandle, useRef, useState } from 'react'
 import { Stage, Layer } from 'react-konva'
+import type Konva from 'konva'
 import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
 import DraggableImage, { type ImageLayout } from '@/features/biometric-image/components/canvas/DraggableImage'
 import DestroyedImagePlaceholder from '@/features/biometric-image/components/DestroyedImagePlaceholder'
@@ -12,8 +13,13 @@ import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
 import { useCanvasFilters } from '@/features/biometric-image/hooks/useCanvasFilters'
 import { useLayers } from '@/features/biometric-image/hooks/useLayers'
 import { ANNOTATION_COLORS, type AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
+import { stageToPngBlob } from '@/features/biometric-image/lib/exportImage'
 
 export type { CanvasZoomHandle }
+
+export type ExportHandle = {
+  exportToBlob: () => Promise<Blob>
+}
 
 type BiometricImageCanvasProps = {
   image: BiometricImage | undefined
@@ -24,6 +30,7 @@ type BiometricImageCanvasProps = {
   onCloseLayers?: () => void
   zoomHandleRef?: React.RefObject<CanvasZoomHandle | null>
   onScaleChange?: (scale: number) => void
+  exportHandleRef?: React.RefObject<ExportHandle | null>
 }
 
 export default function BiometricImageCanvas({
@@ -35,8 +42,10 @@ export default function BiometricImageCanvas({
   onCloseLayers,
   zoomHandleRef,
   onScaleChange,
+  exportHandleRef,
 }: BiometricImageCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const stageRef = useRef<Konva.Stage>(null)
   const size = useContainerSize(containerRef)
   const { view, handleWheel, recenterSignal } = useCanvasView({ size, zoomHandleRef, onScaleChange })
   const { sliderValues, effectiveFilters, handleFilterChange } = useCanvasFilters(image?.id)
@@ -46,6 +55,14 @@ export default function BiometricImageCanvas({
   const [hoveredLayerId, setHoveredLayerId] = useState<string | null>(null)
   const { data: layers = [] } = useLayers(image?.id)
   const annotationLayers = layers.filter((l) => l.type === 'ANNOTATION')
+
+  useImperativeHandle(exportHandleRef, () => ({
+    exportToBlob: () => {
+      const stage = stageRef.current
+      if (!stage) return Promise.reject(new Error('No stage to export'))
+      return stageToPngBlob(stage)
+    },
+  }))
 
   if (image?.imageDestroyedAt) {
     return (
@@ -64,6 +81,7 @@ export default function BiometricImageCanvas({
       {image?.url ? (
         <>
           <Stage
+            ref={stageRef}
             width={size.width}
             height={size.height}
             scaleX={view.scale}
