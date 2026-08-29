@@ -169,6 +169,7 @@ export default function BiometricImageCanvas({
               activeColor={activeColor}
               fingerprintId={image.id}
               imageLayout={imageLayout}
+              fitScale={sourceGeometry?.fitScale ?? 1}
               hoveredLayerId={hoveredLayerId}
             />
             <CalibrationLayer
