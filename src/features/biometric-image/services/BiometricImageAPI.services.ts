@@ -34,6 +34,7 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     withdrawnAt: dto.withdrawnAt ?? null,
     withdrawalMotive: dto.withdrawalMotive ?? null,
     imageDestroyedAt: dto.imageDestroyedAt ?? null,
+    resolutionDpi: dto.resolutionDpi ?? null,
   }
 }
 
@@ -53,6 +54,9 @@ export const BiometricImageAPI = {
 
   restore: (type: BiometricImageType, id: string) =>
     apiClient.post(`${endpointByType[type]}/${id}/restore`).then((res) => res.data),
+
+  calibrate: (type: BiometricImageType, id: string, resolutionDpi: number) =>
+    apiClient.patch(`${endpointByType[type]}/${id}/calibration`, { resolutionDpi }).then(() => undefined),
 
   upload: (type: BiometricImageType, { caseId, file, subjectId, position }: UploadInput) => {
     const formData = new FormData()
