@@ -28,6 +28,7 @@ import Information from './information.svg?react'
 import InvertColors from './invert-colors.svg?react'
 import Layers from './layers.svg?react'
 import LayersOff from './layers-off.svg?react'
+import Link from './link.svg?react'
 import Location from './location.svg?react'
 import Logout from './logout.svg?react'
 import Luminosity from './luminosity.svg?react'
@@ -94,6 +95,7 @@ export const icons = {
   invertColors: InvertColors,
   layers: Layers,
   layersOff: LayersOff,
+  link: Link,
   location: Location,
   logout: Logout,
   luminosity: Luminosity,

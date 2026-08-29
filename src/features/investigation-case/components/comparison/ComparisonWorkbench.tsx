@@ -1,14 +1,19 @@
+import { useState } from 'react'
 import { Sparkle, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { cn } from '@/features/shared/lib/utils'
 import { Button } from '@/features/shared/ui/button'
+import { Icon } from '@/features/shared/icons'
 import WorkbenchWindow from '@/features/shared/components/window/WorkbenchWindow'
 import WindowActionButton from '@/features/shared/components/window/WindowActionButton'
 import { BiometricImageCarousel, BiometricImageCanvas } from '@/features/biometric-image'
 import type { BiometricImageDecoration } from '@/features/biometric-image/types/biometricImage'
 import ZoomControls from '@/features/biometric-image/components/canvas/ZoomControls'
 import RecenterButton from '@/features/biometric-image/components/canvas/RecenterControl'
+import ImageSizeDialog from '@/features/biometric-image/components/canvas/ImageSizeDialog'
+import { useBiometricImages, useCalibrateBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
+import { pxPerCmFromResolutionDpi } from '@/features/biometric-image/lib/imageSize'
 import type { ComparisonWindowState } from '@/features/investigation-case/hooks/useComparisonWindow'
 import { useInvestigationCase } from '@/features/investigation-case/hooks/useInvestigationCases'
 import { downloadBlob, exportFileName } from '@/features/biometric-image/lib/exportImage'
@@ -74,6 +79,13 @@ export default function ComparisonWorkbench({
   const keys = TITLES[type]
   const { data: investigationCase } = useInvestigationCase(caseId)
 
+  // Le carrousel alimente le même cache : aucune requête supplémentaire n'est déclenchée ici.
+  const { data: images } = useBiometricImages(type, caseId)
+  const freshImage = images?.find((img) => img.id === w.selectedTrace?.id) ?? w.selectedTrace
+  const resolutionDpi = freshImage?.resolutionDpi ?? null
+  const calibrate = useCalibrateBiometricImage(type, freshImage?.caseId ?? '')
+  const [isImageSizeDialogOpen, setIsImageSizeDialogOpen] = useState(false)
+
   const title = w.selectedTrace ? t(keys.withFile, { fileName: w.selectedTrace.fileName }) : t(keys.base)
 
   const handleExport = async () => {
@@ -98,6 +110,19 @@ export default function ComparisonWorkbench({
           onZoomOut={() => w.zoomRef.current?.zoomOut()}
         />
         <RecenterButton onClick={() => w.zoomRef.current?.recenter()} />
+        {w.selectedTrace && (
+          <button
+            type="button"
+            onClick={() => setIsImageSizeDialogOpen((open) => !open)}
+            title={t('biometricImage.imageSize.title')}
+            className="flex items-center gap-1 rounded-full bg-grey-light-1 px-2 py-1 text-xs font-medium text-grey-medium-2 hover:text-grey-dark"
+          >
+            {resolutionDpi !== null
+              ? t('biometricImage.imageSize.chip', { value: Math.round(pxPerCmFromResolutionDpi(resolutionDpi)) })
+              : t('biometricImage.imageSize.chipUncalibrated')}
+            <Icon name="pen" size={14} color="currentColor" />
+          </button>
+        )}
         <WindowActionButton
           tone="footer"
           icon={w.isGridVisible ? 'gridOff' : 'grid'}
@@ -164,9 +189,9 @@ export default function ComparisonWorkbench({
         />
       )}
       <div className="min-h-0 flex-1 p-2">
-        <div className="h-full overflow-hidden rounded-sm border border-grey-light-2">
+        <div className="relative h-full overflow-hidden rounded-sm border border-grey-light-2">
           <BiometricImageCanvas
-            image={w.selectedTrace}
+            image={freshImage}
             type={type}
             placeholder={t(`investigationCase.comparison.select${type === 'traces' ? 'Trace' : 'ReferencePrint'}`)}
             isToolbarVisible={isActive}
@@ -174,9 +199,24 @@ export default function ComparisonWorkbench({
             isGridVisible={w.isGridVisible}
             onCloseLayers={w.closeLayersPanel}
             zoomHandleRef={w.zoomRef}
-            onScaleChange={w.setScale}
+            onScaleChange={w.handleScaleChange}
+            onSourceGeometryChange={w.setSourceGeometry}
             exportHandleRef={w.exportRef}
           />
+          {isImageSizeDialogOpen && w.sourceGeometry && (
+            <ImageSizeDialog
+              sourceWidth={w.sourceGeometry.sourceWidth}
+              sourceHeight={w.sourceGeometry.sourceHeight}
+              resolutionDpi={resolutionDpi}
+              isSaving={calibrate.isPending}
+              onValidate={(dpi) => {
+                if (!freshImage) return
+                calibrate.mutate({ id: freshImage.id, resolutionDpi: dpi })
+                setIsImageSizeDialogOpen(false)
+              }}
+              onClose={() => setIsImageSizeDialogOpen(false)}
+            />
+          )}
         </div>
       </div>
     </WorkbenchWindow>

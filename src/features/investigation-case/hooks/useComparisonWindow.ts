@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { usePanelRef } from 'react-resizable-panels'
 import type { CanvasZoomHandle, ExportHandle } from '@/features/biometric-image/components/canvas/BiometricImageCanvas'
+import type { SourceGeometry } from '@/features/biometric-image/components/canvas/DraggableImage'
 import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
 
 export type ComparisonWindowState = ReturnType<typeof useComparisonWindow>
@@ -16,6 +17,12 @@ export function useComparisonWindow() {
   const [isGridVisible, setGridVisible] = useState(false)
   const [scale, setScale] = useState(1)
   const [selectedTrace, setSelectedTrace] = useState<BiometricImage>()
+  const [sourceGeometry, setSourceGeometry] = useState<SourceGeometry | null>(null)
+
+  // L'origine (molette/bouton/recentrage) n'a plus d'usage sur cette branche, qui
+  // remplace les préréglages 1:1/5:1 par le dialogue de taille manuel : un paramètre
+  // en moins reste assignable au type `(scale, origin) => void` attendu par le canevas.
+  const handleScaleChange = (nextScale: number) => setScale(nextScale)
 
   const toggle = () => {
     const panel = panelRef.current
@@ -41,6 +48,9 @@ export function useComparisonWindow() {
     toggleGrid: () => setGridVisible((v) => !v),
     scale,
     setScale,
+    handleScaleChange,
+    sourceGeometry,
+    setSourceGeometry,
     selectedTrace,
     setSelectedTrace,
     toggle,

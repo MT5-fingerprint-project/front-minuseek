@@ -3,6 +3,7 @@ import { Image as KonvaImage } from 'react-konva'
 import Konva from 'konva'
 import type { CanvasFilters } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import { FILTER_META } from '@/features/biometric-image/components/toolbar/canvasFilters'
+import { fitAdjustmentFactor } from '@/features/biometric-image/lib/displayScale'
 
 export type ImageLayout = {
   x: number
@@ -37,8 +38,6 @@ function useImage(url: string) {
 
   return image
 }
-
-const MAX_IMAGE_SIZE = 400
 
 type DraggableImageProps = {
   url: string
@@ -101,7 +100,7 @@ export default function DraggableImage({
   )
 
   // Geometry — shared by the rendered image and the layout reported for annotation anchoring
-  const scale = image ? Math.min(1, MAX_IMAGE_SIZE / Math.max(image.width, image.height)) : 0
+  const scale = image ? fitAdjustmentFactor(image.width, image.height) : 0
   const width = image ? image.width * scale : 0
   const height = image ? image.height * scale : 0
   const centered = {

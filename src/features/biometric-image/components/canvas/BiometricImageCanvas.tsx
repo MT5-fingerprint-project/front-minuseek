@@ -11,7 +11,11 @@ import ScaleBarOverlay from '@/features/biometric-image/components/canvas/ScaleB
 import CanvasGridOverlay from '@/features/biometric-image/components/canvas/CanvasGridOverlay'
 import CanvasToolbar from '@/features/biometric-image/components/toolbar/CanvasToolbar'
 import LayersPanelContainer from '@/features/biometric-image/components/layers/LayersPanelContainer'
-import { useCanvasView, type CanvasZoomHandle } from '@/features/biometric-image/components/canvas/useCanvasView'
+import {
+  useCanvasView,
+  type CanvasZoomHandle,
+  type ScaleChangeOrigin,
+} from '@/features/biometric-image/components/canvas/useCanvasView'
 import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
 import { useCanvasFilters } from '@/features/biometric-image/hooks/useCanvasFilters'
 import { useLayers } from '@/features/biometric-image/hooks/useLayers'
@@ -20,7 +24,7 @@ import { ANNOTATION_COLORS, type AnnotationToolType } from '@/features/biometric
 import type { CalibrationPoint } from '@/features/biometric-image/lib/calibration'
 import { stageToPngBlob } from '@/features/biometric-image/lib/exportImage'
 
-export type { CanvasZoomHandle }
+export type { CanvasZoomHandle, ScaleChangeOrigin }
 
 export type ExportHandle = {
   exportToBlob: () => Promise<Blob>
@@ -35,7 +39,8 @@ type BiometricImageCanvasProps = {
   isGridVisible?: boolean
   onCloseLayers?: () => void
   zoomHandleRef?: React.RefObject<CanvasZoomHandle | null>
-  onScaleChange?: (scale: number) => void
+  onScaleChange?: (scale: number, origin: ScaleChangeOrigin) => void
+  onSourceGeometryChange?: (geometry: SourceGeometry | null) => void
   exportHandleRef?: React.RefObject<ExportHandle | null>
 }
 
@@ -49,6 +54,7 @@ export default function BiometricImageCanvas({
   onCloseLayers,
   zoomHandleRef,
   onScaleChange,
+  onSourceGeometryChange,
   exportHandleRef,
 }: BiometricImageCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null)
@@ -113,6 +119,11 @@ export default function BiometricImageCanvas({
     },
   }))
 
+  const handleSourceGeometryChange = (geometry: SourceGeometry) => {
+    setSourceGeometry(geometry)
+    onSourceGeometryChange?.(geometry)
+  }
+
   if (image?.imageDestroyedAt) {
     return (
       <div ref={containerRef} className="relative h-full w-full overflow-hidden">
@@ -148,7 +159,7 @@ export default function BiometricImageCanvas({
                 isDraggable={activeTool === null && !isRulerActive}
                 viewScale={view.scale}
                 onLayoutChange={setImageLayout}
-                onSourceGeometryChange={setSourceGeometry}
+                onSourceGeometryChange={handleSourceGeometryChange}
               />
             </Layer>
             <AnnotationLayer
