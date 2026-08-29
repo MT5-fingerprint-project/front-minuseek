@@ -1,5 +1,6 @@
 import { Sparkle, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { cn } from '@/features/shared/lib/utils'
 import { Button } from '@/features/shared/ui/button'
 import WorkbenchWindow from '@/features/shared/components/window/WorkbenchWindow'
@@ -9,6 +10,8 @@ import type { BiometricImageDecoration } from '@/features/biometric-image/types/
 import ZoomControls from '@/features/biometric-image/components/canvas/ZoomControls'
 import RecenterButton from '@/features/biometric-image/components/canvas/RecenterControl'
 import type { ComparisonWindowState } from '@/features/investigation-case/hooks/useComparisonWindow'
+import { useInvestigationCase } from '@/features/investigation-case/hooks/useInvestigationCases'
+import { downloadBlob, exportFileName } from '@/features/biometric-image/lib/exportImage'
 
 const TITLES = {
   traces: {
@@ -69,8 +72,21 @@ export default function ComparisonWorkbench({
 }: ComparisonWorkbenchProps) {
   const { t } = useTranslation()
   const keys = TITLES[type]
+  const { data: investigationCase } = useInvestigationCase(caseId)
 
   const title = w.selectedTrace ? t(keys.withFile, { fileName: w.selectedTrace.fileName }) : t(keys.base)
+
+  const handleExport = async () => {
+    try {
+      const blob = await w.exportRef.current?.exportToBlob()
+      if (!blob) return
+      const kind = type === 'traces' ? 'trace' : 'reference'
+      const fileName = exportFileName(investigationCase?.caseNumber ?? '', kind, new Date())
+      downloadBlob(blob, fileName)
+    } catch {
+      toast.error(t('biometricImage.export.failed'))
+    }
+  }
 
   const footer = (
     <>
@@ -108,6 +124,9 @@ export default function ComparisonWorkbench({
         )}
         <WindowActionButton tone="footer" icon="redo" label={t('common.window.redo')} />
         <WindowActionButton tone="footer" icon="undo" label={t('common.window.undo')} />
+        {w.selectedTrace && (
+          <WindowActionButton tone="footer" icon="fileExport" label={t('common.window.export')} onClick={handleExport} />
+        )}
         <span data-layers-toggle>
           <WindowActionButton
             tone="footer"
@@ -156,6 +175,7 @@ export default function ComparisonWorkbench({
             onCloseLayers={w.closeLayersPanel}
             zoomHandleRef={w.zoomRef}
             onScaleChange={w.setScale}
+            exportHandleRef={w.exportRef}
           />
         </div>
       </div>
