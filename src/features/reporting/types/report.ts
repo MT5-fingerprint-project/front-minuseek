@@ -1,5 +1,12 @@
 export type ReportType = 'TECHNICAL' | 'TRACEABILITY'
 
+export type JournalDetail = 'SUMMARY' | 'FULL'
+
+export type GenerateReportInput = {
+  type: ReportType
+  journalDetail: JournalDetail
+}
+
 export type CaseReport = {
   id: string
   type: ReportType
@@ -8,6 +15,7 @@ export type CaseReport = {
   createdAt: string
   generatedByDisplayName: string
   signerDisplayName: string | null
+  journalDetail: JournalDetail
 }
 
 

@@ -477,7 +477,13 @@
       "TECHNICAL": "Rapport technique",
       "TRACEABILITY": "Annexe de traçabilité"
     },
+    "journalDetail": {
+      "label": "Journal des actes détaillé",
+      "hint": "Par défaut, l'annexe C liste les actes de fond et résume les réglages d'image en une ligne par trace. Activez cette option pour obtenir la version qui énumère tous les réglages, un par un.",
+      "badge": "Journal détaillé"
+    },
     "generate": {
+      "EXPLOITATION": "Générer le rapport d'exploitation",
       "TECHNICAL": "Générer le rapport technique",
       "TRACEABILITY": "Générer l'annexe de traçabilité"
     },
