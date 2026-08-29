@@ -69,7 +69,7 @@ export default function ImageSizeDialog({
       </div>
 
       <div className="mb-4 flex items-end gap-2">
-        <div className="relative flex-1 space-y-2">
+        <div className="relative flex flex-1 flex-col gap-2">
           <Field>
             <FieldLabel htmlFor="image-size-width">{t('biometricImage.imageSize.width')}</FieldLabel>
             <Input
@@ -95,12 +95,13 @@ export default function ImageSizeDialog({
             />
           </Field>
           {/* Purement décoratif : la largeur et la hauteur sont toujours liées (même
-              ratio que l'image source), il n'y a rien à activer ni désactiver ici. */}
+              ratio que l'image source), il n'y a rien à activer ni désactiver ici.
+              Positionné sur la couture des deux champs, pas dans la marge à côté. */}
           <Icon
             name="link"
-            size={16}
+            size={14}
             color="currentColor"
-            className="pointer-events-none absolute top-1/2 right-1 -translate-y-1/2 text-grey-medium-1"
+            className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-grey-medium-1"
           />
         </div>
         <div className="flex shrink-0 items-center gap-1 rounded-full border border-grey-light-2 p-0.5 mb-1">
@@ -121,7 +122,7 @@ export default function ImageSizeDialog({
       </div>
 
       <div className="mb-2 flex items-end gap-2">
-        <div className="relative flex-1 space-y-2">
+        <div className="relative flex flex-1 flex-col gap-2">
           <Field data-invalid={isInvalid}>
             <FieldLabel htmlFor="image-size-resolution-x">{t('biometricImage.imageSize.resolutionX')}</FieldLabel>
             <Input
@@ -147,12 +148,13 @@ export default function ImageSizeDialog({
             />
           </Field>
           {/* Purement décoratif : une seule résolution est calibrée, X et Y sont
-              toujours la même valeur, il n'y a rien à activer ni désactiver ici. */}
+              toujours la même valeur, il n'y a rien à activer ni désactiver ici.
+              Positionné sur la couture des deux champs, pas dans la marge à côté. */}
           <Icon
             name="link"
-            size={16}
+            size={14}
             color="currentColor"
-            className="pointer-events-none absolute top-1/2 right-1 -translate-y-1/2 text-grey-medium-1"
+            className="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-grey-medium-1"
           />
         </div>
         <span className="mb-1 shrink-0 rounded-full bg-blue-light-1 px-2 py-0.5 text-xs font-medium text-blue-dark-2">
