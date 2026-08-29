@@ -1,6 +1,11 @@
 import { useRef, useState } from 'react'
 import { usePanelRef } from 'react-resizable-panels'
-import type { CanvasZoomHandle } from '@/features/biometric-image/components/canvas/BiometricImageCanvas'
+import type {
+  CanvasZoomHandle,
+  ScaleChangeOrigin,
+} from '@/features/biometric-image/components/canvas/BiometricImageCanvas'
+import type { SourceGeometry } from '@/features/biometric-image/components/canvas/DraggableImage'
+import type { DisplayScalePreset } from '@/features/biometric-image/lib/displayScale'
 import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
 
 export type ComparisonWindowState = ReturnType<typeof useComparisonWindow>
@@ -15,6 +20,13 @@ export function useComparisonWindow() {
   const [isGridVisible, setGridVisible] = useState(false)
   const [scale, setScale] = useState(1)
   const [selectedTrace, setSelectedTrace] = useState<BiometricImage>()
+  const [sourceGeometry, setSourceGeometry] = useState<SourceGeometry | null>(null)
+  const [displayScalePreset, setDisplayScalePreset] = useState<DisplayScalePreset>('free')
+
+  const handleScaleChange = (nextScale: number, origin: ScaleChangeOrigin) => {
+    setScale(nextScale)
+    if (origin !== 'preset') setDisplayScalePreset('free')
+  }
 
   const toggle = () => {
     const panel = panelRef.current
@@ -39,6 +51,11 @@ export function useComparisonWindow() {
     toggleGrid: () => setGridVisible((v) => !v),
     scale,
     setScale,
+    handleScaleChange,
+    sourceGeometry,
+    setSourceGeometry,
+    displayScalePreset,
+    setDisplayScalePreset,
     selectedTrace,
     setSelectedTrace,
     toggle,

@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from 'react'
 import { Sparkle, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/features/shared/lib/utils'
@@ -8,6 +9,16 @@ import { BiometricImageCarousel, BiometricImageCanvas } from '@/features/biometr
 import type { BiometricImageDecoration } from '@/features/biometric-image/types/biometricImage'
 import ZoomControls from '@/features/biometric-image/components/canvas/ZoomControls'
 import RecenterButton from '@/features/biometric-image/components/canvas/RecenterControl'
+import DisplayScaleControls, {
+  type PresetDisabledReason,
+} from '@/features/biometric-image/components/canvas/DisplayScaleControls'
+import { MIN_SCALE, MAX_SCALE } from '@/features/biometric-image/components/canvas/useCanvasView'
+import { useBiometricImages } from '@/features/biometric-image/hooks/useBiometricImages'
+import {
+  magnificationForViewScale,
+  magnificationOfPreset,
+  viewScaleForMagnification,
+} from '@/features/biometric-image/lib/displayScale'
 import type { ComparisonWindowState } from '@/features/investigation-case/hooks/useComparisonWindow'
 
 const TITLES = {
@@ -70,7 +81,45 @@ export default function ComparisonWorkbench({
   const { t } = useTranslation()
   const keys = TITLES[type]
 
+  // Le carrousel alimente le même cache : aucune requête supplémentaire n'est déclenchée ici.
+  const { data: images } = useBiometricImages(type, caseId)
+  const freshImage = images?.find((img) => img.id === w.selectedTrace?.id) ?? w.selectedTrace
+  const resolutionDpi = freshImage?.resolutionDpi ?? null
+
   const title = w.selectedTrace ? t(keys.withFile, { fileName: w.selectedTrace.fileName }) : t(keys.base)
+
+  const targetScaleForPreset = (magnification: number): number | null => {
+    if (resolutionDpi === null || !w.sourceGeometry) return null
+    return viewScaleForMagnification(magnification, resolutionDpi, w.sourceGeometry.fitScale)
+  }
+
+  const targetScale = useMemo(() => {
+    if (w.displayScalePreset === 'free') return null
+    return targetScaleForPreset(magnificationOfPreset(w.displayScalePreset))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [w.displayScalePreset, resolutionDpi, w.sourceGeometry])
+
+  useEffect(() => {
+    if (targetScale !== null) w.zoomRef.current?.setScale(targetScale)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetScale])
+
+  useEffect(() => {
+    if (resolutionDpi === null && w.displayScalePreset !== 'free') w.setDisplayScalePreset('free')
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resolutionDpi])
+
+  const disabledReasonFor = (magnification: number): PresetDisabledReason => {
+    if (resolutionDpi === null) return 'uncalibrated'
+    const target = targetScaleForPreset(magnification)
+    if (target !== null && (target < MIN_SCALE || target > MAX_SCALE)) return 'out-of-range'
+    return null
+  }
+
+  const magnification =
+    resolutionDpi !== null && w.sourceGeometry
+      ? magnificationForViewScale(w.scale, resolutionDpi, w.sourceGeometry.fitScale)
+      : null
 
   const footer = (
     <>
@@ -82,6 +131,13 @@ export default function ComparisonWorkbench({
           onZoomOut={() => w.zoomRef.current?.zoomOut()}
         />
         <RecenterButton onClick={() => w.zoomRef.current?.recenter()} />
+        <DisplayScaleControls
+          preset={w.displayScalePreset}
+          magnification={magnification}
+          disabledReason1to1={disabledReasonFor(1)}
+          disabledReason5to1={disabledReasonFor(5)}
+          onSelect={w.setDisplayScalePreset}
+        />
         <WindowActionButton
           tone="footer"
           icon={w.isGridVisible ? 'gridOff' : 'grid'}
@@ -147,7 +203,7 @@ export default function ComparisonWorkbench({
       <div className="min-h-0 flex-1 p-2">
         <div className="h-full overflow-hidden rounded-sm border border-grey-light-2">
           <BiometricImageCanvas
-            image={w.selectedTrace}
+            image={freshImage}
             type={type}
             placeholder={t(`investigationCase.comparison.select${type === 'traces' ? 'Trace' : 'ReferencePrint'}`)}
             isToolbarVisible={isActive}
@@ -155,7 +211,8 @@ export default function ComparisonWorkbench({
             isGridVisible={w.isGridVisible}
             onCloseLayers={w.closeLayersPanel}
             zoomHandleRef={w.zoomRef}
-            onScaleChange={w.setScale}
+            onScaleChange={w.handleScaleChange}
+            onSourceGeometryChange={w.setSourceGeometry}
           />
         </div>
       </div>

@@ -361,6 +361,17 @@
       "label": "1 cm",
       "uncalibrated": "Image non calibrée"
     },
+    "displayScale": {
+      "oneToOne": "1:1",
+      "fiveToOne": "5:1",
+      "free": "Libre",
+      "oneToOneTooltip": "Affiche la trace à sa taille réelle (hypothèse : écran à 96 pixels par pouce)",
+      "fiveToOneTooltip": "Affiche la trace à cinq fois sa taille réelle (hypothèse : écran à 96 pixels par pouce)",
+      "uncalibrated": "Image non calibrée",
+      "outOfBounds": "Cette échelle dépasse les limites de zoom de l'atelier",
+      "magnification": "× {{value}}",
+      "densityAssumption": "Grossissement par rapport à l'objet réel, en supposant un écran à 96 pixels par pouce"
+    },
     "withdraw": {
       "success": "Pièce retirée du dossier",
       "error": "Le retrait a échoué",
