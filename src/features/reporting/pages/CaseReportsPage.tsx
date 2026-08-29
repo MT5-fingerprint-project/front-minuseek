@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Button } from '@/features/shared/ui/button'
 import { Spinner } from '@/features/shared/ui/spinner'
 import { H1 } from '@/features/shared/ui/typography'
+import { useCurrentUser } from '@/features/shared/hooks/useCurrentUser'
 import CaseReportList from '@/features/reporting/components/CaseReportList'
 import { useCaseReports, useDownloadReport, useGenerateReport } from '@/features/reporting/hooks/useCaseReports'
 
@@ -11,6 +12,7 @@ export default function CaseReportsPage() {
   const { t } = useTranslation()
   const caseId = id ?? ''
   const { data: reports, isPending } = useCaseReports(caseId)
+  const { data: currentUser } = useCurrentUser()
   const generate = useGenerateReport(caseId)
   const download = useDownloadReport()
 
@@ -24,6 +26,15 @@ export default function CaseReportsPage() {
       </div>
 
       <section className="flex flex-col gap-4 rounded-sm bg-white px-4 py-3">
+        {/* On ne signe que pour soi : le nom imprimé est annoncé avant de générer. */}
+        {currentUser && (
+          <p className="text-sm">
+            {t('reporting.signer.notice', {
+              signer: `${currentUser.grade} ${currentUser.lastName.toLocaleUpperCase('fr')} ${currentUser.firstName}`,
+            })}
+          </p>
+        )}
+
         <div className="flex flex-wrap gap-2">
           <Button variant="dark" size="small" disabled={generate.isPending} onClick={() => generate.mutate('TECHNICAL')}>
             {t('reporting.generate.TECHNICAL')}
@@ -37,6 +48,7 @@ export default function CaseReportsPage() {
             {t('reporting.generate.TRACEABILITY')}
           </Button>
         </div>
+        <p className="text-xs text-muted-foreground">{t('reporting.regenerateNotice')}</p>
         <p className="text-xs text-muted-foreground">{t('reporting.sealNotice')}</p>
       </section>
 

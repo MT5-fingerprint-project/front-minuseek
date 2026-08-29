@@ -471,7 +471,7 @@
     "empty": "Aucun rapport généré pour ce dossier.",
     "sealed": "Scellé",
     "download": "Télécharger",
-    "byline": "par {{actor}} — le {{date}} à {{time}}",
+    "byline": "signé par {{signer}} — le {{date}} à {{time}}",
     "sealNotice": "L'empreinte SHA-256 affichée sous chaque rapport est celle enregistrée dans la chaîne d'audit : elle doit correspondre au fichier téléchargé.",
     "type": {
       "TECHNICAL": "Rapport technique",
@@ -486,6 +486,12 @@
     },
     "errors": {
       "downloadFailed": "Téléchargement impossible."
+    },
+    "number": "Rapport {{number}}",
+    "signerUnknown": "signataire absent de l’annuaire",
+    "regenerateNotice": "Chaque génération produit un rapport nouveau et numéroté. Les précédents restent téléchargeables.",
+    "signer": {
+      "notice": "Ce rapport portera votre signature : {{signer}}."
     }
   },
   "users": {

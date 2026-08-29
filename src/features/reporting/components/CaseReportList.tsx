@@ -25,12 +25,13 @@ export default function CaseReportList({ reports, onDownload, downloadingReportI
           <li key={report.id} className="flex flex-wrap items-center justify-between gap-3 border-b pb-3 last:border-b-0">
             <div className="flex flex-col gap-1">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">{t(`reporting.type.${report.type}`)}</span>
+                <span className="text-sm font-medium">{t('reporting.number', { number: report.number })}</span>
+                <span className="text-sm text-muted-foreground">{t(`reporting.type.${report.type}`)}</span>
                 <Badge variant="secondary">{t('reporting.sealed')}</Badge>
               </div>
               <p className="text-xs text-muted-foreground">
                 {t('reporting.byline', {
-                  actor: report.generatedByDisplayName,
+                  signer: report.signerDisplayName ?? t('reporting.signerUnknown'),
                   date: createdAt.toLocaleDateString(i18n.language),
                   time: createdAt.toLocaleTimeString(i18n.language, { hour: '2-digit', minute: '2-digit' }),
                 })}
