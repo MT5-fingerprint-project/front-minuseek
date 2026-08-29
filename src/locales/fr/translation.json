@@ -447,7 +447,7 @@
     "signerUnknown": "signataire absent de l’annuaire",
     "regenerateNotice": "Chaque génération produit un rapport nouveau et numéroté. Les précédents restent téléchargeables.",
     "signer": {
-      "notice": "Ce rapport portera votre signature : {{signer}}. On ne signe que pour soi."
+      "notice": "Ce rapport portera votre signature : {{signer}}."
     }
   },
   "users": {
