@@ -38,3 +38,15 @@ export function magnificationForViewScale(
 ): number {
   return (viewScale * fitScale * resolutionDpi) / DISPLAY_REFERENCE_DPI
 }
+
+/** Convertit une longueur du repère d'affichage (réduit) vers le repère source (pixels de l'image déposée). */
+export function toSourceLength(displayLength: number, fitScale: number): number {
+  if (!Number.isFinite(fitScale) || fitScale <= 0) return displayLength
+  return displayLength / fitScale
+}
+
+/** Convertit une longueur du repère source vers le repère d'affichage (réduit) — inverse de `toSourceLength`. */
+export function toScreenLength(sourceLength: number, fitScale: number): number {
+  if (!Number.isFinite(fitScale) || fitScale <= 0) return sourceLength
+  return sourceLength * fitScale
+}

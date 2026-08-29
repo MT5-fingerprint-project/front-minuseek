@@ -85,24 +85,26 @@ Le handle de zoom est exposé au parent via `useImperativeHandle(zoomHandleRef, 
 
 C'est le point le plus subtil et le plus important pour le forensique : **une minutie doit rester collée au même pixel de l'empreinte** quels que soient le zoom, le pan, le miroir ou la rotation appliqués à l'image.
 
-La solution en place : les annotations vivent dans le **repère local de l'image**, via un `<Group {...imageLayout}>` qui **rejoue la transform de l'image** (position, `offsetX/offsetY`, `scaleX` du miroir, `rotation`). `DraggableImage` publie ce `ImageLayout` au parent (`onLayoutChange`) ; `AnnotationLayer` l'applique au Group.
+La solution en place : le rendu vit dans le **repère local de l'image** (réduit à `MAX_DISPLAY_SIZE`), via un `<Group {...imageLayout}>` qui **rejoue la transform de l'image** (position, `offsetX/offsetY`, `scaleX` du miroir, `rotation`). `DraggableImage` publie ce `ImageLayout` au parent (`onLayoutChange`) ; `AnnotationLayer` l'applique au Group.
 
-- Pour obtenir la position du pointeur **dans le repère image**, ne pas faire le calcul à la main : utiliser **`groupRef.current.getRelativePointerPosition()`** — il gère zoom + pan + offset + miroir + rotation d'un coup.
+- Pour obtenir la position du pointeur **dans ce repère local**, ne pas faire le calcul à la main : utiliser **`groupRef.current.getRelativePointerPosition()`** — il gère zoom + pan + offset + miroir + rotation d'un coup.
 
 ```ts
 const getPos = () => groupRef.current?.getRelativePointerPosition() ?? null
-// pos.x / pos.y sont en coordonnées locales image → directement stockables dans settings
+// pos.x / pos.y sont dans le repère local (réduit), PAS le repère persisté — voir conversion ci-dessous
 ```
 
-Stocker les annotations dans ce repère local garantit qu'elles **suivent** l'image. Ne jamais persister des coordonnées en pixels écran.
+**Contrat serveur (L5-6/L5-7) : les annotations sont persistées en pixels ENTIERS de l'image SOURCE** (`frame: 'source-pixels'`, `schemaVersion: 1`), jamais dans le repère local réduit ni en pixels écran. Le repère local et le repère source ne diffèrent que par `fitScale` (`fitAdjustmentFactor`, dans `lib/displayScale.ts`) : diviser une longueur locale par `fitScale` donne des pixels source, multiplier fait l'inverse. Toute écriture passe par `toSourceLength` + `Math.round` (entier obligatoire, sauf l'épaisseur du crayon qui reste flottante — l'arrondir l'épaissirait visiblement) ; toute lecture (rendu) passe par `toScreenLength` pour retrouver la taille/position à l'écran. `AnnotationLayer`/`MinutiaeAnnotation` reçoivent `fitScale` en props pour ça — un `fitScale` figé dans une closure périmée ferait mal convertir les nouvelles annotations, d'où sa présence dans le tableau de dépendances de l'effet qui attache les écouteurs de la scène.
+
+Ne jamais persister une position/taille sans être passé par cette conversion, qu'elle vienne du repère local ou du repère écran.
 
 ## 5. Dessin d'annotations / minuties
 
-Trois formes d'annotation, toutes persistées comme des **calques** (`type: 'ANNOTATION'`) via React Query (`useCreateLayer/useUpdateLayer/useDeleteLayer`), discriminées par `settings.type`. L'outil actif (`AnnotationToolType` = `'circle' | 'circleArrow' | 'pencil'`) détermine le `settings.type` créé :
+Trois formes d'annotation, toutes persistées comme des **calques** (`type: 'ANNOTATION'`) via React Query (`useCreateLayer/useUpdateLayer/useDeleteLayer`), discriminées par `settings.type`. L'outil actif (`AnnotationToolType` = `'circle' | 'circleArrow' | 'pencil'`, nom de l'outil UI — ne pas confondre avec `settings.type`) détermine le `settings.type` créé :
 
 - `circle` — outil `circle` : un **point** (`Circle`).
-- `minutiae` — outil `circleArrow` : un **point + flèche orientée** (`MinutiaeAnnotation` : `Group` = `Circle` + `Line`, avec poignée de rotation quand sélectionné). L'angle ↔ géométrie passe par `edgeAndTip(angleDeg, radius)` / `angleFromOffset(dx, dy)` dans `annotationUtils.ts`.
-- `pencil` — outil `pencil` : un **tracé libre** (`Line` avec `tension`, `lineCap/lineJoin="round"`) construit par accumulation de points pendant le drag (`draft` + `draftRef`).
+- `minutia` — outil `circleArrow` : un **point + flèche orientée** (`MinutiaeAnnotation` : `Group` = `Circle` + `Line`, avec poignée de rotation quand sélectionné). Porte aussi `angle` (entier 0–359, zéro en haut, sens horaire) et `minutiaType` (catalogue du contrat serveur, `'UNDETERMINED'` par défaut à la création). L'angle ↔ géométrie passe par `edgeAndTip(angleDeg, radius)` / `angleFromOffset(dx, dy)` dans `annotationUtils.ts` — `radius` doit y être passé **déjà converti en pixels écran** (`toScreenLength`), ces deux fonctions ignorent tout de `fitScale`.
+- `pencil` — outil `pencil` : un **tracé libre** (`Line` avec `tension`, `lineCap/lineJoin="round"`) construit par accumulation de points pendant le drag (`draft` + `draftRef`), en repère local (transitoire, jamais persisté tel quel) ; converti en pixels source à la fin du geste seulement.
 
 Conventions de dessin à reproduire :
 

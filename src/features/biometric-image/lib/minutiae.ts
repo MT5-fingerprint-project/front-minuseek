@@ -2,7 +2,7 @@ import type { Layer } from '@/features/biometric-image/types/layer'
 
 export const REQUIRED_MINUTIAE = 12
 
-const MINUTIA_SETTINGS_TYPES = ['circle', 'circleArrow', 'minutiae']
+const MINUTIA_SETTINGS_TYPES = ['circle', 'minutia']
 
 export function countMinutiae(layers: Layer[] | undefined): number {
   if (!layers) return 0

@@ -6,10 +6,15 @@ import { useCreateLayer, useUpdateLayer, useDeleteLayer } from '@/features/biome
 import type { Layer } from '@/features/biometric-image/types/layer'
 import type { ImageLayout } from '@/features/biometric-image/components/canvas/DraggableImage'
 import type { AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
+import { toScreenLength, toSourceLength } from '@/features/biometric-image/lib/displayScale'
 import MinutiaeAnnotation from './MinutiaeAnnotation'
 
 const RADIUS = 6
 const STROKE_WIDTH = 1.5
+
+// Contrat serveur des annotations (L5-6/L5-7) : pixels entiers de l'image source, jamais du repère d'affichage.
+const ANNOTATION_FRAME = 'source-pixels'
+const ANNOTATION_SCHEMA_VERSION = 1
 
 type Draft = { type: 'pencil'; points: number[] }
 
@@ -21,6 +26,8 @@ type AnnotationLayerProps = {
   activeColor: string
   fingerprintId: string
   imageLayout: ImageLayout | null
+  /** Facteur de réduction affichage (`fitAdjustmentFactor`) : convertit repère d'affichage ↔ pixels source. */
+  fitScale: number
   hoveredLayerId?: string | null
 }
 
@@ -41,11 +48,13 @@ export default function AnnotationLayer({
   activeColor,
   fingerprintId,
   imageLayout,
+  fitScale,
   hoveredLayerId,
 }: AnnotationLayerProps) {
   const { t } = useTranslation()
   const layerRef = useRef<Konva.Layer>(null)
-  // Group whose transform mirrors the image: annotation coords live in the image's local frame.
+  // Group whose transform mirrors the image: rendering happens in this local (display-scaled)
+  // frame, but every stored value is in image-source pixels — converted at the fitScale boundary.
   const groupRef = useRef<Konva.Group>(null)
   const createLayer = useCreateLayer(fingerprintId)
   const updateLayer = useUpdateLayer(fingerprintId)
@@ -85,14 +94,25 @@ export default function AnnotationLayer({
     const stage = layerRef.current?.getStage()
     if (!stage || !activeTool) return
 
-    // Pointer position in the image's local coordinate frame (handles zoom/pan/offset/mirror/rotation).
+    // Pointer position in the image's local (display-scaled) coordinate frame (handles zoom/pan/offset/mirror/rotation).
     const getPos = () => groupRef.current?.getRelativePointerPosition() ?? null
+    // Same position converted to integer pixels of the image source — the only frame the server accepts.
+    const getSourcePos = () => {
+      const pos = getPos()
+      if (!pos) return null
+      return {
+        x: Math.round(toSourceLength(pos.x, fitScale)),
+        y: Math.round(toSourceLength(pos.y, fitScale)),
+      }
+    }
+    const sourceRadius = () => Math.max(1, Math.round(toSourceLength(RADIUS, fitScale)))
 
     const onDown = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
       if (isAnnotationTarget(e.target)) return // let an existing shape be dragged instead
       select(null)
       const pos = getPos()
-      if (!pos) return
+      const sourcePos = getSourcePos()
+      if (!pos || !sourcePos) return
       drawingRef.current = true
 
       if (activeTool === 'circle') {
@@ -103,7 +123,15 @@ export default function AnnotationLayer({
           name: t('biometricImage.toolbar.tools.point'),
           type: 'ANNOTATION',
           zIndex: layerCount,
-          settings: { type: 'circle', x: pos.x, y: pos.y, radius: RADIUS, color: activeColor },
+          settings: {
+            type: 'circle',
+            x: sourcePos.x,
+            y: sourcePos.y,
+            radius: sourceRadius(),
+            color: activeColor,
+            frame: ANNOTATION_FRAME,
+            schemaVersion: ANNOTATION_SCHEMA_VERSION,
+          },
         })
       } else if (activeTool === 'circleArrow') {
         drawingRef.current = false
@@ -113,7 +141,17 @@ export default function AnnotationLayer({
           name: t('biometricImage.toolbar.tools.pointArrow'),
           type: 'ANNOTATION',
           zIndex: layerCount,
-          settings: { type: 'minutiae', x: pos.x, y: pos.y, angleDeg: 0, radius: RADIUS, color: activeColor },
+          settings: {
+            type: 'minutia',
+            x: sourcePos.x,
+            y: sourcePos.y,
+            angle: 0,
+            radius: sourceRadius(),
+            color: activeColor,
+            minutiaType: 'UNDETERMINED',
+            frame: ANNOTATION_FRAME,
+            schemaVersion: ANNOTATION_SCHEMA_VERSION,
+          },
         })
       } else if (activeTool === 'pencil') {
         setDraftBoth({ type: 'pencil', points: [pos.x, pos.y] })
@@ -142,7 +180,16 @@ export default function AnnotationLayer({
           name: t('biometricImage.toolbar.tools.pencil'),
           type: 'ANNOTATION',
           zIndex: layerCount,
-          settings: { type: 'pencil', points: d.points, color: activeColor, strokeWidth: STROKE_WIDTH },
+          settings: {
+            type: 'pencil',
+            points: d.points.map((v) => Math.round(toSourceLength(v, fitScale))),
+            color: activeColor,
+            // Pas arrondi : contrairement aux coordonnées, l'épaisseur doit rester
+            // constante à l'écran (un entier épaissirait visiblement le trait).
+            strokeWidth: toSourceLength(STROKE_WIDTH, fitScale),
+            frame: ANNOTATION_FRAME,
+            schemaVersion: ANNOTATION_SCHEMA_VERSION,
+          },
         })
       }
       setDraftBoth(null)
@@ -152,9 +199,10 @@ export default function AnnotationLayer({
     stage.on('mousemove.annot touchmove.annot', onMove)
     stage.on('mouseup.annot touchend.annot', onUp)
     return () => { stage.off('.annot') }
-  // createLayer/updateLayer mutate refs are stable; re-bind when tool/color/zIndex base change
+  // createLayer/updateLayer mutate refs are stable; re-bind when tool/color/zIndex base or the
+  // display↔source scale factor change (a stale fitScale would mis-convert new annotations).
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTool, activeColor, fingerprintId, layerCount])
+  }, [activeTool, activeColor, fingerprintId, layerCount, fitScale])
 
   const renderShape = (layer: Layer) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -165,31 +213,42 @@ export default function AnnotationLayer({
     const isHighlighted = layer.id === hoveredLayerId
     const sw = (base: number) => base + (isSelected ? 1 : 0) + (isHighlighted ? 1.5 : 0)
 
+    // Le calque est enregistré en pixels de l'image source (contrat serveur) ; le Group qui
+    // porte ce rendu vit lui dans le repère d'affichage réduit — toute grandeur qui vient des
+    // réglages passe par cette conversion, jamais les constantes d'écran pures (STROKE_WIDTH, hitStrokeWidth…).
+    const persistSourcePosition = (settings: Record<string, unknown>, screenX: number, screenY: number) =>
+      persistPosition({
+        ...settings,
+        x: Math.round(toSourceLength(screenX, fitScale)),
+        y: Math.round(toSourceLength(screenY, fitScale)),
+      })
+
     switch (s.type) {
       case 'circle':
         return (
           <Circle
             key={layer.id}
             name="annotation"
-            x={s.x}
-            y={s.y}
-            radius={s.radius ?? RADIUS}
+            x={toScreenLength(s.x, fitScale)}
+            y={toScreenLength(s.y, fitScale)}
+            radius={toScreenLength(s.radius ?? RADIUS, fitScale)}
             stroke={s.color}
             strokeWidth={sw(STROKE_WIDTH)}
             hitStrokeWidth={12}
             draggable
             onClick={(e) => { e.cancelBubble = true; select(isSelected ? null : layer.id) }}
-            onDragEnd={(e) => persistPosition({ ...s, x: e.target.x(), y: e.target.y() })}
+            onDragEnd={(e) => persistSourcePosition(s, e.target.x(), e.target.y())}
           />
         )
 
-      case 'minutiae':
+      case 'minutia':
         return (
           <MinutiaeAnnotation
             key={layer.id}
             layer={layer}
             isSelected={isSelected}
             strokeWidth={sw(STROKE_WIDTH)}
+            fitScale={fitScale}
             onSelect={() => select(isSelected ? null : layer.id)}
             onPersist={persistPosition}
           />
@@ -200,9 +259,9 @@ export default function AnnotationLayer({
           <Line
             key={layer.id}
             name="annotation"
-            points={s.points}
+            points={(s.points as number[]).map((v) => toScreenLength(v, fitScale))}
             stroke={s.color}
-            strokeWidth={sw(s.strokeWidth ?? STROKE_WIDTH)}
+            strokeWidth={sw(toScreenLength(s.strokeWidth ?? STROKE_WIDTH, fitScale))}
             tension={0.5}
             lineCap="round"
             lineJoin="round"

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { Circle, Line, Group } from 'react-konva'
 import type { Layer } from '@/features/biometric-image/types/layer'
+import { toScreenLength, toSourceLength } from '@/features/biometric-image/lib/displayScale'
 import { edgeAndTip, angleFromOffset } from './annotationUtils'
 
 const HANDLE_RADIUS = 4
@@ -10,6 +11,8 @@ type MinutiaeAnnotationProps = {
   layer: Layer
   isSelected: boolean
   strokeWidth: number
+  /** Facteur de réduction affichage : la position/le rayon sont stockés en pixels source. */
+  fitScale: number
   onSelect: () => void
   onPersist: (settings: Record<string, unknown>) => void
 }
@@ -18,6 +21,7 @@ export default function MinutiaeAnnotation({
   layer,
   isSelected,
   strokeWidth,
+  fitScale,
   onSelect,
   onPersist,
 }: MinutiaeAnnotationProps) {
@@ -28,20 +32,24 @@ export default function MinutiaeAnnotation({
   const [draggingHandle, setDraggingHandle] = useState(false)
   const isDraggingHandle = useRef(false)
 
-  const angleDeg = liveAngleDeg ?? (s.angleDeg ?? 0)
-  const radius = s.radius as number
+  const angleDeg = liveAngleDeg ?? (s.angle ?? 0)
+  const radius = toScreenLength(s.radius as number, fitScale)
   const { edge, tip } = edgeAndTip(angleDeg, radius)
 
   return (
     <Group
       name="annotation"
-      x={s.x}
-      y={s.y}
+      x={toScreenLength(s.x, fitScale)}
+      y={toScreenLength(s.y, fitScale)}
       draggable={!draggingHandle}
       onClick={(e) => { e.cancelBubble = true; onSelect() }}
       onDragEnd={(e) => {
         if (isDraggingHandle.current) return
-        onPersist({ ...s, x: e.target.x(), y: e.target.y() })
+        onPersist({
+          ...s,
+          x: Math.round(toSourceLength(e.target.x(), fitScale)),
+          y: Math.round(toSourceLength(e.target.y(), fitScale)),
+        })
       }}
     >
       <Circle
@@ -81,7 +89,8 @@ export default function MinutiaeAnnotation({
             isDraggingHandle.current = false
             setDraggingHandle(false)
             setLiveAngleDeg(null)
-            onPersist({ ...s, angleDeg: newAngle })
+            // Arrondir peut produire 360 (ex. 359.6) : le contrat borne l'angle à 0–359.
+            onPersist({ ...s, angle: Math.round(newAngle) % 360 })
           }}
         />
       )}
