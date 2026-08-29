@@ -17,6 +17,7 @@
       "hideLayers": "Masquer les calques",
       "showGrid": "Afficher la grille",
       "hideGrid": "Masquer la grille",
+      "export": "Exporter l'image affichée",
       "detachWindow": "Ouvrir dans une nouvelle fenêtre",
       "attachWindow": "Fermer la fenêtre détachée",
       "undo": "Annuler (à venir)",
@@ -406,6 +407,9 @@
     "nav": {
       "previous": "Voir les images précédentes",
       "next": "Voir les images suivantes"
+    },
+    "export": {
+      "failed": "L'export a échoué"
     }
   },
   "auth": {

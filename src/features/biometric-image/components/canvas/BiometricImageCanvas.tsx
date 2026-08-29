@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react'
+import { useImperativeHandle, useRef, useState } from 'react'
 import { Stage, Layer } from 'react-konva'
+import type Konva from 'konva'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
 import DraggableImage, { type ImageLayout, type SourceGeometry } from '@/features/biometric-image/components/canvas/DraggableImage'
 import DestroyedImagePlaceholder from '@/features/biometric-image/components/DestroyedImagePlaceholder'
@@ -21,8 +22,13 @@ import { useLayers } from '@/features/biometric-image/hooks/useLayers'
 import { useBiometricImages, useCalibrateBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
 import { ANNOTATION_COLORS, type AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import type { CalibrationPoint } from '@/features/biometric-image/lib/calibration'
+import { stageToPngBlob } from '@/features/biometric-image/lib/exportImage'
 
 export type { CanvasZoomHandle, ScaleChangeOrigin }
+
+export type ExportHandle = {
+  exportToBlob: () => Promise<Blob>
+}
 
 type BiometricImageCanvasProps = {
   image: BiometricImage | undefined
@@ -35,6 +41,7 @@ type BiometricImageCanvasProps = {
   zoomHandleRef?: React.RefObject<CanvasZoomHandle | null>
   onScaleChange?: (scale: number, origin: ScaleChangeOrigin) => void
   onSourceGeometryChange?: (geometry: SourceGeometry | null) => void
+  exportHandleRef?: React.RefObject<ExportHandle | null>
 }
 
 export default function BiometricImageCanvas({
@@ -48,8 +55,10 @@ export default function BiometricImageCanvas({
   zoomHandleRef,
   onScaleChange,
   onSourceGeometryChange,
+  exportHandleRef,
 }: BiometricImageCanvasProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const stageRef = useRef<Konva.Stage>(null)
   const size = useContainerSize(containerRef)
   const { view, handleWheel, recenterSignal } = useCanvasView({ size, zoomHandleRef, onScaleChange })
   const { sliderValues, effectiveFilters, handleFilterChange } = useCanvasFilters(image?.id)
@@ -102,6 +111,13 @@ export default function BiometricImageCanvas({
     if (!image) return
     setRulerSegment({ imageId: image.id, from, to })
   }
+  useImperativeHandle(exportHandleRef, () => ({
+    exportToBlob: () => {
+      const stage = stageRef.current
+      if (!stage) return Promise.reject(new Error('No stage to export'))
+      return stageToPngBlob(stage)
+    },
+  }))
 
   const handleSourceGeometryChange = (geometry: SourceGeometry) => {
     setSourceGeometry(geometry)
@@ -125,6 +141,7 @@ export default function BiometricImageCanvas({
       {image?.url ? (
         <>
           <Stage
+            ref={stageRef}
             width={size.width}
             height={size.height}
             scaleX={view.scale}
