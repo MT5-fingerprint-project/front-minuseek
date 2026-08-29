@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { BiometricImageAPI, type UploadInput } from '@/features/biometric-image/services/BiometricImageAPI.services'
 import type {
+  BiometricImage,
   BiometricImageType,
   WithdrawalMotive,
 } from '@/features/biometric-image/types/biometricImage'
@@ -75,6 +76,30 @@ export function useRestoreBiometricImage(type: BiometricImageType, caseId: strin
     },
     onError: () => {
       toast.error(t('biometricImage.restore.error'))
+    },
+  })
+}
+
+export function useCalibrateBiometricImage(type: BiometricImageType, caseId: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ id, resolutionDpi }: { id: string; resolutionDpi: number }) =>
+      BiometricImageAPI.calibrate(type, id, resolutionDpi),
+    onSuccess: (_data, variables) => {
+      // Écrit la résolution dans le cache avant l'invalidation : la barre d'échelle
+      // apparaît sans attendre l'aller-retour réseau de l'invalidation.
+      queryClient.setQueryData<BiometricImage[]>(biometricImageKeys.list(type, caseId), (images) =>
+        images?.map((image) =>
+          image.id === variables.id ? { ...image, resolutionDpi: variables.resolutionDpi } : image,
+        ),
+      )
+      queryClient.invalidateQueries({ queryKey: biometricImageKeys.list(type, caseId) })
+      toast.success(t('biometricImage.calibration.success'))
+    },
+    onError: () => {
+      toast.error(t('biometricImage.calibration.error'))
     },
   })
 }

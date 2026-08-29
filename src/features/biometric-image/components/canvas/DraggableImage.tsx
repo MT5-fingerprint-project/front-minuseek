@@ -14,6 +14,13 @@ export type ImageLayout = {
   rotation: number
 }
 
+/** Facteur de réduction affichage (`scale` ci-dessous) et dimensions naturelles de l'image source. */
+export type SourceGeometry = {
+  fitScale: number
+  sourceWidth: number
+  sourceHeight: number
+}
+
 function useImage(url: string) {
   const [image, setImage] = useState<HTMLImageElement>()
 
@@ -40,6 +47,7 @@ type DraggableImageProps = {
   isDraggable?: boolean
   viewScale?: number
   onLayoutChange?: (layout: ImageLayout) => void
+  onSourceGeometryChange?: (geometry: SourceGeometry) => void
 }
 
 export default function DraggableImage({
@@ -49,6 +57,7 @@ export default function DraggableImage({
   isDraggable = true,
   viewScale = 1,
   onLayoutChange,
+  onSourceGeometryChange,
 }: DraggableImageProps) {
   const image = useImage(url)
   const imageRef = useRef<Konva.Image>(null)
@@ -131,6 +140,12 @@ export default function DraggableImage({
     onLayoutChange?.({ x: baseX, y: baseY, offsetX, offsetY, scaleX, scaleY: 1, rotation })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [image, baseX, baseY, offsetX, offsetY, scaleX, rotation])
+
+  useEffect(() => {
+    if (!image) return
+    onSourceGeometryChange?.({ fitScale: scale, sourceWidth: image.width, sourceHeight: image.height })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [image, scale])
 
   if (!image) return null
 

@@ -167,6 +167,7 @@ export default function ComparisonWorkbench({
         <div className="h-full overflow-hidden rounded-sm border border-grey-light-2">
           <BiometricImageCanvas
             image={w.selectedTrace}
+            type={type}
             placeholder={t(`investigationCase.comparison.select${type === 'traces' ? 'Trace' : 'ReferencePrint'}`)}
             isToolbarVisible={isActive}
             isLayersVisible={w.isLayersVisible}

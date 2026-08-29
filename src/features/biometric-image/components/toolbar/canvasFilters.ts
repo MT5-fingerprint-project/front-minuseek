@@ -113,13 +113,14 @@ export const IMAGE_TOOLS: ImageTool[] = [
 
 export type AnnotationToolType = 'circle' | 'circleArrow' | 'pencil'
 
-type AnnotationTool = { icon: IconName; label: ParseKeys; tool?: AnnotationToolType }
+type AnnotationTool = { icon: IconName; label: ParseKeys; tool?: AnnotationToolType; isRuler?: boolean }
 
 export const ANNOTATION_TOOLS: AnnotationTool[] = [
   { icon: 'palette'    as IconName, label: 'biometricImage.toolbar.tools.palette' },
   { icon: 'circle'     as IconName, label: 'biometricImage.toolbar.tools.point',      tool: 'circle'      as AnnotationToolType },
   { icon: 'circleLine' as IconName, label: 'biometricImage.toolbar.tools.pointArrow', tool: 'circleArrow' as AnnotationToolType },
   { icon: 'penTrace'   as IconName, label: 'biometricImage.toolbar.tools.pencil',     tool: 'pencil'      as AnnotationToolType },
+  { icon: 'ruler'      as IconName, label: 'biometricImage.toolbar.tools.ruler',      isRuler: true },
 ]
 
 // color palette for annotation tools, always keep Green, Yellow, Red, Orange as the first 4 colors (GYRO standard)

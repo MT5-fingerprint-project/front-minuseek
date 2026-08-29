@@ -36,6 +36,8 @@ export interface BiometricImage {
   withdrawnAt: string | null
   withdrawalMotive: WithdrawalMotive | null
   imageDestroyedAt: string | null
+  /** Résolution calibrée en points par pouce de l'image source ; nulle tant que l'image n'est pas calibrée. */
+  resolutionDpi: number | null
 }
 
 export interface BiometricImageDto {
@@ -53,4 +55,5 @@ export interface BiometricImageDto {
   withdrawnAt?: string | null
   withdrawalMotive?: WithdrawalMotive | null
   imageDestroyedAt?: string | null
+  resolutionDpi?: number | null
 }

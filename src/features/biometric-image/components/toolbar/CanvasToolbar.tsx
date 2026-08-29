@@ -22,6 +22,8 @@ type CanvasToolbarProps = {
   onActiveToolChange: (tool: AnnotationToolType | null) => void
   activeColor: string
   onActiveColorChange: (color: string) => void
+  isRulerActive: boolean
+  onToggleRuler: () => void
 }
 
 export default function CanvasToolbar({
@@ -31,12 +33,13 @@ export default function CanvasToolbar({
   onActiveToolChange,
   activeColor,
   onActiveColorChange,
+  isRulerActive,
+  onToggleRuler,
 }: CanvasToolbarProps) {
   const { t } = useTranslation()
   const [mode, setMode] = useState<'image' | 'annotation'>('image')
   const [openFilter, setOpenFilter] = useState<string | null>(null)
   const [paletteOpen, setPaletteOpen] = useState(false)
-  const tools = mode === 'image' ? IMAGE_TOOLS : ANNOTATION_TOOLS
 
   const rootRef = useRef<HTMLDivElement>(null)
   const closePanels = useCallback(() => {
@@ -50,9 +53,15 @@ export default function CanvasToolbar({
     setOpenFilter(null)
     setPaletteOpen(false)
     onActiveToolChange(null)
+    // La règle vit dans l'onglet Annotations : quitter cet onglet la referme aussi.
+    if (next === 'image' && isRulerActive) onToggleRuler()
   }
 
-  const handleAnnotationClick = (tool: AnnotationToolType | undefined) => {
+  const handleAnnotationClick = (tool: AnnotationToolType | undefined, isRuler?: boolean) => {
+    if (isRuler) {
+      onToggleRuler()
+      return
+    }
     if (!tool) {
       // palette : ouvre/ferme le panneau de couleurs (pas un outil de dessin)
       setPaletteOpen((open) => !open)
@@ -61,9 +70,7 @@ export default function CanvasToolbar({
     onActiveToolChange(activeTool === tool ? null : tool)
   }
 
-  const handleToolClick = (label: string, filterConfig: FilterConfig | undefined) => {
-    if (!filterConfig) return
-
+  const handleToolClick = (label: string, filterConfig: FilterConfig) => {
     const { filterKey, inputType = 'slider', cycleValues } = filterConfig
 
     if (inputType === 'toggle') {
@@ -85,20 +92,17 @@ export default function CanvasToolbar({
     setOpenFilter((prev) => (prev === label ? null : label))
   }
 
-  const activeToolConfig = IMAGE_TOOLS.find(
-    (tool) => tool.label === openFilter && 'filter' in tool,
-  ) as (typeof IMAGE_TOOLS[number] & { filter: FilterConfig }) | undefined
+  const activeToolConfig = IMAGE_TOOLS.find((tool) => tool.label === openFilter)
 
-  const isToolActive = (label: string, filterConfig: FilterConfig | undefined) => {
-    if (!filterConfig) return openFilter === label
+  const isToolActive = (label: string, filterConfig: FilterConfig) => {
     const { filterKey, inputType = 'slider' } = filterConfig
     if (inputType === 'toggle') return (filters[filterKey] ?? 0) === 1
     if (inputType === 'cycle') return (filters[filterKey] ?? 0) !== 0
     return openFilter === label
   }
 
-  const isAnnotationActive = (tool: AnnotationToolType | undefined) =>
-    tool ? activeTool === tool : paletteOpen
+  const isAnnotationActive = (tool: AnnotationToolType | undefined, isRuler?: boolean) =>
+    isRuler ? isRulerActive : tool ? activeTool === tool : paletteOpen
 
   return (
     <div ref={rootRef} className="flex flex-col items-center gap-2">
@@ -135,37 +139,31 @@ export default function CanvasToolbar({
           />
         </div>
         {mode === 'image'
-          ? tools.map(({ icon, label, ...rest }) => {
-              const filterConfig = 'filter' in rest ? (rest.filter as FilterConfig) : undefined
-              return (
+          ? IMAGE_TOOLS.map(({ icon, label, filter }) => (
+              <ItemToolbar
+                key={label}
+                icon={icon}
+                label={t(label)}
+                active={isToolActive(label, filter)}
+                onClick={() => handleToolClick(label, filter)}
+              />
+            ))
+          : ANNOTATION_TOOLS.map(({ icon, label, tool, isRuler }) => (
+              <div key={label} className="relative">
                 <ItemToolbar
-                  key={label}
                   icon={icon}
                   label={t(label)}
-                  active={isToolActive(label, filterConfig)}
-                  onClick={() => handleToolClick(label, filterConfig)}
+                  active={isAnnotationActive(tool, isRuler)}
+                  onClick={() => handleAnnotationClick(tool, isRuler)}
                 />
-              )
-            })
-          : tools.map(({ icon, label, ...rest }) => {
-              const tool = 'tool' in rest ? (rest.tool as AnnotationToolType) : undefined
-              return (
-                <div key={label} className="relative">
-                  <ItemToolbar
-                    icon={icon}
-                    label={t(label)}
-                    active={isAnnotationActive(tool)}
-                    onClick={() => handleAnnotationClick(tool)}
+                {!tool && !isRuler && (
+                  <span
+                    className="pointer-events-none absolute bottom-0.5 right-0.5 h-2.5 w-2.5 rounded-full border border-blue-dark-1"
+                    style={{ backgroundColor: activeColor }}
                   />
-                  {!tool && (
-                    <span
-                      className="pointer-events-none absolute bottom-0.5 right-0.5 h-2.5 w-2.5 rounded-full border border-blue-dark-1"
-                      style={{ backgroundColor: activeColor }}
-                    />
-                  )}
-                </div>
-              )
-            })}
+                )}
+              </div>
+            ))}
       </div>
     </div>
   )

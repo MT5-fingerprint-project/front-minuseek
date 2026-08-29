@@ -46,6 +46,7 @@ import Plus from './plus.svg?react'
 import PlusSmall from './plus-small.svg?react'
 import Redo from './redo.svg?react'
 import Rotate from './rotate.svg?react'
+import Ruler from './ruler.svg?react'
 import Search from './search.svg?react'
 import Settings from './settings.svg?react'
 import Show from './show.svg?react'
@@ -111,6 +112,7 @@ export const icons = {
   plusSmall: PlusSmall,
   redo: Redo,
   rotate: Rotate,
+  ruler: Ruler,
   search: Search,
   settings: Settings,
   show: Show,

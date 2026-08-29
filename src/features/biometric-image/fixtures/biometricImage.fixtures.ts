@@ -20,6 +20,7 @@ const makeFixture = (id: string, fileName: string): BiometricImage => ({
   withdrawnAt: null,
   withdrawalMotive: null,
   imageDestroyedAt: null,
+  resolutionDpi: null,
 })
 
 export const biometricImageFixtures: BiometricImage[] = [
