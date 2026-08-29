@@ -21,9 +21,11 @@ import CaseHistoryPage from './features/audit-trail/pages/CaseHistoryPage.tsx'
 import CaseReportsPage from './features/reporting/pages/CaseReportsPage.tsx'
 import ServiceUsersPage from './features/users/pages/ServiceUsersPage.tsx'
 import ServiceSettingsPage from './features/settings/pages/ServiceSettingsPage.tsx'
+import PublicSealVerificationPage from './features/public-verification/pages/PublicSealVerificationPage.tsx'
 
 const router = createBrowserRouter([
   { path: '/', element: <TenantRequiredPage /> },
+  { path: '/:slug/verification', element: <PublicSealVerificationPage /> },
   {
     path: '/:slug',
     element: <TenantAuthBoundary />,
