@@ -19,6 +19,7 @@ import { useCompare } from '@/features/biometric-image/hooks/useCompare'
 import { layerKeys, useLayers } from '@/features/biometric-image/hooks/useLayers'
 import { useHits, useToggleHit } from '@/features/biometric-image/hooks/useHits'
 import { countMinutiae, REQUIRED_MINUTIAE } from '@/features/biometric-image/lib/minutiae'
+import { useAtelierTour } from '@/features/investigation-case/hooks/useAtelierTour'
 
 export default function InvestigationCaseComparisonPage() {
   const { slug, id } = useParams<{ slug: string; id: string }>()
@@ -34,8 +35,16 @@ export default function InvestigationCaseComparisonPage() {
   })
 
   const { data: referencePrints = [] } = useBiometricImages('reference-prints', id ?? '')
+  // Même clé de cache que le carrousel/ComparisonWorkbench : aucune requête supplémentaire.
+  const { data: traces, isLoading: isTracesLoading } = useBiometricImages('traces', id ?? '')
   const referenceDecorations = useReferencePrintDecorations(id ?? '')
   const compare = useCompare()
+
+  const prepareTourScreen = () => {
+    setActiveWindow('trace')
+    if (!trace.selectedTrace && traces?.[0]) trace.setSelectedTrace(traces[0])
+  }
+  const { restartTour } = useAtelierTour(!isTracesLoading, prepareTourScreen)
 
   const traceId = trace.selectedTrace?.id
   const referenceId = reference.selectedTrace?.id
@@ -96,6 +105,7 @@ export default function InvestigationCaseComparisonPage() {
           window={trace}
           isComparing={compare.isPending}
           onAnalyze={runCompare}
+          onRestartTour={restartTour}
         />
       </div>
     )
@@ -115,12 +125,14 @@ export default function InvestigationCaseComparisonPage() {
         window={trace}
         isComparing={compare.isPending}
         onAnalyze={runCompare}
+        onRestartTour={restartTour}
       />
       <ResizableHandle withHandle className="w-2 bg-transparent">
         {/* Ancré sur le séparateur → suit le drag ; posé vers le bas. */}
         <div
           className="pointer-events-auto absolute bottom-8 left-1/2 z-20 -translate-x-1/2 -translate-y-full"
           onMouseDown={(e) => e.stopPropagation()}
+          data-tour="hit-match"
         >
           {!isCaseClosed && mission === undefined && (
             <HitButton isHit={isHit} disabled={isHitDisabled} onClick={onToggleHit} />
