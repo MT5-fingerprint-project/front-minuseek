@@ -13,9 +13,7 @@ type MinutiaeAnnotationProps = {
   layer: Layer
   isSelected: boolean
   strokeWidth: number
-  /** Facteur de réduction affichage : la position/le rayon sont stockés en pixels source. */
   fitScale: number
-  /** Miroir/rotation courants de l'image : à annuler sur le libellé pour qu'il reste lisible. */
   mirrorScaleX: number
   rotationDeg: number
   onSelect: () => void
@@ -81,8 +79,6 @@ export default function MinutiaeAnnotation({
         lineCap="round"
       />
 
-      {/* Le libellé annule le miroir/la rotation de l'image : il doit rester lisible,
-          contrairement au cercle et à la flèche qui suivent fidèlement l'orientation réelle. */}
       <Group scaleX={mirrorScaleX} rotation={-rotationDeg} listening={false}>
         <Text
           text={typeLabel}
@@ -119,7 +115,6 @@ export default function MinutiaeAnnotation({
             isDraggingHandle.current = false
             setDraggingHandle(false)
             setLiveAngleDeg(null)
-            // Arrondir peut produire 360 (ex. 359.6) : le contrat borne l'angle à 0–359.
             onPersist({ ...s, angle: Math.round(newAngle) % 360 })
           }}
         />

@@ -238,8 +238,6 @@ export const IMAGE_TOOLS: ImageTool[] = [
 
 export type AnnotationToolType = 'circle' | 'circleArrow' | 'pencil'
 
-// Nomme le panneau qu'ouvre l'entrée — explicite, plutôt que déduit de l'absence de `tool`
-// (une entrée sans `tool` n'est plus systématiquement la palette de couleurs).
 type AnnotationPanel = 'color' | 'minutiaType'
 
 type AnnotationTool = {

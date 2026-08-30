@@ -15,8 +15,6 @@ type LayerItemProps = {
 
 export default function LayerItem({ layer, onToggleVisibility, onDelete, onMouseEnter, onMouseLeave }: LayerItemProps) {
   const { t } = useTranslation()
-  // Le nom enregistré (« Point & flèche ») ne dit pas le type choisi, et il se périmerait
-  // au premier changement de type — on affiche le libellé dérivé des réglages courants.
   const name = isMinutiaSettings(layer.settings)
     ? t(`biometricImage.minutia.types.${layer.settings.minutiaType}`)
     : layer.name

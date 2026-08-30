@@ -14,7 +14,6 @@ export function countMinutiae(layers: Layer[] | undefined): number {
   ).length
 }
 
-// Ordre d'affichage du sélecteur — « indéterminée » en dernier même si c'est le défaut.
 export const MINUTIA_TYPES = [
   'RIDGE_ENDING',
   'BIFURCATION',

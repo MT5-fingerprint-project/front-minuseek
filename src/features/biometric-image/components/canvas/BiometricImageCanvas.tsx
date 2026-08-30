@@ -73,8 +73,6 @@ export default function BiometricImageCanvas({
   const [imageLayout, setImageLayout] = useState<ImageLayout | null>(null)
   const [sourceGeometry, setSourceGeometry] = useState<SourceGeometry | null>(null)
   const [hoveredLayerId, setHoveredLayerId] = useState<string | null>(null)
-  // Le tool actif avec lequel une forme a été sélectionnée : un changement d'outil
-  // périme la sélection sans effet dédié (même règle que l'ex-état local d'AnnotationLayer).
   const [selected, setSelected] = useState<{ id: string; tool: AnnotationToolType | null } | null>(null)
   const selectedAnnotationId = selected?.tool === activeTool ? selected.id : null
   const updateSelectedType = useUpdateLayer(image?.id ?? '')
@@ -108,8 +106,6 @@ export default function BiometricImageCanvas({
 
   const handleActiveMinutiaTypeChange = (minutiaType: MinutiaType) => {
     setActiveMinutiaType(minutiaType)
-    // Une minutie sélectionnée : on change SA valeur, sans toucher au reste de ses réglages —
-    // le serveur remplace les réglages en entier, un envoi partiel effacerait position/couleur.
     if (selectedLayer && isMinutiaSettings(selectedLayer.settings)) {
       updateSelectedType.mutate({
         id: selectedLayer.id,

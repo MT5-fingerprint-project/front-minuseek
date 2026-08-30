@@ -28,7 +28,6 @@ type CanvasToolbarProps = {
   onActiveColorChange: (color: string) => void
   activeMinutiaType: MinutiaType
   onActiveMinutiaTypeChange: (type: MinutiaType) => void
-  /** Type de la minutie sélectionnée, ou `undefined` si aucune sélection : le sélecteur affiche l'un ou l'autre. */
   selectedMinutiaType: MinutiaType | undefined
   isRulerActive: boolean
   onToggleRuler: () => void
@@ -134,8 +133,6 @@ export default function CanvasToolbar({
     isRuler?: boolean,
   ) => (isRuler ? isRulerActive : tool ? activeTool === tool : openPanel === panel)
 
-  // Une minutie sélectionnée prime sur le type « à poser » : le sélecteur montre alors
-  // ce qu'on est en train de changer, pas ce qui sera appliqué au prochain clic.
   const displayedMinutiaType = selectedMinutiaType ?? activeMinutiaType
 
   return (
