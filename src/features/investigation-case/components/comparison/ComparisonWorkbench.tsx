@@ -53,6 +53,8 @@ export type ComparisonWorkbenchProps = {
   onToggleDetach?: () => void
   /** Habillage des vignettes du carrousel par id d'image (libellé, bordure) */
   imageDecorations?: Record<string, BiometricImageDecoration>
+  /** Relance le tour guidé de l'atelier (uniquement câblé sur la fenêtre des traces) */
+  onRestartTour?: () => void
 }
 
 /**
@@ -75,6 +77,7 @@ export default function ComparisonWorkbench({
   isDetached,
   onToggleDetach,
   imageDecorations,
+  onRestartTour,
 }: ComparisonWorkbenchProps) {
   const { t } = useTranslation()
   const keys = TITLES[type]
@@ -92,12 +95,23 @@ export default function ComparisonWorkbench({
   const title = w.selectedTrace ? t(keys.selected, { label: w.selectedTrace.label }) : t(keys.base)
 
   const actions =
-    type === 'traces' && w.selectedTrace ? (
-      <WindowActionButton
-        icon="information"
-        label={t('trace.panel.open')}
-        onClick={() => navigate(`/${slug}/affaires/${caseId}/traces?trace=${w.selectedTrace?.id}`)}
-      />
+    (type === 'traces' && w.selectedTrace) || onRestartTour ? (
+      <>
+        {type === 'traces' && w.selectedTrace && (
+          <WindowActionButton
+            icon="information"
+            label={t('trace.panel.open')}
+            onClick={() => navigate(`/${slug}/affaires/${caseId}/traces?trace=${w.selectedTrace?.id}`)}
+          />
+        )}
+        {onRestartTour && (
+          <WindowActionButton
+            icon="information"
+            label={t('investigationCase.comparison.tour.restartLabel')}
+            onClick={onRestartTour}
+          />
+        )}
+      </>
     ) : undefined
 
   const handleExport = async () => {
@@ -151,6 +165,7 @@ export default function ComparisonWorkbench({
             size="small"
             disabled={isComparing}
             onClick={onAnalyze}
+            data-tour="analyze-button"
             className={cn(
               'relative mr-1 overflow-hidden rounded-full border-blue-medium-1/40 text-blue-medium-1 hover:border-blue-medium-1 hover:bg-blue-medium-1 hover:text-white',
             )}
@@ -164,7 +179,7 @@ export default function ComparisonWorkbench({
         {w.selectedTrace && (
           <WindowActionButton tone="footer" icon="fileExport" label={t('common.window.export')} onClick={handleExport} />
         )}
-        <span data-layers-toggle>
+        <span data-layers-toggle {...(side === 'left' ? { 'data-tour': 'layers-toggle' } : {})}>
           <WindowActionButton
             tone="footer"
             icon={w.isLayersVisible ? 'layersOff' : 'layers'}

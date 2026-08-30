@@ -94,7 +94,47 @@
       "hitButtonActive": "Hit déclaré — cliquer pour retirer",
       "hitButtonDisabled": "Posez au moins 12 minuties sur la trace et sur l'empreinte pour déclarer un hit",
       "hitInsufficientMinutiae": "12 minuties requises sur la trace et sur l'empreinte pour déclarer un hit",
-      "hitError": "Impossible de mettre à jour le hit"
+      "hitError": "Impossible de mettre à jour le hit",
+      "tour": {
+        "next": "Suivant",
+        "previous": "Précédent",
+        "done": "Terminé",
+        "restartLabel": "Revoir la visite guidée",
+        "steps": {
+          "welcome": {
+            "title": "Bienvenue dans l'atelier",
+            "text": "Ce tour rapide vous montre où sont les outils pour comparer une trace à une empreinte de référence."
+          },
+          "carousel": {
+            "title": "Vos traces",
+            "text": "Ce carrousel liste les traces de l'affaire. Cliquez sur une vignette pour l'ouvrir dans la fenêtre de gauche."
+          },
+          "import": {
+            "title": "Importer une trace",
+            "text": "Ce bouton ajoute une nouvelle trace à l'affaire."
+          },
+          "imageSettings": {
+            "title": "Réglages de l'image",
+            "text": "Ce mode regroupe la luminosité, le contraste et les autres réglages qui n'affectent que l'affichage de l'image."
+          },
+          "annotationMode": {
+            "title": "Annoter l'image",
+            "text": "Ce mode permet de poser des minuties ou de tracer des repères sur l'image. Choisissez un outil avant de cliquer dans l'image."
+          },
+          "layers": {
+            "title": "Calques",
+            "text": "Ce bouton affiche les annotations posées, pour les revoir ou les masquer."
+          },
+          "analyze": {
+            "title": "Analyse automatique",
+            "text": "Ce bouton propose un classement des empreintes les plus proches de la trace : c'est une aide au tri, la conclusion reste celle de l'opérateur."
+          },
+          "match": {
+            "title": "Déclarer une correspondance",
+            "text": "Ce bouton se débloque une fois douze minuties concordantes posées sur la trace et sur l'empreinte."
+          }
+        }
+      }
     },
     "form": {
       "createTitle": "Nouvelle affaire",

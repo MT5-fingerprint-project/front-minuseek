@@ -41,8 +41,10 @@ export default function BiometricImageCarouselView({
   }
 
   return (
-    <div className="flex w-full items-center gap-2 p-2">
-      <BiometricImageImportButton type={type} caseId={caseId} onUploadSuccess={onUploadSuccess} />
+    <div className="flex w-full items-center gap-2 p-2" data-tour={`carousel-${type}`}>
+      <span data-tour={`import-${type}`}>
+        <BiometricImageImportButton type={type} caseId={caseId} onUploadSuccess={onUploadSuccess} />
+      </span>
 
       {isLoading ? (
         <BiometricImageCarouselSkeleton />

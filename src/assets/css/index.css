@@ -146,3 +146,39 @@ body {
     @apply cursor-pointer;
   }
 }
+
+/* Visite guidée de l'atelier (driver.js, cf. docs/adr/0005). Classes vérifiées
+   dans driver.js@1.8.0 (node_modules/driver.js/dist/driver.css). */
+.driver-popover {
+  max-width: 22ch;
+  border-radius: var(--radius);
+  background-color: var(--color-white);
+  color: var(--color-blue-dark-2);
+  border: 1px solid var(--color-grey-light-2);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.15);
+}
+
+.driver-popover-title {
+  color: var(--color-blue-dark-1);
+  font-weight: 600;
+}
+
+.driver-popover-description {
+  color: var(--color-blue-dark-2);
+}
+
+.driver-popover-footer .driver-popover-footer-btn {
+  border-radius: calc(var(--radius) - 2px);
+  background-color: var(--color-blue-medium-1);
+  color: var(--color-white);
+  text-shadow: none;
+  border: none;
+}
+
+.driver-popover-footer .driver-popover-footer-btn:hover {
+  background-color: var(--color-blue-medium-2);
+}
+
+.driver-popover-close-btn {
+  color: var(--color-grey-medium-2);
+}

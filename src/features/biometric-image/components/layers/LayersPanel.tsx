@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
 import { useClickOutside } from '@/features/shared/hooks/useClickOutside'
+import { TOUR_UI_SELECTOR } from '@/features/shared/constants/tour.constants'
 import type { Layer } from '@/features/biometric-image/types/layer'
 import LayerItem from '@/features/biometric-image/components/layers/LayerItem'
 
@@ -16,7 +17,7 @@ type LayersPanelProps = {
 export default function LayersPanel({ layers, onToggleVisibility, onDelete, onClose, onHoverLayer }: LayersPanelProps) {
   const { t } = useTranslation()
   const panelRef = useRef<HTMLDivElement>(null)
-  useClickOutside(panelRef, onClose, { ignoreSelector: '[data-layers-toggle]' })
+  useClickOutside(panelRef, onClose, { ignoreSelector: `[data-layers-toggle], ${TOUR_UI_SELECTOR}` })
 
   return (
     <div ref={panelRef} className="flex h-full w-44 flex-col border-l bg-white shadow-lg">
