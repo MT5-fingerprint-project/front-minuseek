@@ -37,7 +37,8 @@
     "serviceNavigation": "Navigation du service",
     "cases": "Affaires",
     "users": "Utilisateurs",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "casesToVerify": "Dossiers à vérifier"
   },
   "investigationCase": {
     "status": {
@@ -219,6 +220,12 @@
         "caseClosedOrAlreadyPending": "L'affaire est close, ou ce collègue la vérifie déjà.",
         "unexpected": "La vérification n'a pas pu être confiée."
       }
+    },
+    "toVerify": {
+      "title": "Dossiers à vérifier",
+      "subtitle": "Les dossiers dont la vérification vous a été confiée.",
+      "empty": "Aucune vérification ne vous est confiée pour l'instant.",
+      "caseNumber": "Affaire n°{{caseNumber}}"
     }
   },
   "subject": {

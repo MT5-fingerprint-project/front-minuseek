@@ -1,15 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
+import { verificationKeys } from '@/features/shared/hooks/useMyVerifications'
 import {
   VerificationAPI,
   VerificationRefusedError,
 } from '@/features/investigation-case/services/VerificationAPI.services'
-
-export const verificationKeys = {
-  all: ['verifications'] as const,
-  forCase: (caseId: string) => [...verificationKeys.all, 'case', caseId] as const,
-}
 
 export function useCaseVerifications(caseId: string) {
   return useQuery({

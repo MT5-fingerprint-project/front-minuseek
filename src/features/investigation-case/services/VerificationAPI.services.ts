@@ -1,6 +1,6 @@
 import { isAxiosError } from 'axios'
 import { apiClient } from '@/features/shared/lib/apiClient'
-import type { CaseVerification } from '@/features/investigation-case/types/verification'
+import type { CaseVerification } from '@/features/shared/types/verification'
 
 export type VerificationRefusal =
   | 'unknownVerifier'

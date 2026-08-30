@@ -50,7 +50,6 @@ export default function OperatorPicker({
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebouncedValue(search.trim())
 
-  // La recherche est celle du serveur : on n'interroge qu'une fois le panneau ouvert.
   const candidatesQuery = useServiceUsers(
     {
       ...NO_SERVICE_USERS_FILTER,

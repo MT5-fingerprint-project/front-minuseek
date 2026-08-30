@@ -10,7 +10,7 @@ import {
   isInProgress,
   verifierNameOf,
   type CaseVerification,
-} from '@/features/investigation-case/types/verification'
+} from '@/features/shared/types/verification'
 
 type CaseVerificationsSectionProps = {
   caseId: string

@@ -12,6 +12,7 @@ import TenantRequiredPage from './features/shared/components/TenantRequiredPage.
 import CasePageLayout from './layouts/CasePageLayout.tsx'
 import CaseComparisonLayout from './layouts/CaseComparisonLayout.tsx'
 import InvestigationCasesPage from './features/investigation-case/pages/InvestigationCasesPage.tsx'
+import CasesToVerifyPage from './features/investigation-case/pages/CasesToVerifyPage.tsx'
 import InvestigationCaseDetailsPage from './features/investigation-case/pages/InvestigationCaseDetailsPage.tsx'
 import InvestigationCaseSubjectsPage from './features/investigation-case/pages/InvestigationCaseSubjectsPage.tsx'
 import SubjectDetailsPage from './features/investigation-case/pages/SubjectDetailsPage.tsx'
@@ -32,6 +33,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <InvestigationCasesPage /> },
       { path: 'affaires', element: <InvestigationCasesPage /> },
+      { path: 'verifications', element: <CasesToVerifyPage /> },
       { path: 'utilisateurs', element: <ServiceUsersPage /> },
       { path: 'parametres', element: <ServiceSettingsPage /> },
       {

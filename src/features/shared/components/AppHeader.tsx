@@ -4,6 +4,8 @@ import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
 import { useClickOutside } from '@/features/shared/hooks/useClickOutside'
 import { useCurrentUser } from '@/features/shared/hooks/useCurrentUser'
+import { useMyVerifications } from '@/features/shared/hooks/useMyVerifications'
+import { isInProgress } from '@/features/shared/types/verification'
 import { useAuth } from '@/features/shared/auth/auth-context'
 import { cn } from '@/features/shared/lib/utils'
 
@@ -13,17 +15,28 @@ const SERVICE_NAV = [
   { path: 'parametres', icon: 'settings', labelKey: 'navigation.settings' },
 ] as const
 
+const VERIFICATION_NAV = {
+  path: 'verifications',
+  icon: 'folder',
+  labelKey: 'navigation.casesToVerify',
+} as const
+
 export default function AppHeader() {
   const { t } = useTranslation()
   const { slug, username, logout } = useAuth()
   const { pathname } = useLocation()
   const { data: currentUser } = useCurrentUser()
+  const { data: missions = [] } = useMyVerifications()
   const [isMenuOpen, setMenuOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   useClickOutside(menuRef, () => setMenuOpen(false), { enabled: isMenuOpen })
 
   const label = username ?? t('auth.account')
   const isServiceManager = currentUser?.role === 'ADMIN'
+  const entries = [
+    ...(isServiceManager ? SERVICE_NAV : []),
+    ...(missions.some(isInProgress) ? [VERIFICATION_NAV] : []),
+  ]
 
   function isCurrentSection(path: string): boolean {
     const sectionPath = `/${slug}/${path}`
@@ -42,9 +55,9 @@ export default function AppHeader() {
           MINUSEEK
         </Link>
 
-        {isServiceManager && (
+        {entries.length > 0 && (
           <nav aria-label={t('navigation.serviceNavigation')} className="flex items-center gap-1">
-            {SERVICE_NAV.map((entry) => {
+            {entries.map((entry) => {
               const isCurrent = isCurrentSection(entry.path)
               return (
                 <Link
