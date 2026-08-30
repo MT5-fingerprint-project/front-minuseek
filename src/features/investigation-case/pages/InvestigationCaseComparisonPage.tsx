@@ -9,6 +9,10 @@ import ComparisonWindow from '@/features/investigation-case/components/compariso
 import ComparisonWorkbench from '@/features/investigation-case/components/comparison/ComparisonWorkbench'
 import HitButton from '@/features/investigation-case/components/comparison/HitButton'
 import ClosedCaseBanner from '@/features/investigation-case/components/ClosedCaseBanner'
+import BlindVerificationBanner from '@/features/investigation-case/components/comparison/BlindVerificationBanner'
+import VerificationPanel from '@/features/investigation-case/components/comparison/VerificationPanel'
+import { useMissionOnCase } from '@/features/investigation-case/hooks/useMissionOnCase'
+import { isInProgress } from '@/features/shared/types/verification'
 import { useCaseIsClosed } from '@/features/investigation-case/hooks/useCaseIsClosed'
 import { biometricImageKeys, useBiometricImages } from '@/features/biometric-image/hooks/useBiometricImages'
 import { useCompare } from '@/features/biometric-image/hooks/useCompare'
@@ -41,6 +45,8 @@ export default function InvestigationCaseComparisonPage() {
   const { data: hitReferenceIds } = useHits(traceId)
   const toggleHit = useToggleHit(traceId)
   const isCaseClosed = useCaseIsClosed(id ?? '')
+  const mission = useMissionOnCase(id ?? '')
+  const isBlind = mission !== undefined && isInProgress(mission)
 
   const isHit = !!referenceId && (hitReferenceIds?.includes(referenceId) ?? false)
   const hasEnoughMinutiae =
@@ -80,6 +86,7 @@ export default function InvestigationCaseComparisonPage() {
     return (
       <div className="flex h-full min-h-[500px] flex-col gap-2">
         <ClosedCaseBanner caseId={id} />
+        {isBlind && <BlindVerificationBanner />}
         <ComparisonWorkbench
           side="left"
           type="traces"
@@ -97,6 +104,7 @@ export default function InvestigationCaseComparisonPage() {
   return (
     <div className="flex h-full flex-col gap-2">
       <ClosedCaseBanner caseId={id} />
+      {isBlind && <BlindVerificationBanner />}
       <ResizablePanelGroup orientation="horizontal" className="h-full min-h-[500px]">
       <ComparisonWindow
         side="left"
@@ -114,7 +122,7 @@ export default function InvestigationCaseComparisonPage() {
           className="pointer-events-auto absolute bottom-8 left-1/2 z-20 -translate-x-1/2 -translate-y-full"
           onMouseDown={(e) => e.stopPropagation()}
         >
-          {!isCaseClosed && (
+          {!isCaseClosed && mission === undefined && (
             <HitButton isHit={isHit} disabled={isHitDisabled} onClick={onToggleHit} />
           )}
         </div>
@@ -131,6 +139,7 @@ export default function InvestigationCaseComparisonPage() {
         imageDecorations={referenceDecorations}
       />
       </ResizablePanelGroup>
+      {mission && <VerificationPanel verificationId={mission.id} caseId={id} />}
     </div>
   )
 }
