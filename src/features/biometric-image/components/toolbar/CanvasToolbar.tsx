@@ -16,6 +16,7 @@ import {
 
 type CanvasToolbarProps = {
   filters: CanvasFilters
+  isExpertCase?: boolean
   onFiltersChange: (filters: CanvasFilters) => void
   activeTool: AnnotationToolType | null
   onActiveToolChange: (tool: AnnotationToolType | null) => void
@@ -27,6 +28,7 @@ type CanvasToolbarProps = {
 
 export default function CanvasToolbar({
   filters,
+  isExpertCase = false,
   onFiltersChange,
   activeTool,
   onActiveToolChange,
@@ -147,15 +149,23 @@ export default function CanvasToolbar({
           />
         </div>
         {mode === 'image'
-          ? IMAGE_TOOLS.map(({ icon, label, filters: filterConfigs }) => (
-              <ItemToolbar
-                key={label}
-                icon={icon}
-                label={t(label)}
-                active={isToolActive(label, filterConfigs)}
-                onClick={() => handleToolClick(label, filterConfigs)}
-              />
-            ))
+          ? IMAGE_TOOLS.map(({ icon, label, filters: filterConfigs, isExpertOnly }) => {
+              const isLocked = isExpertOnly === true && !isExpertCase
+              return (
+                <ItemToolbar
+                  key={label}
+                  icon={icon}
+                  label={
+                    isLocked
+                      ? t('biometricImage.toolbar.expertLocked', { tool: t(label) })
+                      : t(label)
+                  }
+                  active={isToolActive(label, filterConfigs)}
+                  disabled={isLocked}
+                  onClick={() => handleToolClick(label, filterConfigs)}
+                />
+              )
+            })
           : ANNOTATION_TOOLS.map(({ icon, label, tool, isRuler }) => (
               <div key={label} className="relative">
                 <ItemToolbar
