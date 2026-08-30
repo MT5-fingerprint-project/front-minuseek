@@ -28,9 +28,19 @@ type WithdrawPieceDialogProps = {
   type: BiometricImageType
   trigger: ReactNode
   onConfirm: (motive: WithdrawalMotive) => void
+  title?: string
+  description?: string
+  actionLabel?: string
 }
 
-export default function WithdrawPieceDialog({ type, trigger, onConfirm }: WithdrawPieceDialogProps) {
+export default function WithdrawPieceDialog({
+  type,
+  trigger,
+  onConfirm,
+  title,
+  description,
+  actionLabel,
+}: WithdrawPieceDialogProps) {
   const { t } = useTranslation()
   const [motive, setMotive] = useState<WithdrawalMotive | null>(null)
 
@@ -39,9 +49,9 @@ export default function WithdrawPieceDialog({ type, trigger, onConfirm }: Withdr
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t('biometricImage.withdraw.confirmTitle')}</AlertDialogTitle>
+          <AlertDialogTitle>{title ?? t('biometricImage.withdraw.confirmTitle')}</AlertDialogTitle>
           <AlertDialogDescription>
-            {t('biometricImage.withdraw.confirmDescription')}
+            {description ?? t('biometricImage.withdraw.confirmDescription')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <Select value={motive ?? undefined} onValueChange={(value) => setMotive(value as WithdrawalMotive)}>
@@ -63,7 +73,7 @@ export default function WithdrawPieceDialog({ type, trigger, onConfirm }: Withdr
             disabled={motive === null}
             onClick={() => motive && onConfirm(motive)}
           >
-            {t('biometricImage.withdraw.confirmAction')}
+            {actionLabel ?? t('biometricImage.withdraw.confirmAction')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

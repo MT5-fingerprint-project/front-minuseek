@@ -26,6 +26,8 @@ const makeFixture = (id: string, label: string): BiometricImage => ({
   origin: null,
   location: null,
   revelationTechnique: null,
+  hasLocationPhoto: false,
+  locationPhoto: null,
 })
 
 export const biometricImageFixtures: BiometricImage[] = [
