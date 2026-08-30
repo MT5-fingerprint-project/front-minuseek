@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
 import { H1 } from '@/features/shared/ui/typography'
+import { Badge } from '@/features/shared/ui/badge'
 import { Button } from '@/features/shared/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/features/shared/ui/tabs'
 import AppHeader from '@/features/shared/components/AppHeader'
@@ -71,27 +72,37 @@ export default function InvestigationCasesPage() {
         <Tabs value={activeTab} onValueChange={(tab) => setSearchParams({ [TAB_PARAM]: tab })}>
           <TabsList variant="line">
             {tabs.map((tab) => (
-              <TabsTrigger key={tab} value={tab}>
-                {t(`investigationCase.list.tabs.${labelKeys[tab]}`)} ({casesOf[tab].length})
+              <TabsTrigger
+                key={tab}
+                value={tab}
+                className="data-[state=active]:font-bold data-[state=active]:text-foreground"
+              >
+                {t(`investigationCase.list.tabs.${labelKeys[tab]}`)}
+                <Badge variant="secondary" className="bg-blue-light-2 tabular-nums">
+                  {casesOf[tab].length}
+                </Badge>
               </TabsTrigger>
             ))}
           </TabsList>
 
-          {tabs.map((tab) => (
-            <TabsContent key={tab} value={tab} className="pt-6">
-              {!isPending && casesOf[tab].length === 0 ? (
-                <p className="text-muted-foreground">
-                  {t(`investigationCase.list.empty.${labelKeys[tab]}`)}
-                </p>
-              ) : (
-                <InvestigationCasesList
-                  investigationCases={casesOf[tab]}
-                  isLoading={isPending}
-                  onAddClick={() => setIsCreateDialogOpen(true)}
-                />
-              )}
-            </TabsContent>
-          ))}
+          {tabs.map((tab) => {
+            const isVerificationsTab = tab === VERIFICATIONS
+            const hasNoCaseToVerify = isVerificationsTab && !isPending && casesOf[tab].length === 0
+
+            return (
+              <TabsContent key={tab} value={tab} className="pt-6">
+                {hasNoCaseToVerify ? (
+                  <p className="text-muted-foreground">{t('investigationCase.list.emptyVerifications')}</p>
+                ) : (
+                  <InvestigationCasesList
+                    investigationCases={casesOf[tab]}
+                    isLoading={isPending}
+                    onAddClick={isVerificationsTab ? undefined : () => setIsCreateDialogOpen(true)}
+                  />
+                )}
+              </TabsContent>
+            )
+          })}
         </Tabs>
 
         <InvestigationCaseCreateForm

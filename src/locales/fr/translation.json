@@ -57,11 +57,7 @@
         "verifications": "Mes vérifications",
         "service": "Le service"
       },
-      "empty": {
-        "mine": "Aucune affaire ne vous est confiée. Créez-en une, ou demandez au responsable de service de vous en confier une.",
-        "verifications": "Aucune vérification ne vous est confiée pour l'instant.",
-        "service": "Le service n'a encore ouvert aucune affaire."
-      }
+      "emptyVerifications": "Aucune affaire à vérifier"
     },
     "card": {
       "title": "Affaire N°{{caseNumber}}",
