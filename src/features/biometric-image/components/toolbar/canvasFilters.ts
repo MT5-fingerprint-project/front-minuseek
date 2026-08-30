@@ -113,14 +113,25 @@ export const IMAGE_TOOLS: ImageTool[] = [
 
 export type AnnotationToolType = 'circle' | 'circleArrow' | 'pencil'
 
-type AnnotationTool = { icon: IconName; label: ParseKeys; tool?: AnnotationToolType; isRuler?: boolean }
+// Nomme le panneau qu'ouvre l'entrée — explicite, plutôt que déduit de l'absence de `tool`
+// (une entrée sans `tool` n'est plus systématiquement la palette de couleurs).
+type AnnotationPanel = 'color' | 'minutiaType'
+
+type AnnotationTool = {
+  icon: IconName
+  label: ParseKeys
+  tool?: AnnotationToolType
+  isRuler?: boolean
+  panel?: AnnotationPanel
+}
 
 export const ANNOTATION_TOOLS: AnnotationTool[] = [
-  { icon: 'palette'    as IconName, label: 'biometricImage.toolbar.tools.palette' },
-  { icon: 'circle'     as IconName, label: 'biometricImage.toolbar.tools.point',      tool: 'circle'      as AnnotationToolType },
-  { icon: 'circleLine' as IconName, label: 'biometricImage.toolbar.tools.pointArrow', tool: 'circleArrow' as AnnotationToolType },
-  { icon: 'penTrace'   as IconName, label: 'biometricImage.toolbar.tools.pencil',     tool: 'pencil'      as AnnotationToolType },
-  { icon: 'ruler'      as IconName, label: 'biometricImage.toolbar.tools.ruler',      isRuler: true },
+  { icon: 'palette'    as IconName, label: 'biometricImage.toolbar.tools.palette',      panel: 'color' },
+  { icon: 'circle'     as IconName, label: 'biometricImage.toolbar.tools.point',        tool: 'circle'      as AnnotationToolType },
+  { icon: 'circleLine' as IconName, label: 'biometricImage.toolbar.tools.pointArrow',   tool: 'circleArrow' as AnnotationToolType },
+  { icon: 'trace'      as IconName, label: 'biometricImage.toolbar.tools.minutiaType',  panel: 'minutiaType' },
+  { icon: 'penTrace'   as IconName, label: 'biometricImage.toolbar.tools.pencil',       tool: 'pencil'      as AnnotationToolType },
+  { icon: 'ruler'      as IconName, label: 'biometricImage.toolbar.tools.ruler',        isRuler: true },
 ]
 
 // color palette for annotation tools, always keep Green, Yellow, Red, Orange as the first 4 colors (GYRO standard)

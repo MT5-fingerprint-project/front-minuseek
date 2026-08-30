@@ -344,7 +344,26 @@
         "point": "Point",
         "pointArrow": "Point & flèche",
         "pencil": "Crayon",
-        "ruler": "Règle"
+        "ruler": "Règle",
+        "minutiaType": "Type de minutie"
+      }
+    },
+    "minutia": {
+      "types": {
+        "RIDGE_ENDING": "arrêt de ligne",
+        "BIFURCATION": "bifurcation",
+        "TRIFURCATION": "trifurcation",
+        "ISLAND": "îlot",
+        "ENCLOSURE": "anneau",
+        "UNDETERMINED": "indéterminée"
+      },
+      "shortTypes": {
+        "RIDGE_ENDING": "AL",
+        "BIFURCATION": "BI",
+        "TRIFURCATION": "TR",
+        "ISLAND": "ÎL",
+        "ENCLOSURE": "AN",
+        "UNDETERMINED": "?"
       }
     },
     "calibration": {

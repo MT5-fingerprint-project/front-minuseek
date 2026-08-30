@@ -18,11 +18,12 @@ import {
 } from '@/features/biometric-image/components/canvas/useCanvasView'
 import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
 import { useCanvasFilters } from '@/features/biometric-image/hooks/useCanvasFilters'
-import { useLayers } from '@/features/biometric-image/hooks/useLayers'
+import { useLayers, useUpdateLayer } from '@/features/biometric-image/hooks/useLayers'
 import { useBiometricImages, useCalibrateBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
 import { ANNOTATION_COLORS, type AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import type { CalibrationPoint } from '@/features/biometric-image/lib/calibration'
 import { stageToPngBlob } from '@/features/biometric-image/lib/exportImage'
+import { DEFAULT_MINUTIA_TYPE, isMinutiaSettings, type MinutiaType } from '@/features/biometric-image/lib/minutiae'
 
 export type { CanvasZoomHandle, ScaleChangeOrigin }
 
@@ -64,9 +65,15 @@ export default function BiometricImageCanvas({
   const { sliderValues, effectiveFilters, handleFilterChange } = useCanvasFilters(image?.id)
   const [activeTool, setActiveTool] = useState<AnnotationToolType | null>(null)
   const [activeColor, setActiveColor] = useState<string>(ANNOTATION_COLORS[0])
+  const [activeMinutiaType, setActiveMinutiaType] = useState<MinutiaType>(DEFAULT_MINUTIA_TYPE)
   const [imageLayout, setImageLayout] = useState<ImageLayout | null>(null)
   const [sourceGeometry, setSourceGeometry] = useState<SourceGeometry | null>(null)
   const [hoveredLayerId, setHoveredLayerId] = useState<string | null>(null)
+  // Le tool actif avec lequel une forme a été sélectionnée : un changement d'outil
+  // périme la sélection sans effet dédié (même règle que l'ex-état local d'AnnotationLayer).
+  const [selected, setSelected] = useState<{ id: string; tool: AnnotationToolType | null } | null>(null)
+  const selectedAnnotationId = selected?.tool === activeTool ? selected.id : null
+  const updateSelectedType = useUpdateLayer(image?.id ?? '')
   const [isRulerActive, setIsRulerActive] = useState(false)
   // Marqué par l'id de l'image : un changement d'image invalide le segment sans effet dédié.
   const [rulerSegment, setRulerSegment] = useState<
@@ -78,6 +85,9 @@ export default function BiometricImageCanvas({
   const [calibrationResetSignal, setCalibrationResetSignal] = useState(0)
   const { data: layers = [] } = useLayers(image?.id)
   const annotationLayers = layers.filter((l) => l.type === 'ANNOTATION')
+  const selectedLayer = annotationLayers.find((l) => l.id === selectedAnnotationId)
+  const selectedMinutiaType =
+    selectedLayer && isMinutiaSettings(selectedLayer.settings) ? selectedLayer.settings.minutiaType : undefined
 
   // Le carrousel alimente le même cache : relire l'image ici ne coûte aucun appel réseau
   // supplémentaire, et c'est ce qui fait apparaître la barre d'échelle sans resélection.
@@ -88,6 +98,21 @@ export default function BiometricImageCanvas({
   const handleActiveToolChange = (tool: AnnotationToolType | null) => {
     setActiveTool(tool)
     if (tool !== null) setIsRulerActive(false)
+  }
+
+  const handleSelectAnnotation = (id: string | null) =>
+    setSelected(id ? { id, tool: activeTool } : null)
+
+  const handleActiveMinutiaTypeChange = (minutiaType: MinutiaType) => {
+    setActiveMinutiaType(minutiaType)
+    // Une minutie sélectionnée : on change SA valeur, sans toucher au reste de ses réglages —
+    // le serveur remplace les réglages en entier, un envoi partiel effacerait position/couleur.
+    if (selectedLayer && isMinutiaSettings(selectedLayer.settings)) {
+      updateSelectedType.mutate({
+        id: selectedLayer.id,
+        input: { settings: { ...selectedLayer.settings, minutiaType } },
+      })
+    }
   }
 
   const handleToggleRuler = () => {
@@ -167,9 +192,12 @@ export default function BiometricImageCanvas({
               layerCount={layers.length}
               activeTool={activeTool}
               activeColor={activeColor}
+              activeMinutiaType={activeMinutiaType}
               fingerprintId={image.id}
               imageLayout={imageLayout}
               fitScale={sourceGeometry?.fitScale ?? 1}
+              selectedId={selectedAnnotationId}
+              onSelect={handleSelectAnnotation}
               hoveredLayerId={hoveredLayerId}
             />
             <CalibrationLayer
@@ -204,6 +232,9 @@ export default function BiometricImageCanvas({
                 onActiveToolChange={handleActiveToolChange}
                 activeColor={activeColor}
                 onActiveColorChange={setActiveColor}
+                activeMinutiaType={activeMinutiaType}
+                onActiveMinutiaTypeChange={handleActiveMinutiaTypeChange}
+                selectedMinutiaType={selectedMinutiaType}
                 isRulerActive={isRulerActive}
                 onToggleRuler={handleToggleRuler}
               />

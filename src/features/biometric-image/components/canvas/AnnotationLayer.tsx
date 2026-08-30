@@ -7,6 +7,7 @@ import type { Layer } from '@/features/biometric-image/types/layer'
 import type { ImageLayout } from '@/features/biometric-image/components/canvas/DraggableImage'
 import type { AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import { toScreenLength, toSourceLength } from '@/features/biometric-image/lib/displayScale'
+import type { MinutiaType } from '@/features/biometric-image/lib/minutiae'
 import MinutiaeAnnotation from './MinutiaeAnnotation'
 
 const RADIUS = 6
@@ -24,10 +25,15 @@ type AnnotationLayerProps = {
   layerCount: number
   activeTool: AnnotationToolType | null
   activeColor: string
+  /** Type appliqué à la prochaine minutie posée au point-flèche. */
+  activeMinutiaType: MinutiaType
   fingerprintId: string
   imageLayout: ImageLayout | null
   /** Facteur de réduction affichage (`fitAdjustmentFactor`) : convertit repère d'affichage ↔ pixels source. */
   fitScale: number
+  /** Sélection possédée par le parent : une minutie sélectionnée pilote aussi la barre d'outils. */
+  selectedId: string | null
+  onSelect: (id: string | null) => void
   hoveredLayerId?: string | null
 }
 
@@ -46,9 +52,12 @@ export default function AnnotationLayer({
   layerCount,
   activeTool,
   activeColor,
+  activeMinutiaType,
   fingerprintId,
   imageLayout,
   fitScale,
+  selectedId,
+  onSelect,
   hoveredLayerId,
 }: AnnotationLayerProps) {
   const { t } = useTranslation()
@@ -64,13 +73,7 @@ export default function AnnotationLayer({
   const draftRef = useRef<Draft | null>(null)
   const drawingRef = useRef(false)
 
-  // Store which tool was active when a shape was selected — if the tool changes,
-  // the selection is stale and we treat it as null without needing an effect.
-  const [selected, setSelected] = useState<{ id: string; tool: AnnotationToolType | null } | null>(null)
-  const selectedId = selected?.tool === activeTool ? selected.id : null
-
-  const select = (id: string | null) =>
-    setSelected(id ? { id, tool: activeTool } : null)
+  const select = onSelect
 
   const setDraftBoth = (d: Draft | null) => {
     draftRef.current = d
@@ -148,7 +151,7 @@ export default function AnnotationLayer({
             angle: 0,
             radius: sourceRadius(),
             color: activeColor,
-            minutiaType: 'UNDETERMINED',
+            minutiaType: activeMinutiaType,
             frame: ANNOTATION_FRAME,
             schemaVersion: ANNOTATION_SCHEMA_VERSION,
           },
@@ -202,7 +205,7 @@ export default function AnnotationLayer({
   // createLayer/updateLayer mutate refs are stable; re-bind when tool/color/zIndex base or the
   // display↔source scale factor change (a stale fitScale would mis-convert new annotations).
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTool, activeColor, fingerprintId, layerCount, fitScale])
+  }, [activeTool, activeColor, activeMinutiaType, fingerprintId, layerCount, fitScale])
 
   const renderShape = (layer: Layer) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -249,6 +252,8 @@ export default function AnnotationLayer({
             isSelected={isSelected}
             strokeWidth={sw(STROKE_WIDTH)}
             fitScale={fitScale}
+            mirrorScaleX={imageLayout?.scaleX ?? 1}
+            rotationDeg={imageLayout?.rotation ?? 0}
             onSelect={() => select(isSelected ? null : layer.id)}
             onPersist={persistPosition}
           />
