@@ -51,7 +51,17 @@
       "title": "Vos affaires",
       "subtitle": "Créez et retrouvez toutes vos affaires ici.",
       "create": "Nouvelle affaire",
-      "addNew": "Ajouter une nouvelle affaire"
+      "addNew": "Ajouter une nouvelle affaire",
+      "tabs": {
+        "mine": "Mes affaires",
+        "verifications": "Mes vérifications",
+        "service": "Le service"
+      },
+      "empty": {
+        "mine": "Aucune affaire ne vous est confiée. Créez-en une, ou demandez au responsable de service de vous en confier une.",
+        "verifications": "Aucune vérification ne vous est confiée pour l'instant.",
+        "service": "Le service n'a encore ouvert aucune affaire."
+      }
     },
     "card": {
       "title": "Affaire N°{{caseNumber}}",
@@ -154,7 +164,8 @@
       "unknownOperator": "Le compte désigné n'existe pas dans ce service, ou y est désactivé",
       "operatorChangeNotAllowed": "Seuls l'opérateur en place et le responsable de service peuvent confier cette affaire",
       "caseNotFound": "Cette affaire est introuvable",
-      "caseClosed": "Cette affaire est close : elle n'est plus modifiable"
+      "caseClosed": "Cette affaire est close : elle n'est plus modifiable",
+      "noLongerAccessible": "Cette affaire ne vous est plus accessible"
     },
     "withdrawn": {
       "title": "Pièces retirées du dossier",
