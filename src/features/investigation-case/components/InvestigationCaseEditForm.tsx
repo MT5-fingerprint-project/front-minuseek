@@ -17,7 +17,7 @@ import OperatorPicker, { type OperatorCandidate } from '@/features/investigation
 import { useEditInvestigationCaseForm } from '@/features/investigation-case/hooks/useEditInvestigationCaseForm'
 import {
   hasCorrections,
-  operatorNameOf,
+  caseUserNameOf,
   type InvestigationCase,
   type InvestigationCaseCorrections,
 } from '@/features/investigation-case/types/investigationCase'
@@ -90,7 +90,7 @@ function CaseFields({
   const [isHandoverPending, setIsHandoverPending] = useState(false)
   const [selectedOperator, setSelectedOperator] = useState<OperatorCandidate | null>(
     investigationCase.operator
-      ? { id: investigationCase.operator.id, name: operatorNameOf(investigationCase.operator) }
+      ? { id: investigationCase.operator.id, name: caseUserNameOf(investigationCase.operator) }
       : null
   )
   const isHandoverConfirmed = useRef(false)
