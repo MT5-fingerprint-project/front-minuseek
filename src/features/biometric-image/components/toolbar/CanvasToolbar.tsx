@@ -6,6 +6,8 @@ import ItemToolbar from './ItemToolbar'
 import FilterPanel from './FilterPanel'
 import FilterControl from './FilterControl'
 import ColorPalette from './ColorPalette'
+import MinutiaTypePalette from './MinutiaTypePalette'
+import type { MinutiaType } from '@/features/biometric-image/lib/minutiae'
 import {
   IMAGE_TOOLS,
   ANNOTATION_TOOLS,
@@ -13,6 +15,8 @@ import {
   type FilterConfig,
   type AnnotationToolType,
 } from './canvasFilters'
+
+type AnnotationPanel = 'color' | 'minutiaType'
 
 type CanvasToolbarProps = {
   filters: CanvasFilters
@@ -22,6 +26,9 @@ type CanvasToolbarProps = {
   onActiveToolChange: (tool: AnnotationToolType | null) => void
   activeColor: string
   onActiveColorChange: (color: string) => void
+  activeMinutiaType: MinutiaType
+  onActiveMinutiaTypeChange: (type: MinutiaType) => void
+  selectedMinutiaType: MinutiaType | undefined
   isRulerActive: boolean
   onToggleRuler: () => void
 }
@@ -34,41 +41,62 @@ export default function CanvasToolbar({
   onActiveToolChange,
   activeColor,
   onActiveColorChange,
+  activeMinutiaType,
+  onActiveMinutiaTypeChange,
+  selectedMinutiaType,
   isRulerActive,
   onToggleRuler,
 }: CanvasToolbarProps) {
   const { t } = useTranslation()
   const [mode, setMode] = useState<'image' | 'annotation'>('image')
   const [openFilter, setOpenFilter] = useState<string | null>(null)
-  const [paletteOpen, setPaletteOpen] = useState(false)
+  const [openPanel, setOpenPanel] = useState<AnnotationPanel | null>(null)
 
   const rootRef = useRef<HTMLDivElement>(null)
   const closePanels = useCallback(() => {
     setOpenFilter(null)
-    setPaletteOpen(false)
+    setOpenPanel(null)
   }, [])
-  useClickOutside(rootRef, closePanels, { enabled: openFilter !== null || paletteOpen })
+  useClickOutside(rootRef, closePanels, { enabled: openFilter !== null || openPanel !== null })
 
   const switchMode = (next: 'image' | 'annotation') => {
     setMode(next)
     setOpenFilter(null)
-    setPaletteOpen(false)
+    setOpenPanel(null)
     onActiveToolChange(null)
     // La règle vit dans l'onglet Annotations : quitter cet onglet la referme aussi.
     if (next === 'image' && isRulerActive) onToggleRuler()
   }
 
-  const handleAnnotationClick = (tool: AnnotationToolType | undefined, isRuler?: boolean) => {
+  const handleAnnotationClick = (
+    tool: AnnotationToolType | undefined,
+    panel: AnnotationPanel | undefined,
+    isRuler?: boolean,
+  ) => {
     if (isRuler) {
       onToggleRuler()
+      if (openPanel === 'minutiaType') setOpenPanel(null)
       return
     }
-    if (!tool) {
-      // palette : ouvre/ferme le panneau de couleurs (pas un outil de dessin)
-      setPaletteOpen((open) => !open)
+    if (tool === 'circleArrow') {
+      if (activeTool !== 'circleArrow') {
+        onActiveToolChange('circleArrow')
+        setOpenPanel('minutiaType')
+      } else if (openPanel === 'minutiaType') {
+        onActiveToolChange(null)
+        setOpenPanel(null)
+      } else {
+        setOpenPanel('minutiaType')
+      }
       return
     }
+    if (panel) {
+      setOpenPanel((open) => (open === panel ? null : panel))
+      return
+    }
+    if (!tool) return
     onActiveToolChange(activeTool === tool ? null : tool)
+    if (openPanel === 'minutiaType') setOpenPanel(null)
   }
 
   const handleToolClick = (label: string, filterConfigs: FilterConfig[]) => {
@@ -113,8 +141,13 @@ export default function CanvasToolbar({
     return openFilter === label
   }
 
-  const isAnnotationActive = (tool: AnnotationToolType | undefined, isRuler?: boolean) =>
-    isRuler ? isRulerActive : tool ? activeTool === tool : paletteOpen
+  const isAnnotationActive = (
+    tool: AnnotationToolType | undefined,
+    panel: AnnotationPanel | undefined,
+    isRuler?: boolean,
+  ) => (isRuler ? isRulerActive : tool ? activeTool === tool : openPanel === panel)
+
+  const displayedMinutiaType = selectedMinutiaType ?? activeMinutiaType
 
   return (
     <div ref={rootRef} className="flex flex-col items-center gap-2">
@@ -130,8 +163,17 @@ export default function CanvasToolbar({
           ))}
         </FilterPanel>
       )}
-      {mode === 'annotation' && paletteOpen && (
+      {mode === 'annotation' && openPanel === 'color' && (
         <ColorPalette activeColor={activeColor} onSelect={onActiveColorChange} />
+      )}
+      {mode === 'annotation' && openPanel === 'minutiaType' && (
+        <MinutiaTypePalette
+          activeType={displayedMinutiaType}
+          onSelect={(minutiaType) => {
+            onActiveMinutiaTypeChange(minutiaType)
+            setOpenPanel(null)
+          }}
+        />
       )}
       <div className="flex items-center gap-3 rounded-md bg-blue-dark-1 px-3 py-2 text-white shadow-lg">
         <div className="flex items-center gap-1 rounded-sm bg-white/25 p-1">
@@ -166,15 +208,15 @@ export default function CanvasToolbar({
                 />
               )
             })
-          : ANNOTATION_TOOLS.map(({ icon, label, tool, isRuler }) => (
+          : ANNOTATION_TOOLS.map(({ icon, label, tool, isRuler, panel }) => (
               <div key={label} className="relative">
                 <ItemToolbar
                   icon={icon}
                   label={t(label)}
-                  active={isAnnotationActive(tool, isRuler)}
-                  onClick={() => handleAnnotationClick(tool, isRuler)}
+                  active={isAnnotationActive(tool, panel, isRuler)}
+                  onClick={() => handleAnnotationClick(tool, panel, isRuler)}
                 />
-                {!tool && !isRuler && (
+                {panel === 'color' && (
                   <span
                     className="pointer-events-none absolute bottom-0.5 right-0.5 h-2.5 w-2.5 rounded-full border border-blue-dark-1"
                     style={{ backgroundColor: activeColor }}

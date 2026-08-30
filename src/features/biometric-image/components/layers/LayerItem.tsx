@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
 import type { IconName } from '@/features/shared/icons'
 import type { Layer } from '@/features/biometric-image/types/layer'
 import { FILTER_META } from '@/features/biometric-image/components/toolbar/canvasFilters'
+import { isMinutiaSettings } from '@/features/biometric-image/lib/minutiae'
 
 type LayerItemProps = {
   layer: Layer
@@ -12,6 +14,11 @@ type LayerItemProps = {
 }
 
 export default function LayerItem({ layer, onToggleVisibility, onDelete, onMouseEnter, onMouseLeave }: LayerItemProps) {
+  const { t } = useTranslation()
+  const name = isMinutiaSettings(layer.settings)
+    ? t(`biometricImage.minutia.types.${layer.settings.minutiaType}`)
+    : layer.name
+
   return (
     <div
       className="flex items-center justify-between gap-1 border-b px-3 py-2"
@@ -24,7 +31,7 @@ export default function LayerItem({ layer, onToggleVisibility, onDelete, onMouse
           size={14}
           color="currentColor"
         />
-        <span className="truncate text-sm font-medium">{layer.name}</span>
+        <span className="truncate text-sm font-medium">{name}</span>
       </div>
       <div className="flex items-center gap-0.5 shrink-0">
         <button
