@@ -134,6 +134,7 @@ export default function CanvasToolbar({
   ) => (isRuler ? isRulerActive : tool ? activeTool === tool : openPanel === panel)
 
   const displayedMinutiaType = selectedMinutiaType ?? activeMinutiaType
+  const isMinutiaTypeRelevant = activeTool === 'circleArrow' || selectedMinutiaType !== undefined
 
   return (
     <div ref={rootRef} className="flex flex-col items-center gap-2">
@@ -152,7 +153,7 @@ export default function CanvasToolbar({
       {mode === 'annotation' && openPanel === 'color' && (
         <ColorPalette activeColor={activeColor} onSelect={onActiveColorChange} />
       )}
-      {mode === 'annotation' && openPanel === 'minutiaType' && (
+      {mode === 'annotation' && openPanel === 'minutiaType' && isMinutiaTypeRelevant && (
         <MinutiaTypePalette activeType={displayedMinutiaType} onSelect={onActiveMinutiaTypeChange} />
       )}
       <div className="flex items-center gap-3 rounded-md bg-blue-dark-1 px-3 py-2 text-white shadow-lg">
@@ -188,7 +189,9 @@ export default function CanvasToolbar({
                 />
               )
             })
-          : ANNOTATION_TOOLS.map(({ icon, label, tool, isRuler, panel }) => (
+          : ANNOTATION_TOOLS.filter(
+              ({ panel }) => panel !== 'minutiaType' || isMinutiaTypeRelevant,
+            ).map(({ icon, label, tool, isRuler, panel }) => (
               <div key={label} className="relative">
                 <ItemToolbar
                   icon={icon}
