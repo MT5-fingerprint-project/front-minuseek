@@ -6,17 +6,23 @@ type ItemToolbarProps = {
   icon: IconName
   label: string
   active?: boolean
+  disabled?: boolean
   onClick?: () => void
 }
 
-export default function ItemToolbar({ icon, label, active = false, onClick }: ItemToolbarProps) {
+export default function ItemToolbar({ icon, label, active = false, disabled = false, onClick }: ItemToolbarProps) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <button
           type="button"
-          onClick={onClick}
-          className={cn('rounded-sm p-1.5 hover:bg-white/15', active && 'bg-white/20')}
+          aria-disabled={disabled}
+          onClick={disabled ? undefined : onClick}
+          className={cn(
+            'rounded-sm p-1.5',
+            disabled ? 'cursor-not-allowed opacity-40' : 'hover:bg-white/15',
+            active && !disabled && 'bg-white/20'
+          )}
         >
           <Icon name={icon} size={20} color="currentColor" />
         </button>

@@ -1,4 +1,5 @@
 import { useImperativeHandle, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Stage, Layer } from 'react-konva'
 import type Konva from 'konva'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
@@ -20,6 +21,8 @@ import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
 import { useCanvasFilters } from '@/features/biometric-image/hooks/useCanvasFilters'
 import { useLayers } from '@/features/biometric-image/hooks/useLayers'
 import { useBiometricImages, useCalibrateBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
+import { useCaseExpertise } from '@/features/investigation-case/hooks/useCaseExpertise'
+import { Badge } from '@/features/shared/ui/badge'
 import { ANNOTATION_COLORS, type AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import type { CalibrationPoint } from '@/features/biometric-image/lib/calibration'
 import { stageToPngBlob } from '@/features/biometric-image/lib/exportImage'
@@ -57,6 +60,7 @@ export default function BiometricImageCanvas({
   onSourceGeometryChange,
   exportHandleRef,
 }: BiometricImageCanvasProps) {
+  const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<Konva.Stage>(null)
   const size = useContainerSize(containerRef)
@@ -77,10 +81,9 @@ export default function BiometricImageCanvas({
   // calibrage pour effacer son segment tracé, sur le modèle de `recenterSignal`.
   const [calibrationResetSignal, setCalibrationResetSignal] = useState(0)
   const { data: layers = [] } = useLayers(image?.id)
+  const expertise = useCaseExpertise(image?.caseId ?? '')
   const annotationLayers = layers.filter((l) => l.type === 'ANNOTATION')
 
-  // Le carrousel alimente le même cache : relire l'image ici ne coûte aucun appel réseau
-  // supplémentaire, et c'est ce qui fait apparaître la barre d'échelle sans resélection.
   const { data: images } = useBiometricImages(type, image?.caseId ?? '')
   const freshImage = images?.find((img) => img.id === image?.id) ?? image
   const calibrate = useCalibrateBiometricImage(type, image?.caseId ?? '')
@@ -185,6 +188,11 @@ export default function BiometricImageCanvas({
             fitScale={sourceGeometry?.fitScale ?? 1}
             viewScale={view.scale}
           />
+          {expertise && (
+            <div className="pointer-events-none absolute top-3 left-1/2 z-10 -translate-x-1/2">
+              <Badge variant="secondary">{t('biometricImage.toolbar.expertCaseBanner')}</Badge>
+            </div>
+          )}
           {activeRulerSegment && sourceGeometry && (
             <CalibrationDialog
               from={activeRulerSegment.from}
@@ -199,6 +207,7 @@ export default function BiometricImageCanvas({
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
               <CanvasToolbar
                 filters={sliderValues}
+                isExpertCase={expertise !== null}
                 onFiltersChange={handleFilterChange}
                 activeTool={activeTool}
                 onActiveToolChange={handleActiveToolChange}

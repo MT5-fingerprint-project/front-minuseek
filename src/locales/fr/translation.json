@@ -348,7 +348,9 @@
         "image": "Édition",
         "annotation": "Annotations"
       },
-      "tools": {
+      "expertLocked": "{{tool}} — réglage d'expert : déclarez le dossier en expertise pour l'utiliser.",
+    "expertCaseBanner": "Expertise judiciaire",
+    "tools": {
         "mirror": "Miroir",
         "rotation": "Rotation",
         "luminosity": "Luminosité",

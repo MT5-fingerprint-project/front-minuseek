@@ -199,7 +199,7 @@ export const FILTER_META: Record<string, { labelKey: string; icon: IconName; kon
 
 // ─── Toolbar tool lists ────────────────────────────────────────────────────────
 
-export type ImageTool = { icon: IconName; label: ParseKeys; filters: FilterConfig[] }
+export type ImageTool = { icon: IconName; label: ParseKeys; filters: FilterConfig[]; isExpertOnly?: boolean }
 
 export const IMAGE_TOOLS: ImageTool[] = [
   { icon: 'mirror'       as IconName, label: 'biometricImage.toolbar.tools.mirror',       filters: [{ filterKey: 'mirror',    inputType: 'toggle' }] },
@@ -211,6 +211,7 @@ export const IMAGE_TOOLS: ImageTool[] = [
   {
     icon: 'palette' as IconName,
     label: 'biometricImage.toolbar.tools.channels',
+    isExpertOnly: true,
     filters: [
       { filterKey: 'channelRed',   labelKey: 'biometricImage.toolbar.tools.channelRed',   inputType: 'toggle' },
       { filterKey: 'channelGreen', labelKey: 'biometricImage.toolbar.tools.channelGreen', inputType: 'toggle' },
@@ -220,6 +221,7 @@ export const IMAGE_TOOLS: ImageTool[] = [
   {
     icon: 'target' as IconName,
     label: 'biometricImage.toolbar.tools.levels',
+    isExpertOnly: true,
     filters: [
       { filterKey: 'levelsBlack', labelKey: 'biometricImage.toolbar.tools.levelsBlack', min: 0,    max: 100, origin: 'left' },
       { filterKey: 'levelsGamma', labelKey: 'biometricImage.toolbar.tools.levelsGamma', min: -100, max: 100, origin: 'center' },
@@ -229,6 +231,7 @@ export const IMAGE_TOOLS: ImageTool[] = [
   {
     icon: 'trace' as IconName,
     label: 'biometricImage.toolbar.tools.sharpening',
+    isExpertOnly: true,
     filters: [{ filterKey: 'sharpening', min: 0, max: 200, origin: 'left' }],
   },
 ]
