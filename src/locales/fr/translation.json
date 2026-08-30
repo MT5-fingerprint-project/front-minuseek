@@ -86,9 +86,9 @@
     "comparison": {
       "title": "Comparaison - Affaire N°{{id}}",
       "tracesWindow": "Traces",
-      "tracesWindowWithFile": "Traces - {{fileName}}",
+      "tracesWindowSelected": "Traces - {{label}}",
       "referencePrintsWindow": "Empreintes",
-      "referencePrintsWindowWithFile": "Empreintes - {{fileName}}",
+      "referencePrintsWindowSelected": "Empreintes - {{label}}",
       "selectTrace": "Visualisez et éditez vos traces ici",
       "selectReferencePrint": "Visualisez et éditez vos empreintes ici",
       "analyzeButton": "Analyse IA",
@@ -475,7 +475,7 @@
     "withdraw": {
       "success": "Pièce retirée du dossier",
       "error": "Le retrait a échoué",
-      "aria": "Retirer {{fileName}} du dossier",
+      "aria": "Retirer {{label}} du dossier",
       "confirmTitle": "Retirer cette pièce du dossier ?",
       "confirmDescription": "La pièce sort du dossier de travail. Elle reste consultable dans les pièces retirées et pourra être rétablie. Le fichier n'est pas détruit.",
       "motiveLabel": "Motif du retrait",

@@ -22,8 +22,7 @@ export interface MatchingScore {
 
 export interface BiometricImage {
   id: string
-  fileName: string
-  /** Nulle quand l'image a été détruite : il n'y a plus rien à signer. */
+  label: string
   url: string | null
   status: BiometricImageStatus
   score: number | null
@@ -43,6 +42,8 @@ export interface BiometricImage {
 export interface BiometricImageDto {
   id: string
   path: string
+  number?: number | null
+  reference?: string | null
   url: string | null
   status: BiometricImageStatus
   score: number | null

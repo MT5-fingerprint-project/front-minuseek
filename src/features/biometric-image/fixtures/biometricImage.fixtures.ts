@@ -5,9 +5,9 @@ import type { BiometricImage } from '@/features/biometric-image/types/biometricI
  */
 const baseTimestamp = '2026-06-11T01:44:21.943Z'
 
-const makeFixture = (id: string, fileName: string): BiometricImage => ({
+const makeFixture = (id: string, label: string): BiometricImage => ({
   id,
-  fileName,
+  label,
   url: 'https://placehold.co/73x107',
   status: 'RECEIVED',
   score: null,

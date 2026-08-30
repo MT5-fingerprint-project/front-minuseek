@@ -21,7 +21,7 @@ export type UploadInput = {
 function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
   return {
     id: dto.id,
-    fileName: dto.path.split('/').pop() ?? dto.path,
+    label: dto.reference ?? dto.path.split('/').pop() ?? dto.path,
     url: dto.url,
     status: dto.status,
     score: dto.score,
