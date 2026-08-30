@@ -44,10 +44,6 @@ export default function InvestigationCaseEditForm({
       <DialogContent
         ref={contentRef}
         className="sm:max-w-2xl rounded-md"
-        // Échap doit refermer la liste des comptes, pas le formulaire et les
-        // corrections en cours. Radix écoute en phase de capture, donc avant le
-        // panneau : quand celui-ci est ouvert, on lui laisse la touche. Le
-        // panneau reste monté une fois refermé, d'où `[data-open]`.
         onEscapeKeyDown={(event) => {
           if (contentRef.current?.querySelector('[data-slot="combobox-popup"][data-open]')) {
             event.preventDefault()
@@ -198,7 +194,7 @@ function CaseFields({
                     id={field.name}
                     ariaLabel={t('investigationCase.form.fields.operator.label')}
                     selected={selectedOperator}
-                    excludedOperatorId={investigationCase.operator?.id}
+                    excludedIds={investigationCase.operator ? [investigationCase.operator.id] : []}
                     container={contentRef}
                     onSelect={(candidate) => {
                       setSelectedOperator(candidate)

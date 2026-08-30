@@ -196,6 +196,31 @@
       "destroyedPrintRefused": "Cette empreinte a été détruite : elle ne peut plus être comparée."
     }
   },
+  "verification": {
+    "status": {
+      "PENDING": "Vérification en cours",
+      "CONCORDANT": "Vérification concordante",
+      "DISCORDANT": "Vérification discordante"
+    },
+    "section": {
+      "title": "Vérification par un second regard",
+      "none": "Personne ne vérifie ce dossier pour l'instant.",
+      "removedAccount": "Compte supprimé du service",
+      "requestedOn": "confiée le {{date}}",
+      "pickerLabel": "Collègue à qui confier la vérification",
+      "entrust": "Confier une vérification"
+    },
+    "entrust": {
+      "success": "Vérification confiée.",
+      "refusals": {
+        "unknownVerifier": "Ce compte n'existe pas dans le service, y est désactivé, ou est l'opérateur de l'affaire.",
+        "notAllowed": "Seul l'opérateur de l'affaire ou un responsable de service peut y confier une vérification.",
+        "caseNotFound": "Affaire introuvable.",
+        "caseClosedOrAlreadyPending": "L'affaire est close, ou ce collègue la vérifie déjà.",
+        "unexpected": "La vérification n'a pas pu être confiée."
+      }
+    }
+  },
   "subject": {
     "sex": {
       "MALE": "Homme",
