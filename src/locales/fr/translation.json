@@ -621,7 +621,10 @@
       "CASE_VERIFICATION_REQUESTED": "Vérification confiée à un pair technique",
       "VERIFICATION_CONCLUSION_STATED": "Conclusion du vérificateur énoncée",
       "CASE_VERIFICATION_COMPLETED": "Vérification close",
-      "TRACE_DESCRIBED": "Fiche de la trace renseignée"
+      "TRACE_DESCRIBED": "Fiche de la trace renseignée",
+      "TRACE_LOCATION_STATED": "Localisation consignée sur le terrain",
+      "LOCATION_PHOTO_UPLOADED": "Photographie de localisation versée",
+      "LOCATION_PHOTO_DELETED": "Photographie de localisation retirée"
     },
     "pagination": {
       "previous": "Précédent",
