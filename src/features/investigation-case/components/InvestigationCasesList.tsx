@@ -8,7 +8,7 @@ import type { InvestigationCase } from '@/features/investigation-case/types/inve
 type InvestigationCasesListProps = {
   investigationCases: InvestigationCase[]
   isLoading: boolean
-  onAddClick: () => void
+  onAddClick?: () => void
 }
 
 export default function InvestigationCasesList({
@@ -20,7 +20,7 @@ export default function InvestigationCasesList({
 
   return (
     <div className="flex flex-wrap gap-4">
-      {investigationCases?.length === 0 && (
+      {onAddClick && investigationCases?.length === 0 && (
         <button
           type="button"
           onClick={onAddClick}

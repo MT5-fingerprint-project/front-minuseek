@@ -34,7 +34,7 @@ export default function BiometricImageThumbnail({
 }: BiometricImageThumbnailProps) {
   const { t } = useTranslation()
   const withdrawImage = useWithdrawBiometricImage(type, caseId)
-  const label = decoration?.label ?? image.fileName
+  const label = decoration?.label ?? image.label
 
   return (
     <div className="relative">
@@ -92,7 +92,7 @@ export default function BiometricImageThumbnail({
           <button
             type="button"
             disabled={withdrawImage.isPending}
-            aria-label={t('biometricImage.withdraw.aria', { fileName: label })}
+            aria-label={t('biometricImage.withdraw.aria', { label })}
             onClick={(event) => event.stopPropagation()}
             className="absolute top-1 right-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-white transition-colors hover:bg-black/85 disabled:opacity-50"
           >

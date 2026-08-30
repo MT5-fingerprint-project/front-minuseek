@@ -21,11 +21,11 @@ import { downloadBlob, exportFileName } from '@/features/biometric-image/lib/exp
 const TITLES = {
   traces: {
     base: 'investigationCase.comparison.tracesWindow',
-    withFile: 'investigationCase.comparison.tracesWindowWithFile',
+    selected: 'investigationCase.comparison.tracesWindowSelected',
   },
   'reference-prints': {
     base: 'investigationCase.comparison.referencePrintsWindow',
-    withFile: 'investigationCase.comparison.referencePrintsWindowWithFile',
+    selected: 'investigationCase.comparison.referencePrintsWindowSelected',
   },
 } as const
 
@@ -86,7 +86,7 @@ export default function ComparisonWorkbench({
   const calibrate = useCalibrateBiometricImage(type, freshImage?.caseId ?? '')
   const [isImageSizeDialogOpen, setIsImageSizeDialogOpen] = useState(false)
 
-  const title = w.selectedTrace ? t(keys.withFile, { fileName: w.selectedTrace.fileName }) : t(keys.base)
+  const title = w.selectedTrace ? t(keys.selected, { label: w.selectedTrace.label }) : t(keys.base)
 
   const handleExport = async () => {
     try {

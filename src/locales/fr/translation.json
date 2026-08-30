@@ -57,11 +57,7 @@
         "verifications": "Mes vérifications",
         "service": "Le service"
       },
-      "empty": {
-        "mine": "Aucune affaire ne vous est confiée. Créez-en une, ou demandez au responsable de service de vous en confier une.",
-        "verifications": "Aucune vérification ne vous est confiée pour l'instant.",
-        "service": "Le service n'a encore ouvert aucune affaire."
-      }
+      "emptyVerifications": "Aucune affaire à vérifier"
     },
     "card": {
       "title": "Affaire N°{{caseNumber}}",
@@ -86,9 +82,9 @@
     "comparison": {
       "title": "Comparaison - Affaire N°{{id}}",
       "tracesWindow": "Traces",
-      "tracesWindowWithFile": "Traces - {{fileName}}",
+      "tracesWindowSelected": "Traces - {{label}}",
       "referencePrintsWindow": "Empreintes",
-      "referencePrintsWindowWithFile": "Empreintes - {{fileName}}",
+      "referencePrintsWindowSelected": "Empreintes - {{label}}",
       "selectTrace": "Visualisez et éditez vos traces ici",
       "selectReferencePrint": "Visualisez et éditez vos empreintes ici",
       "analyzeButton": "Analyse IA",
@@ -475,7 +471,7 @@
     "withdraw": {
       "success": "Pièce retirée du dossier",
       "error": "Le retrait a échoué",
-      "aria": "Retirer {{fileName}} du dossier",
+      "aria": "Retirer {{label}} du dossier",
       "confirmTitle": "Retirer cette pièce du dossier ?",
       "confirmDescription": "La pièce sort du dossier de travail. Elle reste consultable dans les pièces retirées et pourra être rétablie. Le fichier n'est pas détruit.",
       "motiveLabel": "Motif du retrait",
@@ -544,7 +540,13 @@
       "CHAIN_ANCHORED": "Chaîne horodatée",
       "TRACE_RESTORED": "Trace rétablie au dossier",
       "REFERENCE_PRINT_RESTORED": "Empreinte de référence rétablie au dossier",
-      "REFERENCE_PRINT_IMAGE_DESTROYED": "Empreinte de familier détruite"
+      "REFERENCE_PRINT_IMAGE_DESTROYED": "Empreinte de familier détruite",
+      "SERVICE_HEADER_SAVED": "En-tête du service enregistré",
+      "TRACE_CALIBRATED": "Trace calibrée",
+      "REFERENCE_PRINT_CALIBRATED": "Empreinte de référence calibrée",
+      "CASE_VERIFICATION_REQUESTED": "Vérification confiée à un second regard",
+      "VERIFICATION_CONCLUSION_STATED": "Conclusion du vérificateur énoncée",
+      "CASE_VERIFICATION_COMPLETED": "Vérification close"
     },
     "pagination": {
       "previous": "Précédent",

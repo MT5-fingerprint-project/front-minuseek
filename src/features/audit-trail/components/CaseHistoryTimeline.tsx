@@ -30,7 +30,15 @@ const EVENT_ICONS: Record<AuditEventType, IconName> = {
   HIT_REMOVED: 'fingerprint',
   REPORT_GENERATED: 'fileExport',
   CHAIN_ANCHORED: 'verified',
+  SERVICE_HEADER_SAVED: 'settings',
+  TRACE_CALIBRATED: 'ruler',
+  REFERENCE_PRINT_CALIBRATED: 'ruler',
+  CASE_VERIFICATION_REQUESTED: 'personCheck',
+  VERIFICATION_CONCLUSION_STATED: 'check',
+  CASE_VERIFICATION_COMPLETED: 'verified',
 }
+
+const FALLBACK_EVENT_ICON: IconName = 'information'
 
 function CaseHistoryEntry({ event }: { event: CaseAuditEvent }) {
   const { t, i18n } = useTranslation()
@@ -48,7 +56,7 @@ function CaseHistoryEntry({ event }: { event: CaseAuditEvent }) {
     <li className="group flex gap-4">
       <div className="flex flex-col items-center">
         <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-blue-light-1">
-          <Icon name={EVENT_ICONS[event.eventType]} size={16} />
+          <Icon name={EVENT_ICONS[event.eventType] ?? FALLBACK_EVENT_ICON} size={16} />
         </span>
         <span className="w-px flex-1 bg-blue-light-2 group-last:hidden" />
       </div>

@@ -46,7 +46,7 @@ export default function VerificationPanel({ verificationId, caseId }: Verificati
     .map((conclusion) => conclusion.traceId)
 
   function labelOf(traceId: string): string {
-    return traces.find((trace) => trace.id === traceId)?.fileName ?? traceId
+    return traces.find((trace) => trace.id === traceId)?.label ?? traceId
   }
 
   function state(traceId: string, exploitability: VerificationExploitability) {
@@ -92,7 +92,7 @@ export default function VerificationPanel({ verificationId, caseId }: Verificati
           const conclusion = conclusionOf(trace.id)
           return (
             <li key={trace.id} className="flex flex-wrap items-center gap-3 text-sm">
-              <span className="min-w-40 font-medium">{trace.fileName}</span>
+              <span className="min-w-40 font-medium">{trace.label}</span>
               <Button
                 type="button"
                 size="small"
@@ -126,7 +126,7 @@ export default function VerificationPanel({ verificationId, caseId }: Verificati
                     </SelectItem>
                     {referencePrints.map((print) => (
                       <SelectItem key={print.id} value={print.id}>
-                        {print.fileName}
+                        {print.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
