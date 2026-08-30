@@ -12,6 +12,7 @@ import {
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
 import InvestigationCaseEditForm from '@/features/investigation-case/components/InvestigationCaseEditForm'
 import WithdrawnPiecesSection from '@/features/investigation-case/components/WithdrawnPiecesSection'
+import CaseVerificationsSection from '@/features/investigation-case/components/CaseVerificationsSection'
 import CaseClosureActions from '@/features/investigation-case/components/CaseClosureActions'
 import ClosedCaseBanner from '@/features/investigation-case/components/ClosedCaseBanner'
 import DeclareExpertiseDialog from '@/features/investigation-case/components/DeclareExpertiseDialog'
@@ -135,6 +136,12 @@ export default function InvestigationCaseDetailsPage() {
               </div>
             </section>
           )}
+
+          <CaseVerificationsSection
+            caseId={investigationCase.id}
+            operatorUserId={investigationCase.operator?.id ?? null}
+            canEntrust={canChangeOperator}
+          />
 
           <WithdrawnPiecesSection caseId={investigationCase.id} />
         </TabsContent>
