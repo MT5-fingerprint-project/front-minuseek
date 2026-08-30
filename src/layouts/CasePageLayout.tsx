@@ -3,7 +3,7 @@ import CaseFrame from './CaseFrame'
 
 type CasePageLayoutProps = {
   /** Entrée de navigation active (pages internes hors comparateur) */
-  activeNav?: 'info' | 'subjects' | 'history' | 'reports'
+  activeNav?: 'info' | 'subjects' | 'traces' | 'history' | 'reports'
 }
 
 /**

@@ -1,6 +1,8 @@
-import type { ReactNode } from 'react'
-import { useParams } from 'react-router-dom'
+import { useEffect, type ReactNode } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { isAxiosError } from 'axios'
+import { toast } from 'sonner'
 import { useInvestigationCase } from '@/features/investigation-case/hooks/useInvestigationCases'
 import { TooltipProvider } from '@/features/shared/ui/tooltip'
 import Navbar from '@/features/shared/components/navbar/Navbar'
@@ -9,7 +11,7 @@ type CaseFrameProps = {
   /** Navbar réduite (mode comparateur) */
   navbarCollapsed?: boolean
   /** Entrée de navigation active */
-  activeNav: 'info' | 'subjects' | 'comparison' | 'history' | 'reports'
+  activeNav: 'info' | 'subjects' | 'traces' | 'comparison' | 'history' | 'reports'
   children: ReactNode
 }
 
@@ -17,7 +19,16 @@ type CaseFrameProps = {
 export default function CaseFrame({ navbarCollapsed = false, activeNav, children }: CaseFrameProps) {
   const { slug, id } = useParams<{ slug: string; id: string }>()
   const { t } = useTranslation()
-  const { data: investigationCase } = useInvestigationCase(id ?? '')
+  const navigate = useNavigate()
+  const { data: investigationCase, error } = useInvestigationCase(id ?? '')
+
+  const isOutOfReach = isAxiosError(error) && error.response?.status === 404
+
+  useEffect(() => {
+    if (!isOutOfReach) return
+    toast.error(t('investigationCase.errors.noLongerAccessible'))
+    navigate(`/${slug}/affaires`, { replace: true })
+  }, [isOutOfReach, navigate, slug, t])
 
   const navItems = [
     {
@@ -31,6 +42,12 @@ export default function CaseFrame({ navbarCollapsed = false, activeNav, children
       icon: 'personGroup' as const,
       label: t('navigation.subjects'),
       isActive: activeNav === 'subjects',
+    },
+    {
+      link: `/${slug}/affaires/${id}/traces`,
+      icon: 'trace' as const,
+      label: t('navigation.traces'),
+      isActive: activeNav === 'traces',
     },
     {
       link: `/${slug}/affaires/${id}/comparaison`,

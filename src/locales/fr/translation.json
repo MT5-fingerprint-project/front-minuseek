@@ -37,7 +37,9 @@
     "serviceNavigation": "Navigation du service",
     "cases": "Affaires",
     "users": "Utilisateurs",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "casesToVerify": "Dossiers à vérifier",
+    "traces": "Traces"
   },
   "investigationCase": {
     "status": {
@@ -50,7 +52,13 @@
       "title": "Vos affaires",
       "subtitle": "Créez et retrouvez toutes vos affaires ici.",
       "create": "Nouvelle affaire",
-      "addNew": "Ajouter une nouvelle affaire"
+      "addNew": "Ajouter une nouvelle affaire",
+      "tabs": {
+        "mine": "Mes affaires",
+        "verifications": "Mes vérifications",
+        "service": "Le service"
+      },
+      "emptyVerifications": "Aucune affaire à vérifier"
     },
     "card": {
       "title": "Affaire N°{{caseNumber}}",
@@ -75,9 +83,9 @@
     "comparison": {
       "title": "Comparaison - Affaire N°{{id}}",
       "tracesWindow": "Traces",
-      "tracesWindowWithFile": "Traces - {{fileName}}",
+      "tracesWindowSelected": "Traces - {{label}}",
       "referencePrintsWindow": "Empreintes",
-      "referencePrintsWindowWithFile": "Empreintes - {{fileName}}",
+      "referencePrintsWindowSelected": "Empreintes - {{label}}",
       "selectTrace": "Visualisez et éditez vos traces ici",
       "selectReferencePrint": "Visualisez et éditez vos empreintes ici",
       "analyzeButton": "Analyse IA",
@@ -153,7 +161,8 @@
       "unknownOperator": "Le compte désigné n'existe pas dans ce service, ou y est désactivé",
       "operatorChangeNotAllowed": "Seuls l'opérateur en place et le responsable de service peuvent confier cette affaire",
       "caseNotFound": "Cette affaire est introuvable",
-      "caseClosed": "Cette affaire est close : elle n'est plus modifiable"
+      "caseClosed": "Cette affaire est close : elle n'est plus modifiable",
+      "noLongerAccessible": "Cette affaire ne vous est plus accessible"
     },
     "withdrawn": {
       "title": "Pièces retirées du dossier",
@@ -162,6 +171,21 @@
         "traces": "Trace",
         "reference-prints": "Empreinte de référence"
       }
+    },
+    "expertise": {
+      "declare": "Déclarer une expertise",
+      "dialogTitle": "Déclarer ce dossier en expertise",
+      "dialogDescription": "Le texte ci-dessous est archivé mot pour mot au moment où vous le validez. Il ne pourra plus être modifié.",
+      "courtLabel": "Juridiction qui vous a commis",
+      "courtPlaceholder": "Tribunal judiciaire de Paris",
+      "oathHeading": "Prestation de serment d'un expert (articles 157 et 160 du Code de procédure pénale)",
+      "oathFormula": "Je soussigné {{expert}}, {{grade}} en fonction au {{service}}, expert désigné pour procéder aux opérations prévues dans l'ordonnance de commission d'expert de {{court}}, après avoir pris connaissance de la mission qui m'est confiée, prête serment de bien et fidèlement la remplir en mon honneur et conscience.",
+      "engagementLabel": "Je prête ce serment en mon honneur et conscience, et j'engage ma responsabilité d'expert sur ce dossier.",
+      "confirmAction": "Prêter serment et déclarer",
+      "declared": "Dossier déclaré en expertise, serment prêté",
+      "bannerTitle": "Expertise judiciaire",
+      "bannerDetail": "Serment prêté par {{expert}} le {{date}} devant {{court}}.",
+      "unknownExpert": "un compte supprimé"
     },
     "closure": {
       "close": "Clore le dossier",
@@ -179,6 +203,54 @@
       "detachedPrintsKept": "{{count}} empreinte(s) non rattachée(s) à une personne ne sont pas concernées.",
       "recordsKept": "Les fiches des personnes et les rapports déjà édités ne sont pas modifiés.",
       "destroyedPrintRefused": "Cette empreinte a été détruite : elle ne peut plus être comparée."
+    }
+  },
+  "verification": {
+    "status": {
+      "PENDING": "Vérification en cours",
+      "CONCORDANT": "Vérification concordante",
+      "DISCORDANT": "Vérification discordante"
+    },
+    "section": {
+      "title": "Vérification par pair technique",
+      "none": "Personne ne vérifie ce dossier pour l'instant.",
+      "removedAccount": "Compte supprimé du service",
+      "requestedOn": "confiée le {{date}}",
+      "pickerLabel": "Collègue à qui confier la vérification",
+      "entrust": "Confier une vérification",
+      "divergence": "Divergence — un troisième examen est nécessaire"
+    },
+    "entrust": {
+      "success": "Vérification confiée.",
+      "refusals": {
+        "unknownVerifier": "Ce compte n'existe pas dans le service, y est désactivé, ou est l'opérateur de l'affaire.",
+        "notAllowed": "Seul l'opérateur de l'affaire ou un responsable de service peut y confier une vérification.",
+        "caseNotFound": "Affaire introuvable.",
+        "caseClosedOrAlreadyPending": "L'affaire est close, ou ce collègue la vérifie déjà.",
+        "unexpected": "La vérification n'a pas pu être confiée."
+      }
+    },
+    "toVerify": {
+      "title": "Dossiers à vérifier",
+      "subtitle": "Les dossiers dont la vérification vous a été confiée.",
+      "empty": "Aucune vérification ne vous est confiée pour l'instant.",
+      "caseNumber": "Affaire n°{{caseNumber}}"
+    },
+    "blindBanner": "Vérification en aveugle : vous ne voyez ni les calques, ni les identifications, ni les déclarations de l'opérateur du dossier.",
+    "conclusions": {
+      "title": "Mes conclusions",
+      "exploitable": "Exploitable",
+      "notExploitable": "Inexploitable",
+      "identificationLabel": "Empreinte de référence identifiée",
+      "notIdentified": "Non identifiée",
+      "validate": "Valider ma vérification",
+      "missing": "Il manque {{missingCount}} conclusion(s) de trace",
+      "completed": "Vérification validée.",
+      "completeFailed": "La vérification n'a pas pu être validée.",
+      "saveFailed": "La conclusion n'a pas pu être enregistrée.",
+      "concordant": "Vos conclusions rejoignent celles de l'opérateur du dossier.",
+      "discordant": "Divergence sur : {{traces}}. Un troisième examen est nécessaire.",
+      "revisable": "Vous pouvez encore revenir sur une conclusion tant que le dossier est ouvert : la confrontation est rejouée à chaque fois."
     }
   },
   "subject": {
@@ -304,6 +376,101 @@
       "created": "Sujet créé avec succès"
     }
   },
+  "trace": {
+    "list": {
+      "title": "Traces de l'affaire n°{{caseNumber}}",
+      "summary_one": "{{count}} trace, dont {{identified}} identifiée",
+      "summary_other": "{{count}} traces, dont {{identified}} identifiées",
+      "summaryWithoutState_one": "{{count}} trace",
+      "summaryWithoutState_other": "{{count}} traces",
+      "empty": "Aucune trace n'a encore été déposée dans cette affaire.",
+      "columns": {
+        "number": "N°",
+        "image": "Trace",
+        "origin": "Origine",
+        "location": "Localisation",
+        "locationPhoto": "Loc.",
+        "revelation": "Révélation",
+        "state": "État",
+        "depositedOn": "Déposée le",
+        "actions": "Actions"
+      }
+    },
+    "state": {
+      "identified": "Identifiée",
+      "exploitable": "Exploitable",
+      "notExploitable": "Inexploitable",
+      "toQualify": "À qualifier"
+    },
+    "panel": {
+      "title": "Fiche de la trace",
+      "open": "Voir la fiche de la trace",
+      "openInComparator": "Ouvrir dans le comparateur",
+      "close": "Fermer le panneau",
+      "depositedAt": "Déposée le {{date}} à {{time}}",
+      "informations": "Informations",
+      "notProvided": "Non renseigné",
+      "unknown": "Cette trace n'existe pas ou n'appartient pas à cette affaire."
+    },
+    "origin": {
+      "DIGITAL": "Digitale",
+      "PALMAR": "Palmaire"
+    },
+    "technique": {
+      "OPTICAL_PROCESS": "Procédé optique",
+      "FINGERPRINT_POWDER": "Poudre dactyloscopique",
+      "DFO": "DFO",
+      "NINHYDRIN": "Ninhydrine"
+    },
+    "description": {
+      "edit": "Modifier",
+      "submit": "Enregistrer",
+      "submitting": "Enregistrement…",
+      "fields": {
+        "origin": {
+          "label": "Origine",
+          "placeholder": "Choisir l'origine de la trace"
+        },
+        "location": {
+          "label": "Localisation",
+          "placeholder": "ex : Sur la face extérieure de la porte-fenêtre du séjour"
+        },
+        "revelationTechnique": {
+          "label": "Révélation",
+          "placeholder": "Choisir la technique de révélation"
+        }
+      },
+      "success": "Fiche de la trace enregistrée",
+      "error": "L'enregistrement de la fiche a échoué"
+    },
+    "locationPhoto": {
+      "title": "Photographie de localisation",
+      "alt": "Photographie de l'endroit où la trace a été relevée",
+      "empty": "Aucune photographie de localisation n'a été versée pour cette trace.",
+      "present": "Photographie de localisation versée",
+      "absent": "Aucune photographie de localisation",
+      "add": "Ajouter une photographie de localisation",
+      "replace": "Remplacer",
+      "remove": "Retirer",
+      "sealedAt": "Versée le {{date}} à {{time}}",
+      "acceptedFormats": "Formats acceptés : PNG, JPEG, TIFF.",
+      "removeTitle": "Retirer cette photographie ?",
+      "removeDescription": "Elle sera retirée du dossier, et ce retrait sera inscrit au journal des actes. Vous pourrez en verser une autre.",
+      "replaceTitle": "Remplacer cette photographie ?",
+      "replaceDescription": "La photographie actuelle sera retirée du dossier, et ce retrait sera inscrit au journal des actes. Vous choisirez ensuite celle qui la remplace.",
+      "attachSuccess": "Photographie de localisation versée au dossier",
+      "attachError": "Le versement de la photographie a échoué",
+      "alreadyAttached": "Cette trace porte déjà une photographie de localisation. Retirez-la avant d'en verser une autre.",
+      "removeSuccess": "Photographie de localisation retirée du dossier",
+      "removeError": "Le retrait de la photographie a échoué"
+    },
+    "validation": {
+      "originRequired": "L'origine est obligatoire",
+      "locationRequired": "La localisation est obligatoire",
+      "locationTooLong": "La localisation ne peut pas dépasser {{max}} caractères",
+      "revelationTechniqueRequired": "La technique de révélation est obligatoire"
+    }
+  },
   "biometricImage": {
     "import": {
       "traces": "Importer vos traces ici",
@@ -333,6 +500,8 @@
         "image": "Édition",
         "annotation": "Annotations"
       },
+      "expertLocked": "{{tool}} — réglage d'expert : déclarez le dossier en expertise pour l'utiliser.",
+      "expertCaseBanner": "Expertise judiciaire",
       "tools": {
         "mirror": "Miroir",
         "rotation": "Rotation",
@@ -340,6 +509,15 @@
         "contrast": "Contraste",
         "invertColors": "Inversion chromatique",
         "saturation": "Saturation",
+        "channels": "Isolation des canaux",
+        "channelRed": "Masquer le canal rouge",
+        "channelGreen": "Masquer le canal vert",
+        "channelBlue": "Masquer le canal bleu",
+        "levels": "Niveaux",
+        "levelsBlack": "Point noir",
+        "levelsGamma": "Gamma",
+        "levelsWhite": "Point blanc",
+        "sharpening": "Netteté locale",
         "palette": "Palette de couleurs",
         "point": "Point",
         "pointArrow": "Point & flèche",
@@ -408,10 +586,13 @@
     "withdraw": {
       "success": "Pièce retirée du dossier",
       "error": "Le retrait a échoué",
-      "aria": "Retirer {{fileName}} du dossier",
+      "aria": "Retirer {{label}} du dossier",
       "confirmTitle": "Retirer cette pièce du dossier ?",
       "confirmDescription": "La pièce sort du dossier de travail. Elle reste consultable dans les pièces retirées et pourra être rétablie. Le fichier n'est pas détruit.",
       "motiveLabel": "Motif du retrait",
+      "detailLabel": "Précisez le motif",
+      "detailPlaceholder": "ex : relevée sur un scellé rattaché à une autre procédure",
+      "detailHint": "Cette phrase est inscrite au journal des actes et imprimée telle quelle dans le rapport.",
       "confirmAction": "Retirer du dossier"
     },
     "restore": {
@@ -460,6 +641,8 @@
       "CASE_STATUS_CHANGED": "Statut du dossier modifié",
       "CASE_OPERATOR_CHANGED": "Dossier confié à un autre opérateur",
       "CASE_UPDATED": "Informations du dossier corrigées",
+      "CASE_EXPERTISE_DECLARED": "Dossier déclaré en expertise, serment prêté",
+      "CASE_SAISINE_UPDATED": "Saisine du dossier complétée",
       "TRACE_UPLOADED": "Trace déposée",
       "TRACE_QUALIFIED": "Trace qualifiée",
       "TRACE_DELETED": "Trace retirée du dossier",
@@ -475,7 +658,17 @@
       "CHAIN_ANCHORED": "Chaîne horodatée",
       "TRACE_RESTORED": "Trace rétablie au dossier",
       "REFERENCE_PRINT_RESTORED": "Empreinte de référence rétablie au dossier",
-      "REFERENCE_PRINT_IMAGE_DESTROYED": "Empreinte de familier détruite"
+      "REFERENCE_PRINT_IMAGE_DESTROYED": "Empreinte de familier détruite",
+      "SERVICE_HEADER_SAVED": "En-tête du service enregistré",
+      "TRACE_CALIBRATED": "Trace calibrée",
+      "REFERENCE_PRINT_CALIBRATED": "Empreinte de référence calibrée",
+      "CASE_VERIFICATION_REQUESTED": "Vérification confiée à un pair technique",
+      "VERIFICATION_CONCLUSION_STATED": "Conclusion du vérificateur énoncée",
+      "CASE_VERIFICATION_COMPLETED": "Vérification close",
+      "TRACE_DESCRIBED": "Fiche de la trace renseignée",
+      "TRACE_LOCATION_STATED": "Localisation consignée sur le terrain",
+      "LOCATION_PHOTO_UPLOADED": "Photographie de localisation versée",
+      "LOCATION_PHOTO_DELETED": "Photographie de localisation retirée"
     },
     "pagination": {
       "previous": "Précédent",
@@ -496,7 +689,13 @@
       "TECHNICAL": "Rapport technique",
       "TRACEABILITY": "Annexe de traçabilité"
     },
+    "journalDetail": {
+      "label": "Journal des actes détaillé",
+      "hint": "Par défaut, l'annexe C liste les actes de fond et résume les réglages d'image en une ligne par trace. Activez cette option pour obtenir la version qui énumère tous les réglages, un par un.",
+      "badge": "Journal détaillé"
+    },
     "generate": {
+      "EXPLOITATION": "Générer le rapport d'exploitation",
       "TECHNICAL": "Générer le rapport technique",
       "TRACEABILITY": "Générer l'annexe de traçabilité"
     },
@@ -511,6 +710,37 @@
     "regenerateNotice": "Chaque génération produit un rapport nouveau et numéroté. Les précédents restent téléchargeables.",
     "signer": {
       "notice": "Ce rapport portera votre signature : {{signer}}."
+    }
+  },
+  "publicVerification": {
+    "title": "Vérifier un document ou une image",
+    "intro": "Cette page vous a été mise à disposition par le service vous ayant remis vos documents. Elle vous permet de vérifier si les fichiers que vous déposez n'ont pas éta altérés par un tiers, et à quelle date. Elle ne partage aucune information sur le contenu du fichier, ni sur le dossier auquel il appartient.",
+    "stayLocal": "Le fichier ne quitte pas votre ordinateur : seule son empreinte numérique est envoyée.",
+    "pending": "Calcul de l'empreinte en cours…",
+    "another": "Vérifier un autre fichier",
+    "paperNotice": "La vérification porte sur un fichier. Un exemplaire imprimé ne peut pas être vérifié ici.",
+    "dropZone": {
+      "label": "Choisir un fichier, ou le faire glisser ici",
+      "hovered": "Relâchez pour vérifier ce fichier",
+      "hint": "Le rapport que vous avez reçu, ou l'une de ses images."
+    },
+    "kind": {
+      "TRACE": "une trace papillaire",
+      "REFERENCE_PRINT": "une empreinte de référence",
+      "REPORT": "un rapport"
+    },
+    "verdict": {
+      "sealed": "Scellé par {{laboratory}} le {{date}}",
+      "anchored": "Horodaté par une autorité extérieure le {{date}}",
+      "notAnchored": "Aucun horodatage extérieur n'a encore été apposé sur ce scellé.",
+      "earlierReport": "Un rapport antérieur a été établi sur le même dossier. Le document que vous détenez n'est pas le premier état des travaux.",
+      "newerReport": "Un rapport plus récent a été établi sur le même dossier. Le document que vous détenez est authentique, mais il n'est peut-être pas le dernier état des travaux.",
+      "unknown": "Ce fichier est inconnu de ce laboratoire. Aucun scellé ne lui correspond."
+    },
+    "errors": {
+      "unavailable": "La vérification n'a pas abouti. Réessayez dans un instant.",
+      "insecureContext": "La vérification n'a pas abouti. Réessayez dans un instant.",
+      "tooLarge": "Ce fichier est trop volumineux pour être vérifié dans le navigateur (limite : 100 Mo)."
     }
   },
   "users": {
@@ -669,6 +899,7 @@
   "withdrawalMotive": {
     "DUPLICATE": "Doublon d'une pièce déjà versée",
     "MISFILED": "Pièce versée par erreur dans ce dossier",
-    "WRONG_ATTRIBUTION": "Rattachement erroné à une personne ou à un doigt"
+    "WRONG_ATTRIBUTION": "Rattachement erroné à une personne ou à un doigt",
+    "OTHER": "Autre motif"
   }
 }

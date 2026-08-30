@@ -18,7 +18,7 @@ import { useDebouncedValue } from '@/features/shared/hooks/useDebouncedValue'
 import { useServiceUsers } from '@/features/users/hooks/useServiceUsers'
 import { NO_SERVICE_USERS_FILTER } from '@/features/users/types/serviceUser'
 import type { UserRole } from '@/features/shared/types/user'
-import { operatorNameOf } from '@/features/investigation-case/types/investigationCase'
+import { caseUserNameOf } from '@/features/investigation-case/types/investigationCase'
 
 const CANDIDATES_PER_SEARCH = 20
 
@@ -31,12 +31,8 @@ export type OperatorCandidate = {
 type OperatorPickerProps = {
   id?: string
   ariaLabel: string
-  /** Le compte choisi, ou celui en place tant qu'on n'a rien choisi. */
   selected: OperatorCandidate | null
-  /** Jamais proposé : c'est celui qu'on remplace. */
-  excludedOperatorId?: string
-  /** La boîte de dialogue hôte. Un panneau posé sur `body` en sortirait inerte :
-   * Radix y rend tout le reste `aria-hidden` et coupe les événements de pointeur. */
+  excludedIds?: string[]
   container: RefObject<HTMLElement | null>
   onSelect: (candidate: OperatorCandidate | null) => void
 }
@@ -45,7 +41,7 @@ export default function OperatorPicker({
   id,
   ariaLabel,
   selected,
-  excludedOperatorId,
+  excludedIds = [],
   container,
   onSelect,
 }: OperatorPickerProps) {
@@ -54,7 +50,6 @@ export default function OperatorPicker({
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebouncedValue(search.trim())
 
-  // La recherche est celle du serveur : on n'interroge qu'une fois le panneau ouvert.
   const candidatesQuery = useServiceUsers(
     {
       ...NO_SERVICE_USERS_FILTER,
@@ -67,8 +62,8 @@ export default function OperatorPicker({
   )
 
   const candidates: OperatorCandidate[] = (candidatesQuery.data?.data ?? [])
-    .filter((account) => account.id !== excludedOperatorId)
-    .map((account) => ({ id: account.id, name: operatorNameOf(account), role: account.role }))
+    .filter((account) => !excludedIds.includes(account.id))
+    .map((account) => ({ id: account.id, name: caseUserNameOf(account), role: account.role }))
 
   const isTruncated = candidatesQuery.data?.meta.hasNextPage ?? false
 
@@ -82,7 +77,6 @@ export default function OperatorPicker({
   return (
     <Combobox<OperatorCandidate, false>
       items={candidates}
-      // Le serveur cherche : le filtrage interne ne doit pas rejouer sur la page rendue.
       filter={null}
       value={selected}
       onValueChange={(candidate) => onSelect(candidate)}

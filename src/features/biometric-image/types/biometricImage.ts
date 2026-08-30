@@ -1,13 +1,18 @@
+import type { RevelationTechnique, TraceLocationPhoto, TraceOrigin } from '@/features/biometric-image/types/trace'
+
 export type BiometricImageType = 'traces' | 'reference-prints'
 
-export type BiometricImageStatus = 'RECEIVED' | 'PROCESSING' | 'PROCESSED' | 'FAILED'
+export type BiometricImageStatus = 'RECEIVED' | 'EXPLOITABLE' | 'NOT_EXPLOITABLE'
 
-export type WithdrawalMotive = 'DUPLICATE' | 'MISFILED' | 'WRONG_ATTRIBUTION'
+export type WithdrawalMotive = 'DUPLICATE' | 'MISFILED' | 'WRONG_ATTRIBUTION' | 'OTHER'
 
 export const WITHDRAWAL_MOTIVES: Record<BiometricImageType, WithdrawalMotive[]> = {
-  traces: ['DUPLICATE', 'MISFILED'],
-  'reference-prints': ['DUPLICATE', 'MISFILED', 'WRONG_ATTRIBUTION'],
+  traces: ['DUPLICATE', 'MISFILED', 'OTHER'],
+  'reference-prints': ['DUPLICATE', 'MISFILED', 'WRONG_ATTRIBUTION', 'OTHER'],
 }
+
+/** La longueur de la colonne qui la reçoit, côté back. */
+export const MAX_WITHDRAWAL_MOTIVE_DETAIL_LENGTH = 300
 
 export interface BiometricImageDecoration {
   label?: string
@@ -22,10 +27,11 @@ export interface MatchingScore {
 
 export interface BiometricImage {
   id: string
-  fileName: string
-  /** Nulle quand l'image a été détruite : il n'y a plus rien à signer. */
+  label: string
+  number: number | null
   url: string | null
-  status: BiometricImageStatus
+  status: BiometricImageStatus | null
+  identified: boolean | null
   score: number | null
   caseId: string
   subjectId: string | null
@@ -35,16 +41,24 @@ export interface BiometricImage {
   matchings: MatchingScore[]
   withdrawnAt: string | null
   withdrawalMotive: WithdrawalMotive | null
+  withdrawalMotiveDetail: string | null
   imageDestroyedAt: string | null
-  /** Résolution calibrée en points par pouce de l'image source ; nulle tant que l'image n'est pas calibrée. */
   resolutionDpi: number | null
+  origin: TraceOrigin | null
+  location: string | null
+  revelationTechnique: RevelationTechnique | null
+  hasLocationPhoto: boolean
+  locationPhoto: TraceLocationPhoto | null
 }
 
 export interface BiometricImageDto {
   id: string
   path: string
+  number?: number | null
+  reference?: string | null
   url: string | null
-  status: BiometricImageStatus
+  status: BiometricImageStatus | null
+  identified?: boolean | null
   score: number | null
   caseId: string
   subjectId?: string | null
@@ -54,6 +68,12 @@ export interface BiometricImageDto {
   matchings: MatchingScore[]
   withdrawnAt?: string | null
   withdrawalMotive?: WithdrawalMotive | null
+  withdrawalMotiveDetail?: string | null
   imageDestroyedAt?: string | null
   resolutionDpi?: number | null
+  origin?: TraceOrigin | null
+  location?: string | null
+  revelationTechnique?: RevelationTechnique | null
+  hasLocationPhoto?: boolean
+  locationPhoto?: TraceLocationPhoto | null
 }

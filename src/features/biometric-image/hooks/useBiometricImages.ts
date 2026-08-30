@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { BiometricImageAPI, type UploadInput } from '@/features/biometric-image/services/BiometricImageAPI.services'
@@ -7,6 +8,7 @@ import type {
   BiometricImageType,
   WithdrawalMotive,
 } from '@/features/biometric-image/types/biometricImage'
+import type { TraceDescriptionInput } from '@/features/biometric-image/types/trace'
 
 export const biometricImageKeys = {
   all: ['biometric-images'] as const,
@@ -14,6 +16,7 @@ export const biometricImageKeys = {
     [...biometricImageKeys.all, type, caseId] as const,
   withdrawn: (type: BiometricImageType, caseId: string) =>
     [...biometricImageKeys.all, type, caseId, 'withdrawn'] as const,
+  trace: (traceId: string) => [...biometricImageKeys.all, 'trace', traceId] as const,
 }
 
 export function useBiometricImages(type: BiometricImageType, caseId: string) {
@@ -23,6 +26,86 @@ export function useBiometricImages(type: BiometricImageType, caseId: string) {
     enabled: !!caseId,
     staleTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,
+  })
+}
+
+export function useTrace(traceId: string) {
+  return useQuery({
+    queryKey: biometricImageKeys.trace(traceId),
+    queryFn: () => BiometricImageAPI.getTrace(traceId),
+    enabled: !!traceId,
+    meta: { handlesNotFound: true },
+  })
+}
+
+export function useDescribeTrace(caseId: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ id, description }: { id: string; description: TraceDescriptionInput }) =>
+      BiometricImageAPI.describeTrace(id, description),
+    onSuccess: (trace) => {
+      queryClient.invalidateQueries({ queryKey: biometricImageKeys.list('traces', caseId) })
+      queryClient.invalidateQueries({ queryKey: biometricImageKeys.trace(trace.id) })
+      toast.success(t('trace.description.success'))
+    },
+    onError: () => {
+      toast.error(t('trace.description.error'))
+    },
+  })
+}
+
+function invalidateTrace(
+  queryClient: ReturnType<typeof useQueryClient>,
+  caseId: string,
+  traceId: string,
+) {
+  queryClient.invalidateQueries({ queryKey: biometricImageKeys.list('traces', caseId) })
+  queryClient.invalidateQueries({ queryKey: biometricImageKeys.trace(traceId) })
+}
+
+export function useAttachTraceLocationPhoto(caseId: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ traceId, file }: { traceId: string; file: File }) =>
+      BiometricImageAPI.attachLocationPhoto(traceId, file),
+    onSuccess: (_data, { traceId }) => {
+      invalidateTrace(queryClient, caseId, traceId)
+      toast.success(t('trace.locationPhoto.attachSuccess'))
+    },
+    onError: (error) => {
+      const isAlreadyAttached = isAxiosError(error) && error.response?.status === 409
+      toast.error(
+        t(isAlreadyAttached ? 'trace.locationPhoto.alreadyAttached' : 'trace.locationPhoto.attachError')
+      )
+    },
+  })
+}
+
+export function useRemoveTraceLocationPhoto(caseId: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({
+      traceId,
+      motive,
+      motiveDetail,
+    }: {
+      traceId: string
+      motive: WithdrawalMotive
+      motiveDetail?: string
+    }) => BiometricImageAPI.removeLocationPhoto(traceId, motive, motiveDetail),
+    onSuccess: (_data, { traceId }) => {
+      invalidateTrace(queryClient, caseId, traceId)
+      toast.success(t('trace.locationPhoto.removeSuccess'))
+    },
+    onError: () => {
+      toast.error(t('trace.locationPhoto.removeError'))
+    },
   })
 }
 
@@ -36,8 +119,6 @@ export function useWithdrawnBiometricImages(type: BiometricImageType, caseId: st
   })
 }
 
-/** Une pièce passe d'une liste à l'autre : les deux se rafraîchissent, sinon
- * elle n'apparaît dans les pièces retirées qu'après un rechargement. */
 function invalidateBothLists(
   queryClient: ReturnType<typeof useQueryClient>,
   type: BiometricImageType,
@@ -52,8 +133,15 @@ export function useWithdrawBiometricImage(type: BiometricImageType, caseId: stri
   const { t } = useTranslation()
 
   return useMutation({
-    mutationFn: ({ id, motive }: { id: string; motive: WithdrawalMotive }) =>
-      BiometricImageAPI.withdraw(type, id, motive),
+    mutationFn: ({
+      id,
+      motive,
+      motiveDetail,
+    }: {
+      id: string
+      motive: WithdrawalMotive
+      motiveDetail?: string
+    }) => BiometricImageAPI.withdraw(type, id, motive, motiveDetail),
     onSuccess: () => {
       invalidateBothLists(queryClient, type, caseId)
       toast.success(t('biometricImage.withdraw.success'))

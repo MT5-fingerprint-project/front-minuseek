@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { ReportAPI } from '@/features/reporting/services/ReportAPI.services'
-import type { ReportType } from '@/features/reporting/types/report'
+import type { GenerateReportInput } from '@/features/reporting/types/report'
 
 export const reportKeys = {
   all: ['reports'] as const,
@@ -22,7 +22,7 @@ export function useGenerateReport(caseId: string) {
   const { t } = useTranslation()
 
   return useMutation({
-    mutationFn: (type: ReportType) => ReportAPI.generate(caseId, type),
+    mutationFn: (input: GenerateReportInput) => ReportAPI.generate(caseId, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reportKeys.case(caseId) })
       toast.success(t('reporting.success.generated'))

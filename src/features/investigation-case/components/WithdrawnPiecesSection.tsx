@@ -22,25 +22,32 @@ function WithdrawnPieceRow({ piece, type, caseId }: WithdrawnPieceRowProps) {
   const withdrawnDate = piece.withdrawnAt
     ? new Date(piece.withdrawnAt).toLocaleDateString(i18n.language)
     : ''
+  // Sous « Autre », c'est la phrase de l'opérateur qui fait foi, comme dans le rapport.
+  const motiveLabel =
+    piece.withdrawalMotive === 'OTHER' && piece.withdrawalMotiveDetail
+      ? `« ${piece.withdrawalMotiveDetail} »`
+      : piece.withdrawalMotive
+        ? t(`withdrawalMotive.${piece.withdrawalMotive}`)
+        : ''
 
   return (
     <li className="flex items-center gap-4 rounded-sm bg-white px-3 py-2">
       <img
         src={piece.url ?? undefined}
-        alt={piece.fileName}
+        alt={piece.label}
         loading="lazy"
         decoding="async"
         className="h-16 w-12 shrink-0 rounded-xs object-cover"
       />
       <div className="flex flex-1 flex-col gap-0.5">
-        <span className="text-sm font-medium break-all">{piece.fileName}</span>
+        <span className="text-sm font-medium break-all">{piece.label}</span>
         <span className="text-xs text-muted-foreground">
           {t(`investigationCase.withdrawn.kind.${type}`)}
         </span>
         <span className="text-xs text-muted-foreground">
           {t('investigationCase.withdrawn.withdrawnAt', {
             date: withdrawnDate,
-            motive: piece.withdrawalMotive ? t(`withdrawalMotive.${piece.withdrawalMotive}`) : '',
+            motive: motiveLabel,
           })}
         </span>
       </div>

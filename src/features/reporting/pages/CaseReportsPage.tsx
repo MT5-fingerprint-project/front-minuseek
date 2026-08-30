@@ -1,11 +1,16 @@
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/features/shared/ui/button'
+import { Label } from '@/features/shared/ui/label'
+import { Switch } from '@/features/shared/ui/switch'
 import { Spinner } from '@/features/shared/ui/spinner'
 import { H1 } from '@/features/shared/ui/typography'
 import { useCurrentUser } from '@/features/shared/hooks/useCurrentUser'
 import CaseReportList from '@/features/reporting/components/CaseReportList'
 import { useCaseReports, useDownloadReport, useGenerateReport } from '@/features/reporting/hooks/useCaseReports'
+
+const JOURNAL_DETAIL_FIELD_ID = 'report-journal-detail'
 
 export default function CaseReportsPage() {
   const { id } = useParams<{ id: string }>()
@@ -15,6 +20,8 @@ export default function CaseReportsPage() {
   const { data: currentUser } = useCurrentUser()
   const generate = useGenerateReport(caseId)
   const download = useDownloadReport()
+  const [detailedJournal, setDetailedJournal] = useState(false)
+  const journalDetail = detailedJournal ? 'FULL' : 'SUMMARY'
 
   if (isPending) return <Spinner className="size-6" />
 
@@ -26,7 +33,6 @@ export default function CaseReportsPage() {
       </div>
 
       <section className="flex flex-col gap-4 rounded-sm bg-white px-4 py-3">
-        {/* On ne signe que pour soi : le nom imprimé est annoncé avant de générer. */}
         {currentUser && (
           <p className="text-sm">
             {t('reporting.signer.notice', {
@@ -35,15 +41,32 @@ export default function CaseReportsPage() {
           </p>
         )}
 
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2">
+            <Switch
+              id={JOURNAL_DETAIL_FIELD_ID}
+              checked={detailedJournal}
+              onCheckedChange={(checked) => setDetailedJournal(checked)}
+            />
+            <Label htmlFor={JOURNAL_DETAIL_FIELD_ID}>{t('reporting.journalDetail.label')}</Label>
+          </div>
+          <p className="text-xs text-muted-foreground">{t('reporting.journalDetail.hint')}</p>
+        </div>
+
         <div className="flex flex-wrap gap-2">
-          <Button variant="dark" size="small" disabled={generate.isPending} onClick={() => generate.mutate('TECHNICAL')}>
-            {t('reporting.generate.TECHNICAL')}
+          <Button
+            variant="dark"
+            size="small"
+            disabled={generate.isPending}
+            onClick={() => generate.mutate({ type: 'TECHNICAL', journalDetail })}
+          >
+            {t('reporting.generate.EXPLOITATION')}
           </Button>
           <Button
             variant="grey"
             size="small"
             disabled={generate.isPending}
-            onClick={() => generate.mutate('TRACEABILITY')}
+            onClick={() => generate.mutate({ type: 'TRACEABILITY', journalDetail: 'SUMMARY' })}
           >
             {t('reporting.generate.TRACEABILITY')}
           </Button>

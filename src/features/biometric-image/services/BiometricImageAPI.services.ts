@@ -5,6 +5,7 @@ import type {
   BiometricImageType,
   WithdrawalMotive,
 } from '@/features/biometric-image/types/biometricImage'
+import type { TraceDescriptionInput } from '@/features/biometric-image/types/trace'
 
 const endpointByType: Record<BiometricImageType, string> = {
   traces: '/traces',
@@ -21,9 +22,11 @@ export type UploadInput = {
 function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
   return {
     id: dto.id,
-    fileName: dto.path.split('/').pop() ?? dto.path,
+    label: dto.reference ?? dto.path.split('/').pop() ?? dto.path,
+    number: dto.number ?? null,
     url: dto.url,
-    status: dto.status,
+    status: dto.status ?? null,
+    identified: dto.identified ?? null,
     score: dto.score,
     caseId: dto.caseId,
     subjectId: dto.subjectId ?? null,
@@ -33,8 +36,14 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     matchings: dto.matchings ?? [],
     withdrawnAt: dto.withdrawnAt ?? null,
     withdrawalMotive: dto.withdrawalMotive ?? null,
+    withdrawalMotiveDetail: dto.withdrawalMotiveDetail ?? null,
     imageDestroyedAt: dto.imageDestroyedAt ?? null,
     resolutionDpi: dto.resolutionDpi ?? null,
+    origin: dto.origin ?? null,
+    location: dto.location ?? null,
+    revelationTechnique: dto.revelationTechnique ?? null,
+    hasLocationPhoto: dto.hasLocationPhoto ?? false,
+    locationPhoto: dto.locationPhoto ?? null,
   }
 }
 
@@ -42,14 +51,44 @@ export const BiometricImageAPI = {
   getAll: (type: BiometricImageType, caseId: string, options?: { withdrawn?: boolean }) =>
     apiClient
       .get<{ data: BiometricImageDto[] }>(endpointByType[type], {
-        // Le pipe du back ne transforme pas : le drapeau part en chaîne.
         params: { caseId, ...(options?.withdrawn ? { withdrawn: 'true' } : {}) },
       })
       .then((res) => res.data.data.map(mapDtoToBiometricImage)),
 
-  withdraw: (type: BiometricImageType, id: string, motive: WithdrawalMotive) =>
+  getTrace: (id: string) =>
+    apiClient.get<BiometricImageDto>(`/traces/${id}`).then((res) => mapDtoToBiometricImage(res.data)),
+
+  describeTrace: (id: string, input: TraceDescriptionInput) =>
     apiClient
-      .post(`${endpointByType[type]}/${id}/withdraw`, { motive })
+      .put<BiometricImageDto>(`/traces/${id}/description`, input)
+      .then((res) => mapDtoToBiometricImage(res.data)),
+
+  attachLocationPhoto: (traceId: string, file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    return apiClient
+      .post(`/traces/${traceId}/location-photo`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      .then(() => undefined)
+  },
+
+  removeLocationPhoto: (traceId: string, motive: WithdrawalMotive, motiveDetail?: string) =>
+    apiClient
+      .delete(`/traces/${traceId}/location-photo`, {
+        params: { motive, ...(motiveDetail ? { motiveDetail } : {}) },
+      })
+      .then(() => undefined),
+
+  withdraw: (
+    type: BiometricImageType,
+    id: string,
+    motive: WithdrawalMotive,
+    motiveDetail?: string,
+  ) =>
+    apiClient
+      .post(`${endpointByType[type]}/${id}/withdraw`, { motive, ...(motiveDetail ? { motiveDetail } : {}) })
       .then((res) => res.data),
 
   restore: (type: BiometricImageType, id: string) =>

@@ -28,6 +28,9 @@ export default function CaseReportList({ reports, onDownload, downloadingReportI
                 <span className="text-sm font-medium">{t('reporting.number', { number: report.number })}</span>
                 <span className="text-sm text-muted-foreground">{t(`reporting.type.${report.type}`)}</span>
                 <Badge variant="secondary">{t('reporting.sealed')}</Badge>
+                {report.journalDetail === 'FULL' && (
+                  <Badge variant="secondary">{t('reporting.journalDetail.badge')}</Badge>
+                )}
               </div>
               <p className="text-xs text-muted-foreground">
                 {t('reporting.byline', {

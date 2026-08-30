@@ -12,10 +12,13 @@ import {
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
 import InvestigationCaseEditForm from '@/features/investigation-case/components/InvestigationCaseEditForm'
 import WithdrawnPiecesSection from '@/features/investigation-case/components/WithdrawnPiecesSection'
+import CaseVerificationsSection from '@/features/investigation-case/components/CaseVerificationsSection'
 import CaseClosureActions from '@/features/investigation-case/components/CaseClosureActions'
 import ClosedCaseBanner from '@/features/investigation-case/components/ClosedCaseBanner'
+import DeclareExpertiseDialog from '@/features/investigation-case/components/DeclareExpertiseDialog'
+import ExpertiseBanner from '@/features/investigation-case/components/ExpertiseBanner'
 import {
-  operatorNameOf,
+  caseUserNameOf,
   type InvestigationCaseCorrections,
 } from '@/features/investigation-case/types/investigationCase'
 import { Button } from '@/features/shared/ui/button'
@@ -36,6 +39,7 @@ export default function InvestigationCaseDetailsPage() {
   const { data: currentUser, isPending: isCurrentUserPending } = useCurrentUser()
   const correctCase = useCorrectInvestigationCase(id ?? '')
   const [isEditing, setIsEditing] = useState(false)
+  const [isDeclaringExpertise, setIsDeclaringExpertise] = useState(false)
 
   if (isPending || isCurrentUserPending) return <Spinner className="size-6" />
 
@@ -71,6 +75,11 @@ export default function InvestigationCaseDetailsPage() {
           </H1>
           <CaseStatusBadge status={investigationCase.status} />
           <CaseClosureActions investigationCase={investigationCase} />
+          {isCaseOperator && !investigationCase.expertise && (
+            <Button variant="outline" size="small" onClick={() => setIsDeclaringExpertise(true)}>
+              {t('investigationCase.expertise.declare')}
+            </Button>
+          )}
         </div>
         <p className="text-sm text-muted-foreground">
           {t('investigationCase.details.updatedAt', { date: updatedDate, time: updatedTime })}
@@ -78,6 +87,8 @@ export default function InvestigationCaseDetailsPage() {
       </div>
 
       <ClosedCaseBanner caseId={investigationCase.id} />
+
+      {investigationCase.expertise && <ExpertiseBanner expertise={investigationCase.expertise} />}
 
       <Tabs defaultValue={CASE_TAB}>
         <TabsList variant="line">
@@ -109,7 +120,7 @@ export default function InvestigationCaseDetailsPage() {
                 <span className="text-muted-foreground font-medium">{t('investigationCase.details.operator')}</span>
                 <span>
                   {investigationCase.operator
-                    ? operatorNameOf(investigationCase.operator)
+                    ? caseUserNameOf(investigationCase.operator)
                     : t('investigationCase.details.noOperator')}
                 </span>
               </div>
@@ -126,9 +137,21 @@ export default function InvestigationCaseDetailsPage() {
             </section>
           )}
 
+          <CaseVerificationsSection
+            caseId={investigationCase.id}
+            operatorUserId={investigationCase.operator?.id ?? null}
+            canEntrust={canChangeOperator}
+          />
+
           <WithdrawnPiecesSection caseId={investigationCase.id} />
         </TabsContent>
       </Tabs>
+
+      <DeclareExpertiseDialog
+        caseId={investigationCase.id}
+        open={isDeclaringExpertise}
+        onOpenChange={setIsDeclaringExpertise}
+      />
 
       <InvestigationCaseEditForm
         investigationCase={isEditing ? investigationCase : null}

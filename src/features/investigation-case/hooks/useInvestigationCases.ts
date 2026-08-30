@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { InvestigationCaseAPI } from '@/features/investigation-case/services/InvestigationCaseAPI.services'
 import type {
+  CaseExpertiseDeclaration,
   InvestigationCaseCorrections,
   InvestigationCaseCreateInput,
 } from '@/features/investigation-case/types/investigationCase'
@@ -26,6 +27,7 @@ export function useInvestigationCase(id: string) {
     queryKey: investigationCaseKeys.detail(id),
     queryFn: () => InvestigationCaseAPI.getById(id),
     enabled: !!id,
+    meta: { handlesNotFound: true },
   })
 }
 
@@ -67,6 +69,20 @@ export function useReopenInvestigationCase(id: string) {
       queryClient.invalidateQueries({ queryKey: investigationCaseKeys.lists() })
       queryClient.invalidateQueries({ queryKey: investigationCaseKeys.detail(id) })
       toast.success(t('investigationCase.closure.reopened'))
+    },
+  })
+}
+
+export function useDeclareCaseExpertise(id: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: (declaration: CaseExpertiseDeclaration) =>
+      InvestigationCaseAPI.declareExpertise(id, declaration),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: investigationCaseKeys.detail(id) })
+      toast.success(t('investigationCase.expertise.declared'))
     },
   })
 }

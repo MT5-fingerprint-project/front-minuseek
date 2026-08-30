@@ -5,11 +5,13 @@ import type { BiometricImage } from '@/features/biometric-image/types/biometricI
  */
 const baseTimestamp = '2026-06-11T01:44:21.943Z'
 
-const makeFixture = (id: string, fileName: string): BiometricImage => ({
+const makeFixture = (id: string, label: string): BiometricImage => ({
   id,
-  fileName,
+  label,
+  number: null,
   url: 'https://placehold.co/73x107',
   status: 'RECEIVED',
+  identified: false,
   score: null,
   caseId: 'fixture-case-id',
   subjectId: null,
@@ -19,8 +21,14 @@ const makeFixture = (id: string, fileName: string): BiometricImage => ({
   matchings: [],
   withdrawnAt: null,
   withdrawalMotive: null,
+  withdrawalMotiveDetail: null,
   imageDestroyedAt: null,
   resolutionDpi: null,
+  origin: null,
+  location: null,
+  revelationTechnique: null,
+  hasLocationPhoto: false,
+  locationPhoto: null,
 })
 
 export const biometricImageFixtures: BiometricImage[] = [

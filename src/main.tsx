@@ -12,24 +12,29 @@ import TenantRequiredPage from './features/shared/components/TenantRequiredPage.
 import CasePageLayout from './layouts/CasePageLayout.tsx'
 import CaseComparisonLayout from './layouts/CaseComparisonLayout.tsx'
 import InvestigationCasesPage from './features/investigation-case/pages/InvestigationCasesPage.tsx'
+import CasesToVerifyPage from './features/investigation-case/pages/CasesToVerifyPage.tsx'
 import InvestigationCaseDetailsPage from './features/investigation-case/pages/InvestigationCaseDetailsPage.tsx'
 import InvestigationCaseSubjectsPage from './features/investigation-case/pages/InvestigationCaseSubjectsPage.tsx'
 import SubjectDetailsPage from './features/investigation-case/pages/SubjectDetailsPage.tsx'
 import InvestigationCaseComparisonPage from './features/investigation-case/pages/InvestigationCaseComparisonPage.tsx'
 import DetachedReferencePrintsPage from './features/investigation-case/pages/DetachedReferencePrintsPage.tsx'
+import CaseTracesPage from './features/biometric-image/pages/CaseTracesPage.tsx'
 import CaseHistoryPage from './features/audit-trail/pages/CaseHistoryPage.tsx'
 import CaseReportsPage from './features/reporting/pages/CaseReportsPage.tsx'
 import ServiceUsersPage from './features/users/pages/ServiceUsersPage.tsx'
 import ServiceSettingsPage from './features/settings/pages/ServiceSettingsPage.tsx'
+import PublicSealVerificationPage from './features/public-verification/pages/PublicSealVerificationPage.tsx'
 
 const router = createBrowserRouter([
   { path: '/', element: <TenantRequiredPage /> },
+  { path: '/:slug/verification', element: <PublicSealVerificationPage /> },
   {
     path: '/:slug',
     element: <TenantAuthBoundary />,
     children: [
       { index: true, element: <InvestigationCasesPage /> },
       { path: 'affaires', element: <InvestigationCasesPage /> },
+      { path: 'verifications', element: <CasesToVerifyPage /> },
       { path: 'utilisateurs', element: <ServiceUsersPage /> },
       { path: 'parametres', element: <ServiceSettingsPage /> },
       {
@@ -51,6 +56,11 @@ const router = createBrowserRouter([
               { index: true, element: <InvestigationCaseSubjectsPage /> },
               { path: ':subjectId', element: <SubjectDetailsPage /> },
             ],
+          },
+          {
+            path: 'traces',
+            element: <CasePageLayout activeNav="traces" />,
+            children: [{ index: true, element: <CaseTracesPage /> }],
           },
           {
             path: 'rapports',
