@@ -252,7 +252,6 @@ export const ANNOTATION_TOOLS: AnnotationTool[] = [
   { icon: 'palette'    as IconName, label: 'biometricImage.toolbar.tools.palette',      panel: 'color' },
   { icon: 'circle'     as IconName, label: 'biometricImage.toolbar.tools.point',        tool: 'circle'      as AnnotationToolType },
   { icon: 'circleLine' as IconName, label: 'biometricImage.toolbar.tools.pointArrow',   tool: 'circleArrow' as AnnotationToolType },
-  { icon: 'trace'      as IconName, label: 'biometricImage.toolbar.tools.minutiaType',  panel: 'minutiaType' },
   { icon: 'penTrace'   as IconName, label: 'biometricImage.toolbar.tools.pencil',       tool: 'pencil'      as AnnotationToolType },
   { icon: 'ruler'      as IconName, label: 'biometricImage.toolbar.tools.ruler',        isRuler: true },
 ]
