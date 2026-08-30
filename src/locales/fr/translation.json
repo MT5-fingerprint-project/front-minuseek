@@ -442,6 +442,7 @@
       "CASE_OPERATOR_CHANGED": "Dossier confié à un autre opérateur",
       "CASE_UPDATED": "Informations du dossier corrigées",
       "CASE_EXPERTISE_DECLARED": "Dossier déclaré en expertise, serment prêté",
+      "CASE_SAISINE_UPDATED": "Saisine du dossier complétée",
       "TRACE_UPLOADED": "Trace déposée",
       "TRACE_QUALIFIED": "Trace qualifiée",
       "TRACE_DELETED": "Trace retirée du dossier",
