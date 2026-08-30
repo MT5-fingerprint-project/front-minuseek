@@ -5,6 +5,7 @@ export const verificationKeys = {
   all: ['verifications'] as const,
   mine: () => [...verificationKeys.all, 'mine'] as const,
   forCase: (caseId: string) => [...verificationKeys.all, 'case', caseId] as const,
+  detail: (verificationId: string) => [...verificationKeys.all, 'detail', verificationId] as const,
 }
 
 export function useMyVerifications() {

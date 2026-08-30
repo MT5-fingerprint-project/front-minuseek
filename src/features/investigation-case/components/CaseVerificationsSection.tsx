@@ -52,6 +52,12 @@ export default function CaseVerificationsSection({
     <section ref={sectionRef} className="flex flex-col gap-5 px-4 py-3 rounded-sm bg-white">
       <h2 className="text-lg font-semibold">{t('verification.section.title')}</h2>
 
+      {verifications.some((verification) => verification.status === 'DISCORDANT') && (
+        <p className="rounded-sm bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {t('verification.section.divergence')}
+        </p>
+      )}
+
       {isPending ? (
         <Spinner className="size-5" />
       ) : verifications.length === 0 ? (

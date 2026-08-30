@@ -209,7 +209,8 @@
       "removedAccount": "Compte supprimé du service",
       "requestedOn": "confiée le {{date}}",
       "pickerLabel": "Collègue à qui confier la vérification",
-      "entrust": "Confier une vérification"
+      "entrust": "Confier une vérification",
+      "divergence": "Divergence — un troisième examen est nécessaire"
     },
     "entrust": {
       "success": "Vérification confiée.",
@@ -226,6 +227,22 @@
       "subtitle": "Les dossiers dont la vérification vous a été confiée.",
       "empty": "Aucune vérification ne vous est confiée pour l'instant.",
       "caseNumber": "Affaire n°{{caseNumber}}"
+    },
+    "blindBanner": "Vérification en aveugle : vous ne voyez ni les calques, ni les identifications, ni les déclarations de l'opérateur du dossier.",
+    "conclusions": {
+      "title": "Mes conclusions",
+      "exploitable": "Exploitable",
+      "notExploitable": "Inexploitable",
+      "identificationLabel": "Empreinte de référence identifiée",
+      "notIdentified": "Non identifiée",
+      "validate": "Valider ma vérification",
+      "missing": "Il manque {{missingCount}} conclusion(s) de trace",
+      "completed": "Vérification validée.",
+      "completeFailed": "La vérification n'a pas pu être validée.",
+      "saveFailed": "La conclusion n'a pas pu être enregistrée.",
+      "concordant": "Vos conclusions rejoignent celles de l'opérateur du dossier.",
+      "discordant": "Divergence sur : {{traces}}. Un troisième examen est nécessaire.",
+      "revisable": "Vous pouvez encore revenir sur une conclusion tant que le dossier est ouvert : la confrontation est rejouée à chaque fois."
     }
   },
   "subject": {
@@ -381,8 +398,8 @@
         "annotation": "Annotations"
       },
       "expertLocked": "{{tool}} — réglage d'expert : déclarez le dossier en expertise pour l'utiliser.",
-    "expertCaseBanner": "Expertise judiciaire",
-    "tools": {
+      "expertCaseBanner": "Expertise judiciaire",
+      "tools": {
         "mirror": "Miroir",
         "rotation": "Rotation",
         "luminosity": "Luminosité",
@@ -390,15 +407,15 @@
         "invertColors": "Inversion chromatique",
         "saturation": "Saturation",
         "channels": "Isolation des canaux",
-      "channelRed": "Masquer le canal rouge",
-      "channelGreen": "Masquer le canal vert",
-      "channelBlue": "Masquer le canal bleu",
-      "levels": "Niveaux",
-      "levelsBlack": "Point noir",
-      "levelsGamma": "Gamma",
-      "levelsWhite": "Point blanc",
-      "sharpening": "Netteté locale",
-      "palette": "Palette de couleurs",
+        "channelRed": "Masquer le canal rouge",
+        "channelGreen": "Masquer le canal vert",
+        "channelBlue": "Masquer le canal bleu",
+        "levels": "Niveaux",
+        "levelsBlack": "Point noir",
+        "levelsGamma": "Gamma",
+        "levelsWhite": "Point blanc",
+        "sharpening": "Netteté locale",
+        "palette": "Palette de couleurs",
         "point": "Point",
         "pointArrow": "Point & flèche",
         "pencil": "Crayon",
