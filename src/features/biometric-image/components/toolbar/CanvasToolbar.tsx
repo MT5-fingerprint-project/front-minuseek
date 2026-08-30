@@ -4,12 +4,11 @@ import { useClickOutside } from '@/features/shared/hooks/useClickOutside'
 import ModeButton from './ModeButton'
 import ItemToolbar from './ItemToolbar'
 import FilterPanel from './FilterPanel'
-import FilterSlider from './FilterSlider'
+import FilterControl from './FilterControl'
 import ColorPalette from './ColorPalette'
 import {
   IMAGE_TOOLS,
   ANNOTATION_TOOLS,
-  FILTER_DEFAULTS,
   type CanvasFilters,
   type FilterConfig,
   type AnnotationToolType,
@@ -70,8 +69,13 @@ export default function CanvasToolbar({
     onActiveToolChange(activeTool === tool ? null : tool)
   }
 
-  const handleToolClick = (label: string, filterConfig: FilterConfig) => {
-    const { filterKey, inputType = 'slider', cycleValues } = filterConfig
+  const handleToolClick = (label: string, filterConfigs: FilterConfig[]) => {
+    if (filterConfigs.length > 1) {
+      setOpenFilter((prev) => (prev === label ? null : label))
+      return
+    }
+
+    const { filterKey, inputType = 'slider', cycleValues } = filterConfigs[0]
 
     if (inputType === 'toggle') {
       const next = filters[filterKey] === 1 ? 0 : 1
@@ -92,10 +96,16 @@ export default function CanvasToolbar({
     setOpenFilter((prev) => (prev === label ? null : label))
   }
 
-  const activeToolConfig = IMAGE_TOOLS.find((tool) => tool.label === openFilter)
+  const openTool = IMAGE_TOOLS.find((tool) => tool.label === openFilter)
 
-  const isToolActive = (label: string, filterConfig: FilterConfig) => {
-    const { filterKey, inputType = 'slider' } = filterConfig
+  const isToolActive = (label: string, filterConfigs: FilterConfig[]) => {
+    if (filterConfigs.length > 1) {
+      return (
+        openFilter === label ||
+        filterConfigs.some((config) => (filters[config.filterKey] ?? 0) !== 0)
+      )
+    }
+    const { filterKey, inputType = 'slider' } = filterConfigs[0]
     if (inputType === 'toggle') return (filters[filterKey] ?? 0) === 1
     if (inputType === 'cycle') return (filters[filterKey] ?? 0) !== 0
     return openFilter === label
@@ -106,18 +116,16 @@ export default function CanvasToolbar({
 
   return (
     <div ref={rootRef} className="flex flex-col items-center gap-2">
-      {activeToolConfig && (
-        <FilterPanel filterLabel={t(activeToolConfig.label)}>
-          <FilterSlider
-            value={filters[activeToolConfig.filter.filterKey] ?? 0}
-            min={activeToolConfig.filter.min ?? FILTER_DEFAULTS.min}
-            max={activeToolConfig.filter.max ?? FILTER_DEFAULTS.max}
-            unit={activeToolConfig.filter.unit ?? FILTER_DEFAULTS.unit}
-            origin={activeToolConfig.filter.origin ?? FILTER_DEFAULTS.origin}
-            onChange={(v) =>
-              onFiltersChange({ ...filters, [activeToolConfig.filter.filterKey]: v })
-            }
-          />
+      {openTool && (
+        <FilterPanel filterLabel={t(openTool.label)}>
+          {openTool.filters.map((config) => (
+            <FilterControl
+              key={config.filterKey}
+              config={config}
+              value={filters[config.filterKey] ?? 0}
+              onChange={(value) => onFiltersChange({ ...filters, [config.filterKey]: value })}
+            />
+          ))}
         </FilterPanel>
       )}
       {mode === 'annotation' && paletteOpen && (
@@ -139,13 +147,13 @@ export default function CanvasToolbar({
           />
         </div>
         {mode === 'image'
-          ? IMAGE_TOOLS.map(({ icon, label, filter }) => (
+          ? IMAGE_TOOLS.map(({ icon, label, filters: filterConfigs }) => (
               <ItemToolbar
                 key={label}
                 icon={icon}
                 label={t(label)}
-                active={isToolActive(label, filter)}
-                onClick={() => handleToolClick(label, filter)}
+                active={isToolActive(label, filterConfigs)}
+                onClick={() => handleToolClick(label, filterConfigs)}
               />
             ))
           : ANNOTATION_TOOLS.map(({ icon, label, tool, isRuler }) => (
