@@ -540,7 +540,13 @@
       "CHAIN_ANCHORED": "Chaîne horodatée",
       "TRACE_RESTORED": "Trace rétablie au dossier",
       "REFERENCE_PRINT_RESTORED": "Empreinte de référence rétablie au dossier",
-      "REFERENCE_PRINT_IMAGE_DESTROYED": "Empreinte de familier détruite"
+      "REFERENCE_PRINT_IMAGE_DESTROYED": "Empreinte de familier détruite",
+      "SERVICE_HEADER_SAVED": "En-tête du service enregistré",
+      "TRACE_CALIBRATED": "Trace calibrée",
+      "REFERENCE_PRINT_CALIBRATED": "Empreinte de référence calibrée",
+      "CASE_VERIFICATION_REQUESTED": "Vérification confiée à un second regard",
+      "VERIFICATION_CONCLUSION_STATED": "Conclusion du vérificateur énoncée",
+      "CASE_VERIFICATION_COMPLETED": "Vérification close"
     },
     "pagination": {
       "previous": "Précédent",
