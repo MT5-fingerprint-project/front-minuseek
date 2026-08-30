@@ -571,6 +571,9 @@
       "confirmTitle": "Retirer cette pièce du dossier ?",
       "confirmDescription": "La pièce sort du dossier de travail. Elle reste consultable dans les pièces retirées et pourra être rétablie. Le fichier n'est pas détruit.",
       "motiveLabel": "Motif du retrait",
+      "detailLabel": "Précisez le motif",
+      "detailPlaceholder": "ex : relevée sur un scellé rattaché à une autre procédure",
+      "detailHint": "Cette phrase est inscrite au journal des actes et imprimée telle quelle dans le rapport.",
       "confirmAction": "Retirer du dossier"
     },
     "restore": {
@@ -877,6 +880,7 @@
   "withdrawalMotive": {
     "DUPLICATE": "Doublon d'une pièce déjà versée",
     "MISFILED": "Pièce versée par erreur dans ce dossier",
-    "WRONG_ATTRIBUTION": "Rattachement erroné à une personne ou à un doigt"
+    "WRONG_ATTRIBUTION": "Rattachement erroné à une personne ou à un doigt",
+    "OTHER": "Autre motif"
   }
 }

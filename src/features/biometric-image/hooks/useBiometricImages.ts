@@ -90,8 +90,15 @@ export function useRemoveTraceLocationPhoto(caseId: string) {
   const { t } = useTranslation()
 
   return useMutation({
-    mutationFn: ({ traceId, motive }: { traceId: string; motive: WithdrawalMotive }) =>
-      BiometricImageAPI.removeLocationPhoto(traceId, motive),
+    mutationFn: ({
+      traceId,
+      motive,
+      motiveDetail,
+    }: {
+      traceId: string
+      motive: WithdrawalMotive
+      motiveDetail?: string
+    }) => BiometricImageAPI.removeLocationPhoto(traceId, motive, motiveDetail),
     onSuccess: (_data, { traceId }) => {
       invalidateTrace(queryClient, caseId, traceId)
       toast.success(t('trace.locationPhoto.removeSuccess'))
@@ -126,8 +133,15 @@ export function useWithdrawBiometricImage(type: BiometricImageType, caseId: stri
   const { t } = useTranslation()
 
   return useMutation({
-    mutationFn: ({ id, motive }: { id: string; motive: WithdrawalMotive }) =>
-      BiometricImageAPI.withdraw(type, id, motive),
+    mutationFn: ({
+      id,
+      motive,
+      motiveDetail,
+    }: {
+      id: string
+      motive: WithdrawalMotive
+      motiveDetail?: string
+    }) => BiometricImageAPI.withdraw(type, id, motive, motiveDetail),
     onSuccess: () => {
       invalidateBothLists(queryClient, type, caseId)
       toast.success(t('biometricImage.withdraw.success'))

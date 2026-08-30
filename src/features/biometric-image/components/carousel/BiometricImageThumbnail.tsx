@@ -87,7 +87,7 @@ export default function BiometricImageThumbnail({
       {!image.imageDestroyedAt && (
       <WithdrawPieceDialog
         type={type}
-        onConfirm={(motive) => withdrawImage.mutate({ id: image.id, motive })}
+        onConfirm={(motive, motiveDetail) => withdrawImage.mutate({ id: image.id, motive, motiveDetail })}
         trigger={
           <button
             type="button"

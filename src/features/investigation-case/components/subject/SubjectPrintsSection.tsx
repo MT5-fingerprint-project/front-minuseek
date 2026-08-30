@@ -55,7 +55,9 @@ export default function SubjectPrintsSection({ caseId, subjectId }: SubjectPrint
                       print={printsByPosition.get(position)}
                       isUploading={isUploading}
                       onUpload={(file) => uploadPrint.mutate({ caseId, file, subjectId, position })}
-                      onWithdraw={(printId, motive) => withdrawPrint.mutate({ id: printId, motive })}
+                      onWithdraw={(printId, motive, motiveDetail) =>
+                        withdrawPrint.mutate({ id: printId, motive, motiveDetail })
+                      }
                       isReadOnly={isCaseClosed}
                     />
                   )

@@ -15,7 +15,7 @@ type SubjectPrintSlotProps = {
   print?: BiometricImage
   isUploading: boolean
   onUpload: (file: File) => void
-  onWithdraw: (printId: string, motive: WithdrawalMotive) => void
+  onWithdraw: (printId: string, motive: WithdrawalMotive, motiveDetail?: string) => void
   isReadOnly: boolean
 }
 
@@ -49,7 +49,7 @@ export default function SubjectPrintSlot({
           {!isReadOnly && (
           <WithdrawPieceDialog
             type="reference-prints"
-            onConfirm={(motive) => onWithdraw(print.id, motive)}
+            onConfirm={(motive, motiveDetail) => onWithdraw(print.id, motive, motiveDetail)}
             trigger={
               <button
                 type="button"

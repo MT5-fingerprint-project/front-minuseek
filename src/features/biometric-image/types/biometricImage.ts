@@ -4,12 +4,15 @@ export type BiometricImageType = 'traces' | 'reference-prints'
 
 export type BiometricImageStatus = 'RECEIVED' | 'EXPLOITABLE' | 'NOT_EXPLOITABLE'
 
-export type WithdrawalMotive = 'DUPLICATE' | 'MISFILED' | 'WRONG_ATTRIBUTION'
+export type WithdrawalMotive = 'DUPLICATE' | 'MISFILED' | 'WRONG_ATTRIBUTION' | 'OTHER'
 
 export const WITHDRAWAL_MOTIVES: Record<BiometricImageType, WithdrawalMotive[]> = {
-  traces: ['DUPLICATE', 'MISFILED'],
-  'reference-prints': ['DUPLICATE', 'MISFILED', 'WRONG_ATTRIBUTION'],
+  traces: ['DUPLICATE', 'MISFILED', 'OTHER'],
+  'reference-prints': ['DUPLICATE', 'MISFILED', 'WRONG_ATTRIBUTION', 'OTHER'],
 }
+
+/** La longueur de la colonne qui la reçoit, côté back. */
+export const MAX_WITHDRAWAL_MOTIVE_DETAIL_LENGTH = 300
 
 export interface BiometricImageDecoration {
   label?: string
@@ -38,6 +41,7 @@ export interface BiometricImage {
   matchings: MatchingScore[]
   withdrawnAt: string | null
   withdrawalMotive: WithdrawalMotive | null
+  withdrawalMotiveDetail: string | null
   imageDestroyedAt: string | null
   resolutionDpi: number | null
   origin: TraceOrigin | null
@@ -64,6 +68,7 @@ export interface BiometricImageDto {
   matchings: MatchingScore[]
   withdrawnAt?: string | null
   withdrawalMotive?: WithdrawalMotive | null
+  withdrawalMotiveDetail?: string | null
   imageDestroyedAt?: string | null
   resolutionDpi?: number | null
   origin?: TraceOrigin | null
