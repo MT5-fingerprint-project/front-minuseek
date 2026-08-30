@@ -1,3 +1,5 @@
+import type { RevelationTechnique, TraceOrigin } from '@/features/biometric-image/types/trace'
+
 export type BiometricImageType = 'traces' | 'reference-prints'
 
 export type BiometricImageStatus = 'RECEIVED' | 'EXPLOITABLE' | 'NOT_EXPLOITABLE'
@@ -23,6 +25,7 @@ export interface MatchingScore {
 export interface BiometricImage {
   id: string
   label: string
+  number: number | null
   url: string | null
   status: BiometricImageStatus | null
   identified: boolean | null
@@ -37,6 +40,9 @@ export interface BiometricImage {
   withdrawalMotive: WithdrawalMotive | null
   imageDestroyedAt: string | null
   resolutionDpi: number | null
+  origin: TraceOrigin | null
+  location: string | null
+  revelationTechnique: RevelationTechnique | null
 }
 
 export interface BiometricImageDto {
@@ -58,4 +64,7 @@ export interface BiometricImageDto {
   withdrawalMotive?: WithdrawalMotive | null
   imageDestroyedAt?: string | null
   resolutionDpi?: number | null
+  origin?: TraceOrigin | null
+  location?: string | null
+  revelationTechnique?: RevelationTechnique | null
 }

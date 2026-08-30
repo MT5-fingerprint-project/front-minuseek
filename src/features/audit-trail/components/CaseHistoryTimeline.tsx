@@ -36,6 +36,7 @@ const EVENT_ICONS: Record<AuditEventType, IconName> = {
   CASE_VERIFICATION_REQUESTED: 'personCheck',
   VERIFICATION_CONCLUSION_STATED: 'check',
   CASE_VERIFICATION_COMPLETED: 'verified',
+  TRACE_DESCRIBED: 'penTrace',
 }
 
 const FALLBACK_EVENT_ICON: IconName = 'information'

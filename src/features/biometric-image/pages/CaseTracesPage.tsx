@@ -15,6 +15,12 @@ import { traceStateBadge } from '@/features/biometric-image/lib/traceState'
 
 const TRACE_PARAM = 'trace'
 
+function NotProvided() {
+  const { t } = useTranslation()
+
+  return <span className="text-muted-foreground">{t('trace.panel.notProvided')}</span>
+}
+
 export default function CaseTracesPage() {
   const { id } = useParams<{ id: string }>()
   const caseId = id ?? ''
@@ -78,6 +84,9 @@ export default function CaseTracesPage() {
               <TableRow>
                 <TableHead>{t('trace.list.columns.number')}</TableHead>
                 <TableHead>{t('trace.list.columns.image')}</TableHead>
+                <TableHead>{t('trace.list.columns.origin')}</TableHead>
+                <TableHead>{t('trace.list.columns.location')}</TableHead>
+                <TableHead>{t('trace.list.columns.revelation')}</TableHead>
                 <TableHead>{t('trace.list.columns.state')}</TableHead>
                 <TableHead>{t('trace.list.columns.depositedOn')}</TableHead>
                 <TableHead className="text-right">
@@ -114,6 +123,25 @@ export default function CaseTracesPage() {
                         className="size-12 rounded-sm object-cover"
                       />
                     </TableCell>
+                    <TableCell>
+                      {trace.origin ? t(`trace.origin.${trace.origin}`) : <NotProvided />}
+                    </TableCell>
+                    <TableCell className="max-w-64">
+                      {trace.location ? (
+                        <span className="block truncate" title={trace.location}>
+                          {trace.location}
+                        </span>
+                      ) : (
+                        <NotProvided />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {trace.revelationTechnique ? (
+                        t(`trace.technique.${trace.revelationTechnique}`)
+                      ) : (
+                        <NotProvided />
+                      )}
+                    </TableCell>
                     <TableCell>{state && <Badge variant={state.variant}>{t(state.labelKey)}</Badge>}</TableCell>
                     <TableCell>{new Date(trace.createdAt).toLocaleDateString(i18n.language)}</TableCell>
                     <TableCell className="text-right">
@@ -139,6 +167,7 @@ export default function CaseTracesPage() {
       <TraceDetailsPanel
         traceId={selectedTraceId ?? openedTraceId ?? ''}
         caseId={caseId}
+        traces={traces}
         isOpen={selectedTraceId !== null}
         onClose={closePanel}
       />

@@ -7,6 +7,7 @@ import type {
   BiometricImageType,
   WithdrawalMotive,
 } from '@/features/biometric-image/types/biometricImage'
+import type { TraceDescriptionInput } from '@/features/biometric-image/types/trace'
 
 export const biometricImageKeys = {
   all: ['biometric-images'] as const,
@@ -33,6 +34,24 @@ export function useTrace(traceId: string) {
     queryFn: () => BiometricImageAPI.getTrace(traceId),
     enabled: !!traceId,
     meta: { handlesNotFound: true },
+  })
+}
+
+export function useDescribeTrace(caseId: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ id, description }: { id: string; description: TraceDescriptionInput }) =>
+      BiometricImageAPI.describeTrace(id, description),
+    onSuccess: (trace) => {
+      queryClient.invalidateQueries({ queryKey: biometricImageKeys.list('traces', caseId) })
+      queryClient.invalidateQueries({ queryKey: biometricImageKeys.trace(trace.id) })
+      toast.success(t('trace.description.success'))
+    },
+    onError: () => {
+      toast.error(t('trace.description.error'))
+    },
   })
 }
 
