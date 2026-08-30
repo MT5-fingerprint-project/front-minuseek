@@ -13,6 +13,7 @@ import {
 } from '@/features/shared/ui/sheet'
 import { Spinner } from '@/features/shared/ui/spinner'
 import TraceDescriptionForm from '@/features/biometric-image/components/trace/TraceDescriptionForm'
+import TraceLocationPhotoCard from '@/features/biometric-image/components/trace/TraceLocationPhotoCard'
 import { useDescribeTrace, useTrace } from '@/features/biometric-image/hooks/useBiometricImages'
 import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
 import type {
@@ -172,6 +173,8 @@ export default function TraceDetailsPanel({ traceId, caseId, traces, isOpen, onC
                 </div>
               )}
             </section>
+
+            <TraceLocationPhotoCard traceId={trace.id} caseId={caseId} photo={trace.locationPhoto} />
           </div>
         )}
       </SheetContent>

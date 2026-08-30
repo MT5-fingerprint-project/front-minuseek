@@ -21,6 +21,24 @@ function NotProvided() {
   return <span className="text-muted-foreground">{t('trace.panel.notProvided')}</span>
 }
 
+function LocationPhotoCell({ hasLocationPhoto }: { hasLocationPhoto: boolean }) {
+  const { t } = useTranslation()
+  const label = t(hasLocationPhoto ? 'trace.locationPhoto.present' : 'trace.locationPhoto.absent')
+
+  return (
+    <span title={label}>
+      <span className="sr-only">{label}</span>
+      {hasLocationPhoto ? (
+        <Icon name="location" size={20} color="var(--color-blue-medium-1)" aria-hidden />
+      ) : (
+        <span aria-hidden className="text-muted-foreground">
+          —
+        </span>
+      )}
+    </span>
+  )
+}
+
 export default function CaseTracesPage() {
   const { id } = useParams<{ id: string }>()
   const caseId = id ?? ''
@@ -86,6 +104,7 @@ export default function CaseTracesPage() {
                 <TableHead>{t('trace.list.columns.image')}</TableHead>
                 <TableHead>{t('trace.list.columns.origin')}</TableHead>
                 <TableHead>{t('trace.list.columns.location')}</TableHead>
+                <TableHead className="w-16">{t('trace.list.columns.locationPhoto')}</TableHead>
                 <TableHead>{t('trace.list.columns.revelation')}</TableHead>
                 <TableHead>{t('trace.list.columns.state')}</TableHead>
                 <TableHead>{t('trace.list.columns.depositedOn')}</TableHead>
@@ -134,6 +153,9 @@ export default function CaseTracesPage() {
                       ) : (
                         <NotProvided />
                       )}
+                    </TableCell>
+                    <TableCell>
+                      <LocationPhotoCell hasLocationPhoto={trace.hasLocationPhoto} />
                     </TableCell>
                     <TableCell>
                       {trace.revelationTechnique ? (

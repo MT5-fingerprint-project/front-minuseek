@@ -23,3 +23,10 @@ export const traceDescriptionSchema = z.object({
 })
 
 export type TraceDescriptionInput = z.infer<typeof traceDescriptionSchema>
+
+export type TraceLocationPhoto = {
+  id: string
+  url: string
+  sha256: string
+  sealedAt: string
+}

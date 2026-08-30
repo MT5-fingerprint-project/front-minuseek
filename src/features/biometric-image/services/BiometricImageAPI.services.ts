@@ -41,6 +41,8 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     origin: dto.origin ?? null,
     location: dto.location ?? null,
     revelationTechnique: dto.revelationTechnique ?? null,
+    hasLocationPhoto: dto.hasLocationPhoto ?? false,
+    locationPhoto: dto.locationPhoto ?? null,
   }
 }
 
@@ -59,6 +61,20 @@ export const BiometricImageAPI = {
     apiClient
       .put<BiometricImageDto>(`/traces/${id}/description`, input)
       .then((res) => mapDtoToBiometricImage(res.data)),
+
+  attachLocationPhoto: (traceId: string, file: File) => {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    return apiClient
+      .post(`/traces/${traceId}/location-photo`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      .then(() => undefined)
+  },
+
+  removeLocationPhoto: (traceId: string, motive: WithdrawalMotive) =>
+    apiClient.delete(`/traces/${traceId}/location-photo`, { params: { motive } }).then(() => undefined),
 
   withdraw: (type: BiometricImageType, id: string, motive: WithdrawalMotive) =>
     apiClient

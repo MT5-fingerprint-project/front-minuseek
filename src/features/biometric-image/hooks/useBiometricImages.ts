@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { toast } from 'sonner'
 import { useTranslation } from 'react-i18next'
 import { BiometricImageAPI, type UploadInput } from '@/features/biometric-image/services/BiometricImageAPI.services'
@@ -51,6 +52,52 @@ export function useDescribeTrace(caseId: string) {
     },
     onError: () => {
       toast.error(t('trace.description.error'))
+    },
+  })
+}
+
+function invalidateTrace(
+  queryClient: ReturnType<typeof useQueryClient>,
+  caseId: string,
+  traceId: string,
+) {
+  queryClient.invalidateQueries({ queryKey: biometricImageKeys.list('traces', caseId) })
+  queryClient.invalidateQueries({ queryKey: biometricImageKeys.trace(traceId) })
+}
+
+export function useAttachTraceLocationPhoto(caseId: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ traceId, file }: { traceId: string; file: File }) =>
+      BiometricImageAPI.attachLocationPhoto(traceId, file),
+    onSuccess: (_data, { traceId }) => {
+      invalidateTrace(queryClient, caseId, traceId)
+      toast.success(t('trace.locationPhoto.attachSuccess'))
+    },
+    onError: (error) => {
+      const isAlreadyAttached = isAxiosError(error) && error.response?.status === 409
+      toast.error(
+        t(isAlreadyAttached ? 'trace.locationPhoto.alreadyAttached' : 'trace.locationPhoto.attachError')
+      )
+    },
+  })
+}
+
+export function useRemoveTraceLocationPhoto(caseId: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ traceId, motive }: { traceId: string; motive: WithdrawalMotive }) =>
+      BiometricImageAPI.removeLocationPhoto(traceId, motive),
+    onSuccess: (_data, { traceId }) => {
+      invalidateTrace(queryClient, caseId, traceId)
+      toast.success(t('trace.locationPhoto.removeSuccess'))
+    },
+    onError: () => {
+      toast.error(t('trace.locationPhoto.removeError'))
     },
   })
 }
