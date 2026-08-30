@@ -387,6 +387,9 @@
       "columns": {
         "number": "N°",
         "image": "Trace",
+        "origin": "Origine",
+        "location": "Localisation",
+        "revelation": "Révélation",
         "state": "État",
         "depositedOn": "Déposée le",
         "actions": "Actions"
@@ -407,6 +410,43 @@
       "informations": "Informations",
       "notProvided": "Non renseigné",
       "unknown": "Cette trace n'existe pas ou n'appartient pas à cette affaire."
+    },
+    "origin": {
+      "DIGITAL": "Digitale",
+      "PALMAR": "Palmaire"
+    },
+    "technique": {
+      "OPTICAL_PROCESS": "Procédé optique",
+      "FINGERPRINT_POWDER": "Poudre dactyloscopique",
+      "DFO": "DFO",
+      "NINHYDRIN": "Ninhydrine"
+    },
+    "description": {
+      "edit": "Modifier",
+      "submit": "Enregistrer",
+      "submitting": "Enregistrement…",
+      "fields": {
+        "origin": {
+          "label": "Origine",
+          "placeholder": "Choisir l'origine de la trace"
+        },
+        "location": {
+          "label": "Localisation",
+          "placeholder": "ex : Sur la face extérieure de la porte-fenêtre du séjour"
+        },
+        "revelationTechnique": {
+          "label": "Révélation",
+          "placeholder": "Choisir la technique de révélation"
+        }
+      },
+      "success": "Fiche de la trace enregistrée",
+      "error": "L'enregistrement de la fiche a échoué"
+    },
+    "validation": {
+      "originRequired": "L'origine est obligatoire",
+      "locationRequired": "La localisation est obligatoire",
+      "locationTooLong": "La localisation ne peut pas dépasser {{max}} caractères",
+      "revelationTechniqueRequired": "La technique de révélation est obligatoire"
     }
   },
   "biometricImage": {
@@ -580,7 +620,8 @@
       "REFERENCE_PRINT_CALIBRATED": "Empreinte de référence calibrée",
       "CASE_VERIFICATION_REQUESTED": "Vérification confiée à un pair technique",
       "VERIFICATION_CONCLUSION_STATED": "Conclusion du vérificateur énoncée",
-      "CASE_VERIFICATION_COMPLETED": "Vérification close"
+      "CASE_VERIFICATION_COMPLETED": "Vérification close",
+      "TRACE_DESCRIBED": "Fiche de la trace renseignée"
     },
     "pagination": {
       "previous": "Précédent",

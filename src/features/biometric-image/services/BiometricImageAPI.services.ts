@@ -5,6 +5,7 @@ import type {
   BiometricImageType,
   WithdrawalMotive,
 } from '@/features/biometric-image/types/biometricImage'
+import type { TraceDescriptionInput } from '@/features/biometric-image/types/trace'
 
 const endpointByType: Record<BiometricImageType, string> = {
   traces: '/traces',
@@ -22,6 +23,7 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
   return {
     id: dto.id,
     label: dto.reference ?? dto.path.split('/').pop() ?? dto.path,
+    number: dto.number ?? null,
     url: dto.url,
     status: dto.status ?? null,
     identified: dto.identified ?? null,
@@ -36,6 +38,9 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     withdrawalMotive: dto.withdrawalMotive ?? null,
     imageDestroyedAt: dto.imageDestroyedAt ?? null,
     resolutionDpi: dto.resolutionDpi ?? null,
+    origin: dto.origin ?? null,
+    location: dto.location ?? null,
+    revelationTechnique: dto.revelationTechnique ?? null,
   }
 }
 
@@ -49,6 +54,11 @@ export const BiometricImageAPI = {
 
   getTrace: (id: string) =>
     apiClient.get<BiometricImageDto>(`/traces/${id}`).then((res) => mapDtoToBiometricImage(res.data)),
+
+  describeTrace: (id: string, input: TraceDescriptionInput) =>
+    apiClient
+      .put<BiometricImageDto>(`/traces/${id}/description`, input)
+      .then((res) => mapDtoToBiometricImage(res.data)),
 
   withdraw: (type: BiometricImageType, id: string, motive: WithdrawalMotive) =>
     apiClient

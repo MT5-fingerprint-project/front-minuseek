@@ -8,6 +8,7 @@ const baseTimestamp = '2026-06-11T01:44:21.943Z'
 const makeFixture = (id: string, label: string): BiometricImage => ({
   id,
   label,
+  number: null,
   url: 'https://placehold.co/73x107',
   status: 'RECEIVED',
   identified: false,
@@ -22,6 +23,9 @@ const makeFixture = (id: string, label: string): BiometricImage => ({
   withdrawalMotive: null,
   imageDestroyedAt: null,
   resolutionDpi: null,
+  origin: null,
+  location: null,
+  revelationTechnique: null,
 })
 
 export const biometricImageFixtures: BiometricImage[] = [
