@@ -1,6 +1,8 @@
 import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useClickOutside } from '@/features/shared/hooks/useClickOutside'
+import { TOUR_UI_SELECTOR } from '@/features/investigation-case/constants/atelierTour.constants'
+import type { BiometricImageType } from '@/features/biometric-image/types/biometricImage'
 import ModeButton from './ModeButton'
 import ItemToolbar from './ItemToolbar'
 import FilterPanel from './FilterPanel'
@@ -19,6 +21,7 @@ import {
 type AnnotationPanel = 'color' | 'minutiaType'
 
 type CanvasToolbarProps = {
+  type: BiometricImageType
   filters: CanvasFilters
   isExpertCase?: boolean
   onFiltersChange: (filters: CanvasFilters) => void
@@ -34,6 +37,7 @@ type CanvasToolbarProps = {
 }
 
 export default function CanvasToolbar({
+  type,
   filters,
   isExpertCase = false,
   onFiltersChange,
@@ -57,7 +61,10 @@ export default function CanvasToolbar({
     setOpenFilter(null)
     setOpenPanel(null)
   }, [])
-  useClickOutside(rootRef, closePanels, { enabled: openFilter !== null || openPanel !== null })
+  useClickOutside(rootRef, closePanels, {
+    enabled: openFilter !== null || openPanel !== null,
+    ignoreSelector: TOUR_UI_SELECTOR,
+  })
 
   const switchMode = (next: 'image' | 'annotation') => {
     setMode(next)
@@ -177,18 +184,22 @@ export default function CanvasToolbar({
       )}
       <div className="flex items-center gap-3 rounded-md bg-blue-dark-1 px-3 py-2 text-white shadow-lg">
         <div className="flex items-center gap-1 rounded-sm bg-white/25 p-1">
-          <ModeButton
-            icon="image"
-            label={t('biometricImage.toolbar.modes.image')}
-            isActive={mode === 'image'}
-            onClick={() => switchMode('image')}
-          />
-          <ModeButton
-            icon="pen"
-            label={t('biometricImage.toolbar.modes.annotation')}
-            isActive={mode === 'annotation'}
-            onClick={() => switchMode('annotation')}
-          />
+          <span data-tour={`mode-image-${type}`}>
+            <ModeButton
+              icon="image"
+              label={t('biometricImage.toolbar.modes.image')}
+              isActive={mode === 'image'}
+              onClick={() => switchMode('image')}
+            />
+          </span>
+          <span data-tour={`mode-annotation-${type}`}>
+            <ModeButton
+              icon="pen"
+              label={t('biometricImage.toolbar.modes.annotation')}
+              isActive={mode === 'annotation'}
+              onClick={() => switchMode('annotation')}
+            />
+          </span>
         </div>
         {mode === 'image'
           ? IMAGE_TOOLS.map(({ icon, label, filters: filterConfigs, isExpertOnly }) => {

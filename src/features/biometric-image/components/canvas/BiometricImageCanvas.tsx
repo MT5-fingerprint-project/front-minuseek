@@ -230,6 +230,7 @@ export default function BiometricImageCanvas({
           {isToolbarVisible && (
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
               <CanvasToolbar
+                type={type}
                 filters={sliderValues}
                 isExpertCase={expertise !== null}
                 onFiltersChange={handleFilterChange}
