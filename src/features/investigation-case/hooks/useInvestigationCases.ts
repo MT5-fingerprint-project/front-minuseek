@@ -27,6 +27,7 @@ export function useInvestigationCase(id: string) {
     queryKey: investigationCaseKeys.detail(id),
     queryFn: () => InvestigationCaseAPI.getById(id),
     enabled: !!id,
+    meta: { handlesNotFound: true },
   })
 }
 
