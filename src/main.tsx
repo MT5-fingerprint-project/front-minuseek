@@ -18,6 +18,7 @@ import InvestigationCaseSubjectsPage from './features/investigation-case/pages/I
 import SubjectDetailsPage from './features/investigation-case/pages/SubjectDetailsPage.tsx'
 import InvestigationCaseComparisonPage from './features/investigation-case/pages/InvestigationCaseComparisonPage.tsx'
 import DetachedReferencePrintsPage from './features/investigation-case/pages/DetachedReferencePrintsPage.tsx'
+import CaseTracesPage from './features/biometric-image/pages/CaseTracesPage.tsx'
 import CaseHistoryPage from './features/audit-trail/pages/CaseHistoryPage.tsx'
 import CaseReportsPage from './features/reporting/pages/CaseReportsPage.tsx'
 import ServiceUsersPage from './features/users/pages/ServiceUsersPage.tsx'
@@ -55,6 +56,11 @@ const router = createBrowserRouter([
               { index: true, element: <InvestigationCaseSubjectsPage /> },
               { path: ':subjectId', element: <SubjectDetailsPage /> },
             ],
+          },
+          {
+            path: 'traces',
+            element: <CasePageLayout activeNav="traces" />,
+            children: [{ index: true, element: <CaseTracesPage /> }],
           },
           {
             path: 'rapports',

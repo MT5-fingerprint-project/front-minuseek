@@ -10,12 +10,15 @@ type BiometricImageImportButtonProps = {
   type: BiometricImageType
   caseId: string
   onUploadSuccess?: (image: BiometricImage) => void
+  /** `blue` pour une tête de page, `ghost` pour la barre du carrousel. */
+  variant?: 'blue' | 'ghost'
 }
 
 export default function BiometricImageImportButton({
   type,
   caseId,
   onUploadSuccess,
+  variant = 'ghost',
 }: BiometricImageImportButtonProps) {
   const { t } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
@@ -30,18 +33,32 @@ export default function BiometricImageImportButton({
 
   if (isCaseClosed) return null
 
+  const label = upload.isPending ? t('biometricImage.import.uploading') : t('biometricImage.import.button')
+
   return (
     <>
-      <Button
-        variant="ghost"
-        type="button"
-        disabled={upload.isPending}
-        onClick={() => inputRef.current?.click()}
-        className="shrink-0 gap-2 text-base text-blue-medium-1"
-      >
-        <Icon name="importPlus" size={20} color="currentColor" />
-        {upload.isPending ? t('biometricImage.import.uploading') : t('biometricImage.import.button')}
-      </Button>
+      {variant === 'blue' ? (
+        <Button
+          variant="blue"
+          type="button"
+          disabled={upload.isPending}
+          onClick={() => inputRef.current?.click()}
+        >
+          {label}
+          <Icon name="importPlus" size={24} color="white" />
+        </Button>
+      ) : (
+        <Button
+          variant="ghost"
+          type="button"
+          disabled={upload.isPending}
+          onClick={() => inputRef.current?.click()}
+          className="shrink-0 gap-2 text-base text-blue-medium-1"
+        >
+          <Icon name="importPlus" size={20} color="currentColor" />
+          {label}
+        </Button>
+      )}
       <input
         ref={inputRef}
         type="file"
