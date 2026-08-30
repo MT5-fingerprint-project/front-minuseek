@@ -36,6 +36,7 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     matchings: dto.matchings ?? [],
     withdrawnAt: dto.withdrawnAt ?? null,
     withdrawalMotive: dto.withdrawalMotive ?? null,
+    withdrawalMotiveDetail: dto.withdrawalMotiveDetail ?? null,
     imageDestroyedAt: dto.imageDestroyedAt ?? null,
     resolutionDpi: dto.resolutionDpi ?? null,
     origin: dto.origin ?? null,
@@ -73,12 +74,21 @@ export const BiometricImageAPI = {
       .then(() => undefined)
   },
 
-  removeLocationPhoto: (traceId: string, motive: WithdrawalMotive) =>
-    apiClient.delete(`/traces/${traceId}/location-photo`, { params: { motive } }).then(() => undefined),
-
-  withdraw: (type: BiometricImageType, id: string, motive: WithdrawalMotive) =>
+  removeLocationPhoto: (traceId: string, motive: WithdrawalMotive, motiveDetail?: string) =>
     apiClient
-      .post(`${endpointByType[type]}/${id}/withdraw`, { motive })
+      .delete(`/traces/${traceId}/location-photo`, {
+        params: { motive, ...(motiveDetail ? { motiveDetail } : {}) },
+      })
+      .then(() => undefined),
+
+  withdraw: (
+    type: BiometricImageType,
+    id: string,
+    motive: WithdrawalMotive,
+    motiveDetail?: string,
+  ) =>
+    apiClient
+      .post(`${endpointByType[type]}/${id}/withdraw`, { motive, ...(motiveDetail ? { motiveDetail } : {}) })
       .then((res) => res.data),
 
   restore: (type: BiometricImageType, id: string) =>

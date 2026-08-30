@@ -22,6 +22,13 @@ function WithdrawnPieceRow({ piece, type, caseId }: WithdrawnPieceRowProps) {
   const withdrawnDate = piece.withdrawnAt
     ? new Date(piece.withdrawnAt).toLocaleDateString(i18n.language)
     : ''
+  // Sous « Autre », c'est la phrase de l'opérateur qui fait foi, comme dans le rapport.
+  const motiveLabel =
+    piece.withdrawalMotive === 'OTHER' && piece.withdrawalMotiveDetail
+      ? `« ${piece.withdrawalMotiveDetail} »`
+      : piece.withdrawalMotive
+        ? t(`withdrawalMotive.${piece.withdrawalMotive}`)
+        : ''
 
   return (
     <li className="flex items-center gap-4 rounded-sm bg-white px-3 py-2">
@@ -40,7 +47,7 @@ function WithdrawnPieceRow({ piece, type, caseId }: WithdrawnPieceRowProps) {
         <span className="text-xs text-muted-foreground">
           {t('investigationCase.withdrawn.withdrawnAt', {
             date: withdrawnDate,
-            motive: piece.withdrawalMotive ? t(`withdrawalMotive.${piece.withdrawalMotive}`) : '',
+            motive: motiveLabel,
           })}
         </span>
       </div>

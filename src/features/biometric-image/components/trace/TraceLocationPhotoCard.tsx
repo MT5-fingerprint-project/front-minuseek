@@ -13,6 +13,8 @@ import type { TraceLocationPhoto } from '@/features/biometric-image/types/trace'
 
 const ACCEPTED_FORMATS = 'image/png,image/jpeg,image/tiff'
 
+type PendingWithdrawal = { motive: WithdrawalMotive; motiveDetail?: string }
+
 type TraceLocationPhotoCardProps = {
   traceId: string
   caseId: string
@@ -22,7 +24,7 @@ type TraceLocationPhotoCardProps = {
 export default function TraceLocationPhotoCard({ traceId, caseId, photo }: TraceLocationPhotoCardProps) {
   const { t, i18n } = useTranslation()
   const inputRef = useRef<HTMLInputElement>(null)
-  const [replacedMotive, setReplacedMotive] = useState<WithdrawalMotive | null>(null)
+  const [replacedWithdrawal, setReplacedWithdrawal] = useState<PendingWithdrawal | null>(null)
   const attachPhoto = useAttachTraceLocationPhoto(caseId)
   const removePhoto = useRemoveTraceLocationPhoto(caseId)
   const isCaseClosed = useCaseIsClosed(caseId)
@@ -34,11 +36,11 @@ export default function TraceLocationPhotoCard({ traceId, caseId, photo }: Trace
     event.target.value = ''
     if (!file) return
 
-    const motive = replacedMotive
-    setReplacedMotive(null)
+    const withdrawal = replacedWithdrawal
+    setReplacedWithdrawal(null)
     try {
-      if (motive !== null) {
-        await removePhoto.mutateAsync({ traceId, motive })
+      if (withdrawal !== null) {
+        await removePhoto.mutateAsync({ traceId, ...withdrawal })
       }
       await attachPhoto.mutateAsync({ traceId, file })
     } catch {
@@ -46,8 +48,8 @@ export default function TraceLocationPhotoCard({ traceId, caseId, photo }: Trace
     }
   }
 
-  const startReplacement = (motive: WithdrawalMotive) => {
-    setReplacedMotive(motive)
+  const startReplacement = (motive: WithdrawalMotive, motiveDetail?: string) => {
+    setReplacedWithdrawal({ motive, motiveDetail })
     inputRef.current?.click()
   }
 
@@ -89,7 +91,9 @@ export default function TraceLocationPhotoCard({ traceId, caseId, photo }: Trace
                 title={t('trace.locationPhoto.removeTitle')}
                 description={t('trace.locationPhoto.removeDescription')}
                 actionLabel={t('trace.locationPhoto.remove')}
-                onConfirm={(motive) => removePhoto.mutate({ traceId, motive })}
+                onConfirm={(motive, motiveDetail) =>
+                  removePhoto.mutate({ traceId, motive, motiveDetail })
+                }
                 trigger={
                   <Button type="button" variant="destructive" size="small" disabled={isBusy}>
                     {t('trace.locationPhoto.remove')}
@@ -110,7 +114,7 @@ export default function TraceLocationPhotoCard({ traceId, caseId, photo }: Trace
                 size="small"
                 disabled={isBusy}
                 onClick={() => {
-                  setReplacedMotive(null)
+                  setReplacedWithdrawal(null)
                   inputRef.current?.click()
                 }}
               >
