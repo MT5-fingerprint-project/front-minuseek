@@ -4,10 +4,17 @@ import i18n from '@/features/shared/lib/i18n'
 export const investigationCaseStatusSchema = z.enum(['OPEN', 'IN_PROGRESS', 'UNDER_REVIEW', 'CLOSED'])
 export type InvestigationCaseStatus = z.infer<typeof investigationCaseStatusSchema>
 
-export type CaseOperator = {
+export type CaseUser = {
   id: string
   firstName: string
   lastName: string
+}
+
+export type CaseExpertise = {
+  expert: CaseUser | null
+  courtReference: string
+  oathStatement: string
+  swornAt: Date
 }
 
 export interface InvestigationCase {
@@ -16,15 +23,23 @@ export interface InvestigationCase {
   caseNumber: string
   pvNumber: string
   status: InvestigationCaseStatus
-  operator: CaseOperator | null
+  operator: CaseUser | null
+  expertise: CaseExpertise | null
   createdAt: Date
   updatedAt: Date
 }
 
-export const caseOperatorSchema = z.object({
+export const caseUserSchema = z.object({
   id: z.string(),
   firstName: z.string(),
   lastName: z.string(),
+})
+
+export const caseExpertiseSchema = z.object({
+  expert: caseUserSchema.nullable(),
+  courtReference: z.string(),
+  oathStatement: z.string(),
+  swornAt: z.date(),
 })
 
 export const investigationCaseSchema = z.object({
@@ -33,7 +48,8 @@ export const investigationCaseSchema = z.object({
   caseNumber: z.string().min(1),
   pvNumber: z.string().min(1),
   status: investigationCaseStatusSchema,
-  operator: caseOperatorSchema.nullable(),
+  operator: caseUserSchema.nullable(),
+  expertise: caseExpertiseSchema.nullable(),
   createdAt: z.date(),
   updatedAt: z.date(),
 })
@@ -91,6 +107,11 @@ export function hasCorrections(corrections: InvestigationCaseCorrections): boole
   return Object.keys(corrections).length > 0
 }
 
-export function operatorNameOf({ firstName, lastName }: CaseOperator): string {
+export function caseUserNameOf({ firstName, lastName }: CaseUser): string {
   return `${firstName} ${lastName}`
+}
+
+export type CaseExpertiseDeclaration = {
+  oathStatement: string
+  courtReference: string
 }

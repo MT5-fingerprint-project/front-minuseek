@@ -163,6 +163,21 @@
         "reference-prints": "Empreinte de référence"
       }
     },
+    "expertise": {
+      "declare": "Déclarer une expertise",
+      "dialogTitle": "Déclarer ce dossier en expertise",
+      "dialogDescription": "Le texte ci-dessous est archivé mot pour mot au moment où vous le validez. Il ne pourra plus être modifié.",
+      "courtLabel": "Juridiction qui vous a commis",
+      "courtPlaceholder": "Tribunal judiciaire de Paris",
+      "oathHeading": "Prestation de serment d'un expert (articles 157 et 160 du Code de procédure pénale)",
+      "oathFormula": "Je soussigné {{expert}}, {{grade}} en fonction au {{service}}, expert désigné pour procéder aux opérations prévues dans l'ordonnance de commission d'expert de {{court}}, après avoir pris connaissance de la mission qui m'est confiée, prête serment de bien et fidèlement la remplir en mon honneur et conscience.",
+      "engagementLabel": "Je prête ce serment en mon honneur et conscience, et j'engage ma responsabilité d'expert sur ce dossier.",
+      "confirmAction": "Prêter serment et déclarer",
+      "declared": "Dossier déclaré en expertise, serment prêté",
+      "bannerTitle": "Expertise judiciaire",
+      "bannerDetail": "Serment prêté par {{expert}} le {{date}} devant {{court}}.",
+      "unknownExpert": "un compte supprimé"
+    },
     "closure": {
       "close": "Clore le dossier",
       "reopen": "Rouvrir le dossier",
