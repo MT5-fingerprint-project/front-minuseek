@@ -10,6 +10,7 @@ const makeFixture = (id: string, label: string): BiometricImage => ({
   label,
   url: 'https://placehold.co/73x107',
   status: 'RECEIVED',
+  identified: false,
   score: null,
   caseId: 'fixture-case-id',
   subjectId: null,

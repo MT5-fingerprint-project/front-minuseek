@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Sparkle, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
@@ -77,6 +78,8 @@ export default function ComparisonWorkbench({
 }: ComparisonWorkbenchProps) {
   const { t } = useTranslation()
   const keys = TITLES[type]
+  const { slug } = useParams<{ slug: string }>()
+  const navigate = useNavigate()
   const { data: investigationCase } = useInvestigationCase(caseId)
 
   // Le carrousel alimente le même cache : aucune requête supplémentaire n'est déclenchée ici.
@@ -87,6 +90,15 @@ export default function ComparisonWorkbench({
   const [isImageSizeDialogOpen, setIsImageSizeDialogOpen] = useState(false)
 
   const title = w.selectedTrace ? t(keys.selected, { label: w.selectedTrace.label }) : t(keys.base)
+
+  const actions =
+    type === 'traces' && w.selectedTrace ? (
+      <WindowActionButton
+        icon="information"
+        label={t('trace.panel.open')}
+        onClick={() => navigate(`/${slug}/affaires/${caseId}/traces?trace=${w.selectedTrace?.id}`)}
+      />
+    ) : undefined
 
   const handleExport = async () => {
     try {
@@ -168,6 +180,7 @@ export default function ComparisonWorkbench({
     <WorkbenchWindow
       title={title}
       icon={ICON[type]}
+      actions={actions}
       isCollapsed={isCollapsed}
       onToggleCollapse={onToggleCollapse}
       isActive={isActive}

@@ -38,7 +38,8 @@
     "cases": "Affaires",
     "users": "Utilisateurs",
     "settings": "Paramètres",
-    "casesToVerify": "Dossiers à vérifier"
+    "casesToVerify": "Dossiers à vérifier",
+    "traces": "Traces"
   },
   "investigationCase": {
     "status": {
@@ -211,7 +212,7 @@
       "DISCORDANT": "Vérification discordante"
     },
     "section": {
-      "title": "Vérification par un second regard",
+      "title": "Vérification par pair technique",
       "none": "Personne ne vérifie ce dossier pour l'instant.",
       "removedAccount": "Compte supprimé du service",
       "requestedOn": "confiée le {{date}}",
@@ -373,6 +374,39 @@
     },
     "success": {
       "created": "Sujet créé avec succès"
+    }
+  },
+  "trace": {
+    "list": {
+      "title": "Traces de l'affaire n°{{caseNumber}}",
+      "summary_one": "{{count}} trace, dont {{identified}} identifiée",
+      "summary_other": "{{count}} traces, dont {{identified}} identifiées",
+      "summaryWithoutState_one": "{{count}} trace",
+      "summaryWithoutState_other": "{{count}} traces",
+      "empty": "Aucune trace n'a encore été déposée dans cette affaire.",
+      "columns": {
+        "number": "N°",
+        "image": "Trace",
+        "state": "État",
+        "depositedOn": "Déposée le",
+        "actions": "Actions"
+      }
+    },
+    "state": {
+      "identified": "Identifiée",
+      "exploitable": "Exploitable",
+      "notExploitable": "Inexploitable",
+      "toQualify": "À qualifier"
+    },
+    "panel": {
+      "title": "Fiche de la trace",
+      "open": "Voir la fiche de la trace",
+      "openInComparator": "Ouvrir dans le comparateur",
+      "close": "Fermer le panneau",
+      "depositedAt": "Déposée le {{date}} à {{time}}",
+      "informations": "Informations",
+      "notProvided": "Non renseigné",
+      "unknown": "Cette trace n'existe pas ou n'appartient pas à cette affaire."
     }
   },
   "biometricImage": {
@@ -544,7 +578,7 @@
       "SERVICE_HEADER_SAVED": "En-tête du service enregistré",
       "TRACE_CALIBRATED": "Trace calibrée",
       "REFERENCE_PRINT_CALIBRATED": "Empreinte de référence calibrée",
-      "CASE_VERIFICATION_REQUESTED": "Vérification confiée à un second regard",
+      "CASE_VERIFICATION_REQUESTED": "Vérification confiée à un pair technique",
       "VERIFICATION_CONCLUSION_STATED": "Conclusion du vérificateur énoncée",
       "CASE_VERIFICATION_COMPLETED": "Vérification close"
     },

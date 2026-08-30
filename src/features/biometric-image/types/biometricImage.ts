@@ -1,6 +1,6 @@
 export type BiometricImageType = 'traces' | 'reference-prints'
 
-export type BiometricImageStatus = 'RECEIVED' | 'PROCESSING' | 'PROCESSED' | 'FAILED'
+export type BiometricImageStatus = 'RECEIVED' | 'EXPLOITABLE' | 'NOT_EXPLOITABLE'
 
 export type WithdrawalMotive = 'DUPLICATE' | 'MISFILED' | 'WRONG_ATTRIBUTION'
 
@@ -24,7 +24,8 @@ export interface BiometricImage {
   id: string
   label: string
   url: string | null
-  status: BiometricImageStatus
+  status: BiometricImageStatus | null
+  identified: boolean | null
   score: number | null
   caseId: string
   subjectId: string | null
@@ -35,7 +36,6 @@ export interface BiometricImage {
   withdrawnAt: string | null
   withdrawalMotive: WithdrawalMotive | null
   imageDestroyedAt: string | null
-  /** Résolution calibrée en points par pouce de l'image source ; nulle tant que l'image n'est pas calibrée. */
   resolutionDpi: number | null
 }
 
@@ -45,7 +45,8 @@ export interface BiometricImageDto {
   number?: number | null
   reference?: string | null
   url: string | null
-  status: BiometricImageStatus
+  status: BiometricImageStatus | null
+  identified?: boolean | null
   score: number | null
   caseId: string
   subjectId?: string | null

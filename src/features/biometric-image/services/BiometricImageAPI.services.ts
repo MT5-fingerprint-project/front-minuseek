@@ -23,7 +23,8 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     id: dto.id,
     label: dto.reference ?? dto.path.split('/').pop() ?? dto.path,
     url: dto.url,
-    status: dto.status,
+    status: dto.status ?? null,
+    identified: dto.identified ?? null,
     score: dto.score,
     caseId: dto.caseId,
     subjectId: dto.subjectId ?? null,
@@ -42,10 +43,12 @@ export const BiometricImageAPI = {
   getAll: (type: BiometricImageType, caseId: string, options?: { withdrawn?: boolean }) =>
     apiClient
       .get<{ data: BiometricImageDto[] }>(endpointByType[type], {
-        // Le pipe du back ne transforme pas : le drapeau part en chaîne.
         params: { caseId, ...(options?.withdrawn ? { withdrawn: 'true' } : {}) },
       })
       .then((res) => res.data.data.map(mapDtoToBiometricImage)),
+
+  getTrace: (id: string) =>
+    apiClient.get<BiometricImageDto>(`/traces/${id}`).then((res) => mapDtoToBiometricImage(res.data)),
 
   withdraw: (type: BiometricImageType, id: string, motive: WithdrawalMotive) =>
     apiClient

@@ -14,6 +14,7 @@ export const biometricImageKeys = {
     [...biometricImageKeys.all, type, caseId] as const,
   withdrawn: (type: BiometricImageType, caseId: string) =>
     [...biometricImageKeys.all, type, caseId, 'withdrawn'] as const,
+  trace: (traceId: string) => [...biometricImageKeys.all, 'trace', traceId] as const,
 }
 
 export function useBiometricImages(type: BiometricImageType, caseId: string) {
@@ -23,6 +24,15 @@ export function useBiometricImages(type: BiometricImageType, caseId: string) {
     enabled: !!caseId,
     staleTime: 5 * 60 * 1000,
     placeholderData: keepPreviousData,
+  })
+}
+
+export function useTrace(traceId: string) {
+  return useQuery({
+    queryKey: biometricImageKeys.trace(traceId),
+    queryFn: () => BiometricImageAPI.getTrace(traceId),
+    enabled: !!traceId,
+    meta: { handlesNotFound: true },
   })
 }
 
@@ -36,8 +46,6 @@ export function useWithdrawnBiometricImages(type: BiometricImageType, caseId: st
   })
 }
 
-/** Une pièce passe d'une liste à l'autre : les deux se rafraîchissent, sinon
- * elle n'apparaît dans les pièces retirées qu'après un rechargement. */
 function invalidateBothLists(
   queryClient: ReturnType<typeof useQueryClient>,
   type: BiometricImageType,
