@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useClickOutside } from '@/features/shared/hooks/useClickOutside'
-import { TOUR_UI_SELECTOR } from '@/features/investigation-case/constants/atelierTour.constants'
+import { TOUR_UI_SELECTOR } from '@/features/shared/constants/tour.constants'
 import type { BiometricImageType } from '@/features/biometric-image/types/biometricImage'
 import ModeButton from './ModeButton'
 import ItemToolbar from './ItemToolbar'

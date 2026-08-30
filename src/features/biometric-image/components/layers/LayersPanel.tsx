@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
 import { useClickOutside } from '@/features/shared/hooks/useClickOutside'
-import { TOUR_UI_SELECTOR } from '@/features/investigation-case/constants/atelierTour.constants'
+import { TOUR_UI_SELECTOR } from '@/features/shared/constants/tour.constants'
 import type { Layer } from '@/features/biometric-image/types/layer'
 import LayerItem from '@/features/biometric-image/components/layers/LayerItem'
 

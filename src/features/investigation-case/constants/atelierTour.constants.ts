@@ -10,14 +10,6 @@ export type TourStep = {
 /** Suffixée par une version : incrémenter invalide les passages déjà enregistrés. */
 export const TOUR_STORAGE_PREFIX = 'minuseek:atelier-tour:v1'
 
-/**
- * Éléments injectés par driver.js hors de l'arbre DOM de l'atelier (voile + panneau).
- * Classes vérifiées dans `driver.js@1.8.0` (`node_modules/driver.js/dist/driver.css`) :
- * à utiliser comme `ignoreSelector` partout où `useClickOutside` écoute un clic
- * document-wide, pour qu'un clic sur le tour ne referme pas un panneau ouvert.
- */
-export const TOUR_UI_SELECTOR = '.driver-overlay, .driver-popover'
-
 export const ATELIER_TOUR_STEPS: TourStep[] = [
   {
     titleKey: 'investigationCase.comparison.tour.steps.welcome.title',
