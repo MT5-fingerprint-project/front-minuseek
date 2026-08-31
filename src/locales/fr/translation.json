@@ -861,7 +861,6 @@
     "verdict": {
       "sealed": "Scellé par {{laboratory}} le {{date}}",
       "anchored": "Horodaté par une autorité extérieure le {{date}}",
-      "notAnchored": "Aucun horodatage extérieur n'a encore été apposé sur ce scellé.",
       "earlierReport": "Un rapport antérieur a été établi sur le même dossier. Le document que vous détenez n'est pas le premier état des travaux.",
       "newerReport": "Un rapport plus récent a été établi sur le même dossier. Le document que vous détenez est authentique, mais il n'est peut-être pas le dernier état des travaux.",
       "unknown": "Ce fichier est inconnu de ce laboratoire. Aucun scellé ne lui correspond."
