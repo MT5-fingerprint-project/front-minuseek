@@ -310,11 +310,12 @@
     },
     "type": {
       "CLOSE_ASSOCIATE": "Familier",
-      "PERSON_OF_INTEREST": "Mis en cause"
+      "PERSON_OF_INTEREST": "Mis en cause",
+      "VICTIM": "Victime"
     },
     "list": {
       "title": "Sujets de l'affaire n°{{caseNumber}}",
-      "summary": "{{closeAssociates}} et {{personsOfInterest}}",
+      "summary": "{{closeAssociates}}, {{personsOfInterest}} et {{victims}}",
       "closeAssociateCount_one": "{{count}} familier",
       "closeAssociateCount_other": "{{count}} familiers",
       "personOfInterestCount_one": "{{count}} mis en cause",
@@ -323,7 +324,10 @@
       "closeAssociates": "Familiers",
       "personsOfInterest": "Mis en cause",
       "empty": "Aucun sujet pour l'instant",
-      "bornOn": "Né.e le {{date}}"
+      "bornOn": "Né.e le {{date}}",
+      "victimCount_one": "{{count}} victime",
+      "victimCount_other": "{{count}} victimes",
+      "victims": "Victimes"
     },
     "details": {
       "back": "Retour aux sujets",
@@ -417,8 +421,6 @@
     "validation": {
       "lastNameRequired": "Le nom est requis",
       "firstNameRequired": "Le prénom est requis",
-      "birthDateRequired": "La date de naissance est requise",
-      "birthPlaceRequired": "Le lieu de naissance est requis",
       "sexRequired": "Le genre est requis",
       "typeRequired": "Le type de sujet est requis"
     },
@@ -718,7 +720,8 @@
       "TRACE_DESCRIBED": "Fiche de la trace renseignée",
       "TRACE_LOCATION_STATED": "Localisation consignée sur le terrain",
       "LOCATION_PHOTO_UPLOADED": "Photographie de localisation versée",
-      "LOCATION_PHOTO_DELETED": "Photographie de localisation retirée"
+      "LOCATION_PHOTO_DELETED": "Photographie de localisation retirée",
+      "SUBJECT_REGISTERED": "Personne déclarée au dossier"
     },
     "pagination": {
       "previous": "Précédent",
