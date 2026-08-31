@@ -11,6 +11,7 @@ import {
 } from '@/features/investigation-case/hooks/useInvestigationCases'
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
 import InvestigationCaseEditForm from '@/features/investigation-case/components/InvestigationCaseEditForm'
+import CaseJudicialHeaderSummary from '@/features/investigation-case/components/CaseJudicialHeaderSummary'
 import WithdrawnPiecesSection from '@/features/investigation-case/components/WithdrawnPiecesSection'
 import CaseVerificationsSection from '@/features/investigation-case/components/CaseVerificationsSection'
 import CaseClosureActions from '@/features/investigation-case/components/CaseClosureActions'
@@ -19,6 +20,7 @@ import DeclareExpertiseDialog from '@/features/investigation-case/components/Dec
 import ExpertiseBanner from '@/features/investigation-case/components/ExpertiseBanner'
 import {
   caseUserNameOf,
+  isJudicialHeaderEmpty,
   type InvestigationCaseCorrections,
 } from '@/features/investigation-case/types/investigationCase'
 import { Button } from '@/features/shared/ui/button'
@@ -56,6 +58,10 @@ export default function InvestigationCaseDetailsPage() {
     minute: '2-digit',
   })
   const openedDate = new Date(investigationCase.createdAt).toLocaleDateString(i18n.language)
+  // Tant que rien n'est renseigné, le bouton dit ce qu'il reste à faire.
+  const editLabel = isJudicialHeaderEmpty(investigationCase)
+    ? t('investigationCase.judicialHeader.complete')
+    : t('investigationCase.details.edit')
 
   async function handleCorrections(corrections: InvestigationCaseCorrections) {
     await correctCase.mutateAsync(corrections)
@@ -100,7 +106,7 @@ export default function InvestigationCaseDetailsPage() {
             <div className="flex items-center justify-between gap-4">
               <h2 className="text-lg font-semibold">{t('investigationCase.details.informations')}</h2>
               <Button variant="outline" size="small" onClick={() => setIsEditing(true)}>
-                {t('investigationCase.details.edit')}
+                {editLabel}
                 <Icon name="pen" size={12} data-icon="inline-end" color="currentColor" />
               </Button>
             </div>
@@ -126,6 +132,8 @@ export default function InvestigationCaseDetailsPage() {
               </div>
             </div>
           </section>
+
+          <CaseJudicialHeaderSummary investigationCase={investigationCase} />
 
           {investigationCase.description && (
             <section className="flex flex-col gap-5 px-4 py-3 rounded-sm bg-blue-light-1">
