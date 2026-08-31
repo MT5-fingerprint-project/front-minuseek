@@ -5,6 +5,7 @@ import { CaseCorrectionRefusedError } from '@/features/investigation-case/servic
 import {
   correctedFieldsOf,
   investigationCaseEditSchema,
+  judicialHeaderFormValues,
   type InvestigationCase,
   type InvestigationCaseCorrections,
   type InvestigationCaseEditValues,
@@ -24,6 +25,7 @@ export function useEditInvestigationCaseForm({ investigationCase, onSubmit }: Us
       pvNumber: investigationCase.pvNumber,
       description: investigationCase.description ?? '',
       operatorUserId: investigationCase.operator?.id ?? '',
+      ...judicialHeaderFormValues(investigationCase),
     } satisfies InvestigationCaseEditValues,
     validators: {
       onSubmit: investigationCaseEditSchema,
