@@ -20,7 +20,7 @@ function InfoRow({ icon, label, value }: { icon: IconName; label: string; value:
 
 export default function SubjectInfoCard({ subject }: SubjectInfoCardProps) {
   const { t, i18n } = useTranslation()
-  const birthDate = new Date(subject.birthDate).toLocaleDateString(i18n.language)
+  const birthDate = subject.birthDate ? new Date(subject.birthDate).toLocaleDateString(i18n.language) : null
 
   return (
     <section className="flex flex-col gap-5 rounded-sm bg-white px-4 py-3">

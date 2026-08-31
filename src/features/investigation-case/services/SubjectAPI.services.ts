@@ -4,10 +4,21 @@ import type { Subject, SubjectCreateInput } from '@/features/investigation-case/
 export type RegisterSubjectInput = SubjectCreateInput & { caseId: string; color?: string }
 
 export const SubjectAPI = {
-  create: ({ phoneNumber, firstParentName, secondParentName, ...input }: RegisterSubjectInput) =>
+  // Un champ laissé vide n'est pas envoyé : le serveur refuse la chaîne vide là
+  // où il accepte l'absence.
+  create: ({
+    phoneNumber,
+    firstParentName,
+    secondParentName,
+    birthDate,
+    birthPlace,
+    ...input
+  }: RegisterSubjectInput) =>
     apiClient
       .post<{ id: string }>('/subjects', {
         ...input,
+        birthDate: birthDate || undefined,
+        birthPlace: birthPlace || undefined,
         phoneNumber: phoneNumber || undefined,
         firstParentName: firstParentName || undefined,
         secondParentName: secondParentName || undefined,
