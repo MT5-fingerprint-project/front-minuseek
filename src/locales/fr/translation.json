@@ -74,7 +74,8 @@
       "context": "Contexte",
       "summary": "Résumé des faits :",
       "tabs": {
-        "case": "Le dossier"
+        "case": "Le dossier",
+        "recipient": "Destinataire"
       },
       "edit": "Modifier",
       "operator": "Opérateur :",
@@ -252,6 +253,40 @@
       "validation": {
         "offensePeriodReversed": "La fin de la période ne peut pas précéder la date des faits.",
         "offensePeriodWithoutStart": "Une fin de période suppose une date des faits."
+      }
+    },
+    "recipient": {
+      "title": "Destinataire du rapport",
+      "choose": "Choisir le destinataire",
+      "fromBook": "Reprendre un destinataire enregistré",
+      "fromBookPlaceholder": "Choisir une fiche du carnet",
+      "oneOff": "Saisie ponctuelle",
+      "bookEmpty": "Le carnet du service est vide.",
+      "attentionLine": "À l'attention de {{quality}} {{name}}",
+      "notProvided": "Non renseigné",
+      "saveToBook": "Enregistrer ce destinataire dans le carnet",
+      "removeFromBook": "Retirer ce destinataire du carnet",
+      "removedFromBook": "Destinataire retiré du carnet",
+      "saved": "Destinataire enregistré",
+      "saveFailed": "Impossible d'enregistrer le destinataire",
+      "bookSaveFailed": "Impossible d'enregistrer ce destinataire dans le carnet",
+      "bookRemoveFailed": "Impossible de retirer ce destinataire du carnet",
+      "fields": {
+        "authority": {
+          "label": "Autorité destinataire",
+          "placeholder": "Le Commissaire Général, chef du 3e District de Police Judiciaire de la D.R.P.J de Paris"
+        },
+        "attentionQuality": {
+          "label": "À l'attention de — qualité",
+          "placeholder": "Brigadier-Chef de Police"
+        },
+        "attentionName": {
+          "label": "À l'attention de — nom",
+          "placeholder": "MARCHAND Claire"
+        }
+      },
+      "validation": {
+        "authorityRequired": "L'autorité destinataire est obligatoire."
       }
     }
   },

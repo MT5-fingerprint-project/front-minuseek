@@ -6,6 +6,7 @@ import type {
   InvestigationCaseCorrections,
   InvestigationCaseCreateInput,
 } from '@/features/investigation-case/types/investigationCase'
+import type { CaseRecipientInput } from '@/features/investigation-case/types/reportRecipient'
 
 export type CaseCorrectionRefusal = 'unknownOperator' | 'operatorChangeNotAllowed' | 'caseNotFound' | 'caseClosed'
 
@@ -54,6 +55,17 @@ export const InvestigationCaseAPI = {
   declareExpertise: (id: string, declaration: CaseExpertiseDeclaration) =>
     apiClient
       .post<InvestigationCase>(`/investigation-cases/${id}/expertise`, declaration)
+      .then((res) => res.data),
+
+  // Les trois lignes forment un bloc : ce qui n'est pas envoyé est effacé du
+  // dossier, une ligne vide n'est donc pas envoyée du tout.
+  updateRecipient: (id: string, input: CaseRecipientInput) =>
+    apiClient
+      .put<InvestigationCase>(`/investigation-cases/${id}/recipient`, {
+        authority: input.authority,
+        attentionQuality: input.attentionQuality || undefined,
+        attentionName: input.attentionName || undefined,
+      })
       .then((res) => res.data),
 
   correct: (id: string, corrections: InvestigationCaseCorrections) =>

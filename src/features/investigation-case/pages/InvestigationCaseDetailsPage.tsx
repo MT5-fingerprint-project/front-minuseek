@@ -8,10 +8,19 @@ import {
   investigationCaseKeys,
   useCorrectInvestigationCase,
   useInvestigationCase,
+  useUpdateCaseRecipient,
 } from '@/features/investigation-case/hooks/useInvestigationCases'
+import {
+  useAddReportRecipient,
+  useRemoveReportRecipient,
+  useReportRecipients,
+} from '@/features/investigation-case/hooks/useReportRecipients'
+import type { CaseRecipientInput } from '@/features/investigation-case/types/reportRecipient'
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
 import InvestigationCaseEditForm from '@/features/investigation-case/components/InvestigationCaseEditForm'
 import CaseJudicialHeaderSummary from '@/features/investigation-case/components/CaseJudicialHeaderSummary'
+import CaseRecipientForm from '@/features/investigation-case/components/CaseRecipientForm'
+import CaseRecipientSummary from '@/features/investigation-case/components/CaseRecipientSummary'
 import WithdrawnPiecesSection from '@/features/investigation-case/components/WithdrawnPiecesSection'
 import CaseVerificationsSection from '@/features/investigation-case/components/CaseVerificationsSection'
 import CaseClosureActions from '@/features/investigation-case/components/CaseClosureActions'
@@ -28,9 +37,8 @@ import { Spinner } from '@/features/shared/ui/spinner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/features/shared/ui/tabs'
 import { H1 } from '@/features/shared/ui/typography'
 
-/** Le premier onglet de la page Informations. L'en-tête judiciaire et les
- * destinataires poseront les leurs à côté. */
 const CASE_TAB = 'case'
+const RECIPIENT_TAB = 'recipient'
 
 export default function InvestigationCaseDetailsPage() {
   const { slug, id } = useParams<{ slug: string; id: string }>()
@@ -40,8 +48,13 @@ export default function InvestigationCaseDetailsPage() {
   const { data: investigationCase, isPending } = useInvestigationCase(id ?? '')
   const { data: currentUser, isPending: isCurrentUserPending } = useCurrentUser()
   const correctCase = useCorrectInvestigationCase(id ?? '')
+  const updateRecipient = useUpdateCaseRecipient(id ?? '')
   const [isEditing, setIsEditing] = useState(false)
+  const [isChoosingRecipient, setIsChoosingRecipient] = useState(false)
   const [isDeclaringExpertise, setIsDeclaringExpertise] = useState(false)
+  const { data: recipientBook = [] } = useReportRecipients(isChoosingRecipient)
+  const addToBook = useAddReportRecipient()
+  const removeFromBook = useRemoveReportRecipient()
 
   if (isPending || isCurrentUserPending) return <Spinner className="size-6" />
 
@@ -62,6 +75,16 @@ export default function InvestigationCaseDetailsPage() {
   const editLabel = isJudicialHeaderEmpty(investigationCase)
     ? t('investigationCase.judicialHeader.complete')
     : t('investigationCase.details.edit')
+
+  /** La fiche part au carnet d'abord : le dossier porte ensuite une copie de ce
+   * qui a été saisi, modifications comprises. Un carnet qui refuse la fiche ne
+   * fait pas perdre le geste principal — il a déjà toasté son échec. */
+  async function handleRecipient(input: CaseRecipientInput, alsoSaveToBook: boolean) {
+    if (alsoSaveToBook) {
+      await addToBook.mutateAsync(input).catch(() => undefined)
+    }
+    await updateRecipient.mutateAsync(input)
+  }
 
   async function handleCorrections(corrections: InvestigationCaseCorrections) {
     await correctCase.mutateAsync(corrections)
@@ -99,6 +122,7 @@ export default function InvestigationCaseDetailsPage() {
       <Tabs defaultValue={CASE_TAB}>
         <TabsList variant="line">
           <TabsTrigger value={CASE_TAB}>{t('investigationCase.details.tabs.case')}</TabsTrigger>
+          <TabsTrigger value={RECIPIENT_TAB}>{t('investigationCase.details.tabs.recipient')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value={CASE_TAB} className="flex flex-col gap-6 pt-4">
@@ -153,12 +177,27 @@ export default function InvestigationCaseDetailsPage() {
 
           <WithdrawnPiecesSection caseId={investigationCase.id} />
         </TabsContent>
+
+        <TabsContent value={RECIPIENT_TAB} className="flex flex-col gap-6 pt-4">
+          <CaseRecipientSummary
+            investigationCase={investigationCase}
+            onEdit={() => setIsChoosingRecipient(true)}
+          />
+        </TabsContent>
       </Tabs>
 
       <DeclareExpertiseDialog
         caseId={investigationCase.id}
         open={isDeclaringExpertise}
         onOpenChange={setIsDeclaringExpertise}
+      />
+
+      <CaseRecipientForm
+        investigationCase={isChoosingRecipient ? investigationCase : null}
+        book={recipientBook}
+        onClose={() => setIsChoosingRecipient(false)}
+        onSubmit={handleRecipient}
+        onRemoveFromBook={(entryId) => removeFromBook.mutate(entryId)}
       />
 
       <InvestigationCaseEditForm

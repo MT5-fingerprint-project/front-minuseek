@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import i18n from '@/features/shared/lib/i18n'
+import type { CaseRecipient } from '@/features/investigation-case/types/reportRecipient'
 
 export const investigationCaseStatusSchema = z.enum(['OPEN', 'IN_PROGRESS', 'UNDER_REVIEW', 'CLOSED'])
 export type InvestigationCaseStatus = z.infer<typeof investigationCaseStatusSchema>
@@ -51,7 +52,7 @@ export const JUDICIAL_DATE_FIELDS = [
   'interventionDate',
 ] as const satisfies readonly (keyof CaseJudicialHeader)[]
 
-export interface InvestigationCase extends Partial<CaseJudicialHeader> {
+export interface InvestigationCase extends Partial<CaseJudicialHeader>, Partial<CaseRecipient> {
   id: string
   description?: string | undefined
   caseNumber: string
