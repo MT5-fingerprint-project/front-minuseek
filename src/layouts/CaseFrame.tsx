@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { isAxiosError } from 'axios'
 import { toast } from 'sonner'
 import { useInvestigationCase } from '@/features/investigation-case/hooks/useInvestigationCases'
-import { TooltipProvider } from '@/features/shared/ui/tooltip'
 import Navbar from '@/features/shared/components/navbar/Navbar'
 
 type CaseFrameProps = {
@@ -70,11 +69,9 @@ export default function CaseFrame({ navbarCollapsed = false, activeNav, children
   ]
 
   return (
-    <TooltipProvider>
-      <div className="flex h-screen w-full overflow-hidden bg-blue-dark-1">
-        <Navbar isCollapsed={navbarCollapsed} investigationCase={investigationCase} items={navItems} />
-        <main className="flex w-full overflow-auto p-3 pl-0">{children}</main>
-      </div>
-    </TooltipProvider>
+    <div className="flex h-screen w-full overflow-hidden bg-blue-dark-1">
+      <Navbar isCollapsed={navbarCollapsed} investigationCase={investigationCase} items={navItems} />
+      <main className="flex w-full overflow-auto p-3 pl-0">{children}</main>
+    </div>
   )
 }

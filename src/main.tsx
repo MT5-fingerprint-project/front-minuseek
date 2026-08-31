@@ -7,6 +7,7 @@ import './assets/css/index.css'
 import './features/shared/lib/i18n'
 import { queryClient } from './features/shared/lib/queryClient.ts'
 import { Toaster } from './features/shared/ui/sonner.tsx'
+import { TooltipProvider } from './features/shared/ui/tooltip.tsx'
 import TenantAuthBoundary from './features/shared/auth/TenantAuthBoundary.tsx'
 import TenantRequiredPage from './features/shared/components/TenantRequiredPage.tsx'
 import CasePageLayout from './layouts/CasePageLayout.tsx'
@@ -85,7 +86,9 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
+      <TooltipProvider>
+        <RouterProvider router={router} />
+      </TooltipProvider>
       <Toaster richColors position="top-right" />
       <ReactQueryDevtools initialIsOpen={false} buttonPosition="bottom-right" />
     </QueryClientProvider>
