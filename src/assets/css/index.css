@@ -43,7 +43,8 @@ body {
 
   /* Blue */
   --color-blue-light-1: rgb(224, 224, 232); /* #E0E0E8 */
-  --color-blue-light-2: rgb(208, 217, 233); /* #D0D9E9 */
+  --color-blue-light-2: rgb(208, 217, 233); 
+  --color-blue-light-3: rgb(154, 166, 208); 
   --color-blue-medium-1: rgb(75, 94, 163); /* #4B5EA3 */
   --color-blue-medium-2: rgb(56, 71, 126); /* #38477E */
   --color-blue-dark-1: rgb(9, 16, 41); /* #091029 */

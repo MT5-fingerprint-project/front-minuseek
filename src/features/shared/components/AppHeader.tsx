@@ -38,18 +38,20 @@ export default function AppHeader() {
     ...(missions.some(isInProgress) ? [VERIFICATION_NAV] : []),
   ]
 
+  const serviceHomePath = `/${slug}`
+  const isOnServiceHome = pathname === serviceHomePath
+
   function isCurrentSection(path: string): boolean {
-    const sectionPath = `/${slug}/${path}`
-    const isServiceIndex = pathname === `/${slug}` && path === 'affaires'
-    return isServiceIndex || pathname === sectionPath || pathname.startsWith(`${sectionPath}/`)
+    const sectionPath = `${serviceHomePath}/${path}`
+    return pathname === sectionPath || pathname.startsWith(`${sectionPath}/`)
   }
 
   return (
     <header className="flex items-center justify-between gap-6 px-6 py-4 text-blue-dark-2">
       <div className="flex items-center gap-10">
         <Link
-          to={`/${slug}`}
-          aria-label={t('navigation.home')}
+          to={serviceHomePath}
+          aria-label={t('navigation.backToHome')}
           className="text-2xl font-light transition-colors hover:text-blue-medium-1"
         >
           MINUSEEK
@@ -57,6 +59,19 @@ export default function AppHeader() {
 
         {entries.length > 0 && (
           <nav aria-label={t('navigation.serviceNavigation')} className="flex items-center gap-1">
+            {isServiceManager && (
+              <Link
+                to={serviceHomePath}
+                aria-current={isOnServiceHome ? 'page' : undefined}
+                className={cn(
+                  'flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors',
+                  isOnServiceHome ? 'bg-blue-light-1 font-medium' : 'hover:bg-grey-light-1'
+                )}
+              >
+                <Icon name="home" size={18} color="currentColor" />
+                {t('navigation.home')}
+              </Link>
+            )}
             {entries.map((entry) => {
               const isCurrent = isCurrentSection(entry.path)
               return (
