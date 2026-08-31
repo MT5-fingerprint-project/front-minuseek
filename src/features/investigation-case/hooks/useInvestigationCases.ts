@@ -7,6 +7,7 @@ import type {
   InvestigationCaseCorrections,
   InvestigationCaseCreateInput,
 } from '@/features/investigation-case/types/investigationCase'
+import type { CaseRecipientInput } from '@/features/investigation-case/types/reportRecipient'
 
 export const investigationCaseKeys = {
   all: ['investigation-cases'] as const,
@@ -97,6 +98,22 @@ export function useCorrectInvestigationCase(id: string) {
       queryClient.invalidateQueries({ queryKey: investigationCaseKeys.lists() })
       queryClient.invalidateQueries({ queryKey: investigationCaseKeys.detail(id) })
       toast.success(t('investigationCase.success.corrected'))
+    },
+  })
+}
+
+export function useUpdateCaseRecipient(id: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: (input: CaseRecipientInput) => InvestigationCaseAPI.updateRecipient(id, input),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: investigationCaseKeys.detail(id) })
+      toast.success(t('investigationCase.recipient.saved'))
+    },
+    onError: () => {
+      toast.error(t('investigationCase.recipient.saveFailed'))
     },
   })
 }
