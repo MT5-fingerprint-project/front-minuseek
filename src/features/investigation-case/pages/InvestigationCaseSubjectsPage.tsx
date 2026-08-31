@@ -25,6 +25,7 @@ export default function InvestigationCaseSubjectsPage() {
 
   const closeAssociates = subjects.filter((subject) => subject.type === 'CLOSE_ASSOCIATE')
   const personsOfInterest = subjects.filter((subject) => subject.type === 'PERSON_OF_INTEREST')
+  const victims = subjects.filter((subject) => subject.type === 'VICTIM')
 
   return (
     <div className="flex flex-col gap-10">
@@ -37,6 +38,7 @@ export default function InvestigationCaseSubjectsPage() {
             {t('subject.list.summary', {
               closeAssociates: t('subject.list.closeAssociateCount', { count: closeAssociates.length }),
               personsOfInterest: t('subject.list.personOfInterestCount', { count: personsOfInterest.length }),
+              victims: t('subject.list.victimCount', { count: victims.length }),
             })}
           </p>
         </div>
@@ -59,6 +61,7 @@ export default function InvestigationCaseSubjectsPage() {
           subjects={personsOfInterest}
           className="bg-blue-light-1"
         />
+        <SubjectTypeColumn title={t('subject.list.victims')} subjects={victims} className="bg-blue-light-2/40" />
       </div>
 
       <SubjectCreateForm

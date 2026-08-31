@@ -14,6 +14,7 @@ const EVENT_ICONS: Record<AuditEventType, IconName> = {
   CASE_UPDATED: 'pen',
   CASE_EXPERTISE_DECLARED: 'verified',
   CASE_SAISINE_UPDATED: 'pen',
+  SUBJECT_REGISTERED: 'personGroup',
   TRACE_UPLOADED: 'import',
   TRACE_QUALIFIED: 'check',
   TRACE_DELETED: 'close',
