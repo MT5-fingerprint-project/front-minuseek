@@ -33,13 +33,14 @@
     "tracesAndFingerprints": "Traces & empreintes",
     "history": "Historique",
     "reports": "Rapports",
-    "home": "Retour à l'accueil",
+    "home": "Accueil",
     "serviceNavigation": "Navigation du service",
     "cases": "Affaires",
     "users": "Utilisateurs",
     "settings": "Paramètres",
     "casesToVerify": "Dossiers à vérifier",
-    "traces": "Traces"
+    "traces": "Traces",
+    "backToHome": "Retour à l'accueil"
   },
   "investigationCase": {
     "status": {
@@ -1029,5 +1030,150 @@
     "MISFILED": "Pièce versée par erreur dans ce dossier",
     "WRONG_ATTRIBUTION": "Rattachement erroné à une personne ou à un doigt",
     "OTHER": "Autre motif"
+  },
+  "statistics": {
+    "page": {
+      "title": "Activité du service",
+      "period": "Du 1er janvier {{year}} à aujourd'hui",
+      "operatorLabel": "Opérateur",
+      "wholeService": "Tout le service",
+      "empty": "Aucune donnée sur cette période."
+    },
+    "headline": {
+      "openCases": "dossiers en cours",
+      "trendUp": "L'encours a monté de {{count}} dossiers depuis janvier",
+      "trendDown": "L'encours a baissé de {{count}} dossiers depuis janvier",
+      "trendFlat": "L'encours n'a pas bougé depuis janvier",
+      "trendDetail": "— {{opened}} ouverts, {{closed}} clos.",
+      "oldestCase": "Le plus ancien est le dossier {{caseNumber}}, ouvert il y a {{days}} jours et confié à {{operator}}."
+    },
+    "tiles": {
+      "closedSinceJanuary": "Dossiers clos depuis le 1er janvier",
+      "closedPerMonth": "soit {{average}} par mois en moyenne",
+      "medianClosure": "Délai médian de clôture",
+      "medianClosureValue": "{{days}} j",
+      "ninthDecile": "9 dossiers sur 10 clos sous {{days}} jours",
+      "noClosure": "aucun dossier clos cette année",
+      "openOverOneMonth": "Dossiers ouverts depuis plus d'un mois",
+      "openOver90Days": "dont {{count}} au-delà de 90 jours"
+    },
+    "signals": {
+      "title": "Ce qui demande une décision",
+      "subtitle": "des stocks, comptés à l'instant où vous regardez",
+      "critical": "Critique",
+      "toHandle": "À traiter",
+      "dormant": "dossiers sans aucun acte depuis plus de 30 jours",
+      "expertiseDeadlines": "expertises dont l'échéance de prorogation tombe sous 15 jours",
+      "exploitableNeverCompared": "traces exploitables jamais confrontées à une empreinte",
+      "withoutOperator": "dossiers en cours sans opérateur désigné"
+    },
+    "monthlyFlow": {
+      "title": "Le débit",
+      "subtitle": "ce qui entre, ce qui sort",
+      "opened": "Dossiers ouverts",
+      "closed": "Dossiers clos",
+      "month": "Mois",
+      "balance": "Solde",
+      "openedTooltip": "{{month}} — {{count}} dossiers ouverts",
+      "closedTooltip": "{{month}} — {{count}} dossiers clos"
+    },
+    "funnel": {
+      "title": "L'entonnoir des traces",
+      "subtitle": "année en cours — entre deux barres, la part qui passe à l'étape suivante",
+      "collected": "Relevées",
+      "exploitable": "Exploitables",
+      "compared": "Comparées",
+      "identified": "Identifiées",
+      "notRecorded": "non renseigné",
+      "passingShare": "↓ {{percent}} %",
+      "stepTooltip": "{{step}} — {{count}} traces",
+      "step": "Étape",
+      "traces": "Traces"
+    },
+    "byOperator": {
+      "title": "Par opérateur",
+      "subtitle": "la charge qu'il porte, et le temps que ses dossiers ont pris",
+      "operator": "Opérateur",
+      "openCases": "Dossiers en cours",
+      "medianClosure": "Délai médian de clôture",
+      "medianClosureColumn": "Délai médian (j)",
+      "closedCases": "Dossiers clos",
+      "unassigned": "Non attribué",
+      "tooFewClosures": "trop peu de clôtures",
+      "notApplicable": "sans objet",
+      "closedCount": "{{count}} clos",
+      "days": "{{days}} j",
+      "openCasesTooltip": "{{operator}} — {{count}} dossiers en cours",
+      "medianTooltip": "{{operator}} — délai médian {{days}} jours sur {{count}} dossiers clos",
+      "serviceLine": "Le trait vertical marque le service : {{avg}} dossiers en cours par opérateur à gauche, {{days}} jours de délai médian à droite.",
+      "medianCaveat": "La médiane ne corrige pas la difficulté des affaires : deux opérateurs qui ne traitent pas les mêmes dossiers n'ont aucune raison d'avoir le même délai."
+    },
+    "figures": {
+      "show": "Voir les chiffres"
+    },
+    "export": {
+      "button": "Exporter en CSV",
+      "summary": {
+        "label": "Synthèse du service",
+        "hint": "les indicateurs de la page, un par ligne",
+        "fileName": "minuseek-synthese-service-{{year}}.csv"
+      },
+      "operators": {
+        "label": "Activité par opérateur",
+        "hint": "charge, clôtures et délai médian",
+        "fileName": "minuseek-operateurs-{{year}}.csv"
+      },
+      "openCases": {
+        "label": "Dossiers en cours",
+        "hint": "{{count}} lignes — de quoi refaire ses propres tris",
+        "fileName": "minuseek-dossiers-en-cours-{{year}}.csv"
+      },
+      "monthlyFlow": {
+        "label": "Débit mensuel",
+        "hint": "ouvertures et clôtures, mois par mois",
+        "fileName": "minuseek-debit-mensuel-{{year}}.csv"
+      },
+      "columns": {
+        "indicator": "Indicateur",
+        "value": "Valeur",
+        "detail": "Précision",
+        "operator": "Opérateur",
+        "openCases": "Dossiers en cours",
+        "closedInPeriod": "Dossiers clos dans la période",
+        "medianClosureDays": "Délai médian de clôture (jours)",
+        "caseNumber": "Numéro",
+        "openedOn": "Ouvert le",
+        "ageInDays": "Âge (jours)",
+        "lastActivityOn": "Dernier acte le",
+        "idleDays": "Sans acte depuis (jours)",
+        "month": "Mois",
+        "openedCases": "Dossiers ouverts",
+        "closedCases": "Dossiers clos",
+        "balance": "Solde"
+      },
+      "indicators": {
+        "period": "Période",
+        "scope": "Périmètre",
+        "openCases": "Dossiers en cours",
+        "openOver30Days": "Dossiers en cours ouverts depuis plus de 30 jours",
+        "oldestOpenCase": "Dossier en cours le plus ancien",
+        "openWithoutOperator": "Dossiers en cours sans opérateur",
+        "dormant": "Dossiers sans acte depuis plus de 30 jours",
+        "expertiseDeadlines": "Expertises à échéance sous 15 jours",
+        "openedInPeriod": "Dossiers ouverts dans la période",
+        "closedInPeriod": "Dossiers clos dans la période",
+        "medianClosureDays": "Délai médian de clôture (jours)",
+        "ninthDecileClosureDays": "Neuvième décile du délai de clôture (jours)",
+        "tracesCollected": "Traces relevées",
+        "tracesExploitable": "Traces exploitables",
+        "tracesCompared": "Traces comparées",
+        "tracesIdentified": "Traces identifiées",
+        "exploitableNeverCompared": "Traces exploitables jamais comparées"
+      },
+      "periodValue": "du {{from}} au {{to}}",
+      "oldestCaseDetail": "{{days}} jours, {{operator}}",
+      "over90DaysDetail": "dont {{count}} au-delà de 90 jours",
+      "serviceRow": "Service"
+    }
   }
 }
