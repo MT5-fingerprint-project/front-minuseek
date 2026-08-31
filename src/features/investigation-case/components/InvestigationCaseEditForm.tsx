@@ -13,6 +13,7 @@ import { Field, FieldDescription, FieldError, FieldLabel } from '@/features/shar
 import { Input } from '@/features/shared/ui/input'
 import { Textarea } from '@/features/shared/ui/textarea'
 import CaseHandoverDialog from '@/features/investigation-case/components/CaseHandoverDialog'
+import CaseJudicialHeaderFields from '@/features/investigation-case/components/CaseJudicialHeaderFields'
 import OperatorPicker, { type OperatorCandidate } from '@/features/investigation-case/components/OperatorPicker'
 import { useEditInvestigationCaseForm } from '@/features/investigation-case/hooks/useEditInvestigationCaseForm'
 import {
@@ -43,7 +44,7 @@ export default function InvestigationCaseEditForm({
     <Dialog open={investigationCase !== null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         ref={contentRef}
-        className="sm:max-w-2xl rounded-md"
+        className="max-h-[85vh] overflow-y-auto sm:max-w-2xl rounded-md"
         onEscapeKeyDown={(event) => {
           if (contentRef.current?.querySelector('[data-slot="combobox-popup"][data-open]')) {
             event.preventDefault()
@@ -181,6 +182,8 @@ function CaseFields({
             }}
           />
         </section>
+
+        <CaseJudicialHeaderFields form={form} />
 
         {canChangeOperator && (
           <section className="grid gap-4">

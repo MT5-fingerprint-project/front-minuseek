@@ -243,6 +243,56 @@
       "detachedPrintsKept": "{{count}} empreinte(s) non rattachée(s) à une personne ne sont pas concernées.",
       "recordsKept": "Les fiches des personnes et les rapports déjà édités ne sont pas modifiés.",
       "destroyedPrintRefused": "Cette empreinte a été détruite : elle ne peut plus être comparée."
+    },
+    "judicialHeader": {
+      "title": "En-tête judiciaire",
+      "complete": "Compléter l'en-tête judiciaire",
+      "notProvided": "Non renseigné",
+      "offenseOn": "le {{date}}",
+      "offenseBetween": "entre le {{from}} et le {{to}}",
+      "fields": {
+        "requestDate": {
+          "label": "Date de la demande d'intervention"
+        },
+        "requesterQuality": {
+          "label": "Qualité du requérant",
+          "placeholder": "Brigadier-Chef de Police"
+        },
+        "requesterName": {
+          "label": "Nom du requérant",
+          "placeholder": "MARCHAND Claire"
+        },
+        "requesterService": {
+          "label": "Service du requérant",
+          "placeholder": "3e District de Police Judiciaire de la D.R.P.J de Paris"
+        },
+        "offenseNature": {
+          "label": "Nature de l'infraction",
+          "placeholder": "Vol par effraction"
+        },
+        "offenseLocation": {
+          "label": "Lieu des faits",
+          "placeholder": "12 rue Léon Frot à Paris 11e"
+        },
+        "offenseDateFrom": {
+          "label": "Date des faits"
+        },
+        "offenseDateTo": {
+          "label": "Fin de la période (si les faits couvrent plusieurs jours)"
+        },
+        "interventionDate": {
+          "label": "Date d'intervention"
+        },
+        "caseAgainst": {
+          "label": "Affaire contre",
+          "placeholder": "X",
+          "hint": "Portez X lorsque l'auteur est inconnu."
+        }
+      },
+      "validation": {
+        "offensePeriodReversed": "La fin de la période ne peut pas précéder la date des faits.",
+        "offensePeriodWithoutStart": "Une fin de période suppose une date des faits."
+      }
     }
   },
   "verification": {
