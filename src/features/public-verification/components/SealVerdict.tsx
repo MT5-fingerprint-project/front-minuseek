@@ -64,11 +64,11 @@ export default function SealVerdict({ verification, error }: SealVerdictProps) {
         })}
       </p>
       <p className="text-sm">{t(`publicVerification.kind.${lookup.kind}`)}</p>
-      <p className="text-sm text-muted-foreground">
-        {lookup.anchoredAt
-          ? t('publicVerification.verdict.anchored', { date: dateOf(lookup.anchoredAt, i18n.language) })
-          : t('publicVerification.verdict.notAnchored')}
-      </p>
+      {lookup.anchoredAt && (
+        <p className="text-sm text-muted-foreground">
+          {t('publicVerification.verdict.anchored', { date: dateOf(lookup.anchoredAt, i18n.language) })}
+        </p>
+      )}
       {lookup.precededByEarlierReport && (
         <p className="text-sm">{t('publicVerification.verdict.earlierReport')}</p>
       )}
