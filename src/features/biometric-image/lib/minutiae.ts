@@ -7,10 +7,7 @@ const MINUTIA_SETTINGS_TYPES = ['circle', 'minutia']
 export function countMinutiae(layers: Layer[] | undefined): number {
   if (!layers) return 0
   return layers.filter(
-    (layer) =>
-      layer.type === 'ANNOTATION' &&
-      typeof layer.settings.type === 'string' &&
-      MINUTIA_SETTINGS_TYPES.includes(layer.settings.type)
+    (layer) => layer.type === 'ANNOTATION' && isMinutiaSettings(layer.settings)
   ).length
 }
 
@@ -28,13 +25,13 @@ export type MinutiaType = (typeof MINUTIA_TYPES)[number]
 export const DEFAULT_MINUTIA_TYPE: MinutiaType = 'UNDETERMINED'
 
 export type MinutiaSettings = {
-  type: 'minutia'
+  type: 'circle' | 'minutia'
   x: number
   y: number
   radius: number
   color: string
-  angle: number
-  minutiaType: MinutiaType
+  angle?: number
+  minutiaType?: MinutiaType
   frame: 'source-pixels'
   schemaVersion: 1
 }
@@ -42,5 +39,10 @@ export type MinutiaSettings = {
 export function isMinutiaSettings(
   settings: Record<string, unknown>
 ): settings is MinutiaSettings {
-  return settings.type === 'minutia'
+  return typeof settings.type === 'string' && MINUTIA_SETTINGS_TYPES.includes(settings.type)
+}
+
+
+export function minutiaTypeOf(settings: MinutiaSettings): MinutiaType {
+  return settings.minutiaType ?? DEFAULT_MINUTIA_TYPE
 }

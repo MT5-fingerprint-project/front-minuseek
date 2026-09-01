@@ -26,7 +26,12 @@ import { Badge } from '@/features/shared/ui/badge'
 import { ANNOTATION_COLORS, type AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import type { CalibrationPoint } from '@/features/biometric-image/lib/calibration'
 import { stageToPngBlob } from '@/features/biometric-image/lib/exportImage'
-import { DEFAULT_MINUTIA_TYPE, isMinutiaSettings, type MinutiaType } from '@/features/biometric-image/lib/minutiae'
+import {
+  DEFAULT_MINUTIA_TYPE,
+  isMinutiaSettings,
+  minutiaTypeOf,
+  type MinutiaType,
+} from '@/features/biometric-image/lib/minutiae'
 
 export type { CanvasZoomHandle, ScaleChangeOrigin }
 
@@ -90,7 +95,9 @@ export default function BiometricImageCanvas({
   const annotationLayers = layers.filter((l) => l.type === 'ANNOTATION')
   const selectedLayer = annotationLayers.find((l) => l.id === selectedAnnotationId)
   const selectedMinutiaType =
-    selectedLayer && isMinutiaSettings(selectedLayer.settings) ? selectedLayer.settings.minutiaType : undefined
+    selectedLayer && isMinutiaSettings(selectedLayer.settings)
+      ? minutiaTypeOf(selectedLayer.settings)
+      : undefined
 
   const { data: images } = useBiometricImages(type, image?.caseId ?? '')
   const freshImage = images?.find((img) => img.id === image?.id) ?? image

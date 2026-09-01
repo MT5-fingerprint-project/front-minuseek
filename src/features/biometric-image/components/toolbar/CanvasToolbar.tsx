@@ -13,6 +13,7 @@ import type { MinutiaType } from '@/features/biometric-image/lib/minutiae'
 import {
   IMAGE_TOOLS,
   ANNOTATION_TOOLS,
+  MINUTIA_TOOLS,
   type CanvasFilters,
   type FilterConfig,
   type AnnotationToolType,
@@ -85,9 +86,9 @@ export default function CanvasToolbar({
       if (openPanel === 'minutiaType') setOpenPanel(null)
       return
     }
-    if (tool === 'circleArrow') {
-      if (activeTool !== 'circleArrow') {
-        onActiveToolChange('circleArrow')
+    if (tool && MINUTIA_TOOLS.includes(tool)) {
+      if (activeTool !== tool) {
+        onActiveToolChange(tool)
         setOpenPanel('minutiaType')
       } else if (openPanel === 'minutiaType') {
         onActiveToolChange(null)
