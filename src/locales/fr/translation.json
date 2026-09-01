@@ -773,6 +773,7 @@
       "CASE_SAISINE_UPDATED": "Saisine du dossier complétée",
       "TRACE_UPLOADED": "Trace déposée",
       "TRACE_QUALIFIED": "Trace qualifiée",
+      "TRACE_NOT_IDENTIFIED": "Trace déclarée non identifiée",
       "TRACE_DELETED": "Trace retirée du dossier",
       "REFERENCE_PRINT_UPLOADED": "Empreinte de référence déposée",
       "REFERENCE_PRINT_DELETED": "Empreinte de référence retirée du dossier",
