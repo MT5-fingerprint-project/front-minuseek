@@ -1,9 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Image as KonvaImage } from 'react-konva'
 import Konva from 'konva'
-import type { CanvasFilters } from '@/features/biometric-image/components/toolbar/canvasFilters'
+import type { Filter } from 'konva/lib/Node'
+import type { CanvasFilters, KonvaFilterDef } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import { FILTER_META } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import { fitAdjustmentFactor } from '@/features/biometric-image/lib/displayScale'
+
+// Au-delà, le canvas hors écran approche des limites du navigateur (Safari en premier),
+// qui rend alors une surface vide sans lever d'erreur.
+const MAX_CACHE_SIDE = 4096
 
 export type ImageLayout = {
   x: number
@@ -20,6 +25,12 @@ export type SourceGeometry = {
   fitScale: number
   sourceWidth: number
   sourceHeight: number
+}
+
+type FilterEntry = [key: string, value: number]
+
+function activeEntriesOfKind(filters: CanvasFilters | undefined, kind: KonvaFilterDef['type']): FilterEntry[] {
+  return Object.entries(filters ?? {}).filter(([key, value]) => value !== 0 && FILTER_META[key]?.konva.type === kind)
 }
 
 function useImage(url: string) {
@@ -62,46 +73,35 @@ export default function DraggableImage({
   const imageRef = useRef<Konva.Image>(null)
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null)
 
-  const activeKeys = Object.keys(filters ?? {}).filter((k) => (filters?.[k] ?? 0) !== 0)
+  const filterSignature = JSON.stringify(activeEntriesOfKind(filters, 'filter'))
+  const transformSignature = JSON.stringify(activeEntriesOfKind(filters, 'transform'))
 
-  const konvaFilters = [
-    ...new Set(
-      activeKeys.flatMap((k) => {
-        const def = FILTER_META[k]?.konva
-        return def?.type === 'filter' ? [def.filter] : []
-      }),
-    ),
-  ]
-  const filterProps = Object.fromEntries(
-    activeKeys.flatMap((k) => {
-      const def = FILTER_META[k]?.konva
-      if (def?.type !== 'filter' || !def.prop) return []
-      return [[def.prop, filters![k] * def.scale]]
-    }),
-  )
-
-  // Konva n'applique les filtres que sur un node caché : on (re)cache quand un
-  // filtre est actif, on vide le cache sinon (rendu brut net, réversible à 0).
-  const filterSignature = JSON.stringify(filterProps)
-  useEffect(() => {
-    const node = imageRef.current
-    if (!node || !image) return
-    if (konvaFilters.length > 0) {
-      node.cache()
-    } else {
-      node.clearCache()
+  // Reposer l'attribut `filters` d'un nœud Konva invalide sa passe de filtrage : garder
+  // l'identité du tableau stable rend un déplacement ou un zoom gratuits, et la faire
+  // changer avec la signature refiltre dès qu'une valeur bouge — les filtres maison lisent
+  // des attributs que Konva ne connaît pas, ils ne se réappliquent pas d'eux-mêmes.
+  const { konvaFilters, filterProps } = useMemo(() => {
+    const definitions: Filter[] = []
+    const props: Record<string, number> = {}
+    for (const [key, value] of JSON.parse(filterSignature) as FilterEntry[]) {
+      const definition = FILTER_META[key]?.konva
+      if (definition?.type !== 'filter') continue
+      if (!definitions.includes(definition.filter)) definitions.push(definition.filter)
+      if (definition.prop) props[definition.prop] = value * definition.scale
     }
-    node.getLayer()?.batchDraw()
-  }, [image, konvaFilters.length, filterSignature])
+    return { konvaFilters: definitions, filterProps: props }
+  }, [filterSignature])
 
   // Transforms — go as direct Konva node props
-  const transformProps = Object.fromEntries(
-    activeKeys.flatMap((k) => {
-      const def = FILTER_META[k]?.konva
-      if (def?.type !== 'transform') return []
-      return [[def.prop, def.transform(filters![k])]]
-    }),
-  )
+  const transformProps = useMemo(() => {
+    const props: Record<string, number> = {}
+    for (const [key, value] of JSON.parse(transformSignature) as FilterEntry[]) {
+      const definition = FILTER_META[key]?.konva
+      if (definition?.type !== 'transform') continue
+      props[definition.prop] = definition.transform(value)
+    }
+    return props
+  }, [transformSignature])
 
   // Geometry — shared by the rendered image and the layout reported for annotation anchoring
   const scale = image ? fitAdjustmentFactor(image.width, image.height) : 0
@@ -111,8 +111,8 @@ export default function DraggableImage({
     x: Math.max(0, (stageSize.width - width) / 2),
     y: Math.max(0, (stageSize.height - height) / 2),
   }
-  const scaleX = (transformProps.scaleX as number) ?? 1
-  const rotation = (transformProps.rotation as number) ?? 0
+  const scaleX = transformProps.scaleX ?? 1
+  const rotation = transformProps.rotation ?? 0
   // Pivot toujours au centre : le miroir (scaleX = -1) se reflète sur place sans décaler l'image.
   const offsetX = width / 2
   const offsetY = height / 2
@@ -121,22 +121,27 @@ export default function DraggableImage({
 
   const hasFilter = konvaFilters.length > 0
 
-  const zoomLevel = Math.max(1, Math.ceil(viewScale)) // le zoom courant, arrondi, jamais < 1
-  const sourceResolution = scale > 0 ? 1 / scale : 1 // combien la source est plus grande que l'affichage
-  const cachePixelRatio = Math.min(zoomLevel, sourceResolution)
+  // Le cache est rasterisé en pixels physiques : sans `Konva.pixelRatio`, un écran Retina
+  // afficherait l'image filtrée à la moitié de la densité de l'image nue, donc plus floue.
+  // Par paliers de puissance de deux, pour ne pas rasteriser à chaque cran de molette.
+  const zoomTier = 2 ** Math.ceil(Math.log2(Math.max(1, viewScale)))
+  const sourceResolution = scale > 0 ? 1 / scale : 1
+  const renderedMaxSide = Math.max(width, height)
+  const cacheSideLimit = renderedMaxSide > 0 ? MAX_CACHE_SIDE / renderedMaxSide : 1
+  const cachePixelRatio = Math.min(zoomTier * Konva.pixelRatio, sourceResolution, cacheSideLimit)
 
-  // Sans filtre : pas de cache -> res native.
-  // Avec filtre : cache obligatoire ajusté à la résolution d'affichage.
+  // Konva n'applique les filtres que sur un nœud caché : on (re)cache quand un
+  // filtre est actif, on vide le cache sinon (rendu brut net, réversible à 0).
   useEffect(() => {
     const node = imageRef.current
-    if (!node) return
+    if (!node || !image) return
     if (hasFilter) {
       node.cache({ pixelRatio: cachePixelRatio })
     } else {
       node.clearCache()
     }
     node.getLayer()?.batchDraw()
-  }, [image, filters, hasFilter, cachePixelRatio])
+  }, [image, hasFilter, cachePixelRatio])
 
   useEffect(() => {
     if (!image) return

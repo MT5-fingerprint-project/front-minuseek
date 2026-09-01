@@ -125,14 +125,30 @@ Source unique : `FILTER_META` dans `components/toolbar/canvasFilters.ts`. Chaque
 
 Les filtres sont eux aussi **persistés comme calques** (`type: 'FILTER'`), avec debounce (`useCanvasFilters.ts`, ~500 ms ; valeur revenue à 0 = calque supprimé). Pour ajouter un filtre : l'enregistrer dans `FILTER_META` (+ entrée dans `IMAGE_TOOLS`), ne pas câbler un `Konva.Filters.*` en dur dans `DraggableImage`.
 
-> **Règle Konva des filtres** : un node ne rend ses `filters` que s'il est **mis en cache**. D'où, à chaque changement de filtres :
+> **Règle Konva des filtres** : un node ne rend ses `filters` que s'il est **mis en cache**, et
+> `cache()` rasterise le node entier — un appel par frame suffit à faire saccader l'atelier. On ne
+> recache donc que quand l'échelle du cache change. Ce qui déclenche une nouvelle passe de filtrage,
+> c'est **l'identité du tableau passé en prop `filters`** (le setter de cet attribut remet
+> `_filterUpToDate` à `false`) : le mémoïser sur une signature des valeurs actives rend un
+> déplacement ou un zoom gratuits, et le fait changer dès qu'un curseur bouge. Ne pas compter sur
+> `Factory.afterSetFilter` : les filtres maison lisent des attributs que Konva ne déclare pas
+> (`brightnessAmount`, `levelsGammaAmount`…), ils ne se réappliquent pas d'eux-mêmes.
 > ```ts
+> const filterSignature = JSON.stringify(activeEntriesOfKind(filters, 'filter'))
+> const { konvaFilters, filterProps } = useMemo(() => /* … */, [filterSignature])
+>
 > useEffect(() => {
->   imageRef.current?.cache()
->   imageRef.current?.getLayer()?.batchDraw()
-> }, [filters])
+>   if (hasFilter) node.cache({ pixelRatio: cachePixelRatio })
+>   else node.clearCache()
+>   node.getLayer()?.batchDraw()
+> }, [image, hasFilter, cachePixelRatio])
 > ```
 > Oublier le `cache()` = filtres invisibles ; oublier le `batchDraw()` = rendu non rafraîchi.
+> `cachePixelRatio` se multiplie par `Konva.pixelRatio`, sans quoi l'image filtrée est rasterisée à
+> la moitié de la densité de l'image nue sur un écran Retina (donc visiblement plus floue), et se
+> plafonne pour que le canvas hors écran reste sous `MAX_CACHE_SIDE` — au-delà le navigateur rend
+> une surface vide sans lever d'erreur. Les transformations (miroir, rotation) portent leur propre
+> signature : les faire passer par celle des filtres refiltrerait l'image à chaque cran du curseur.
 
 ## 7. Overlay / superposition trace vs référence (approche prospective)
 
@@ -151,12 +167,12 @@ Approche cible pour un mode "overlay" dans un **Stage unique** :
 Le forensique implique des images détaillées et beaucoup d'annotations : limiter les redraws est essentiel.
 
 - **Layers séparés statique vs dynamique** : image (rare changement) dans un `Layer`, annotations (interactions fréquentes) dans un autre. Déjà en place — le conserver.
-- **`cache()` sur l'image** : nécessaire pour les filtres, et accélère le rendu d'un node coûteux. Re-`cache()` quand la géométrie/les filtres changent.
+- **`cache()` sur l'image** : nécessaire pour les filtres, et accélère le rendu d'un node coûteux. Ne re-`cache()` que quand la géométrie ou l'échelle du cache changent — pas à chaque changement de valeur de filtre, et surtout pas à chaque rendu.
 - **`batchDraw()`** (via `node.getLayer()?.batchDraw()`) plutôt que des redraws synchrones répétés ; regrouper les mises à jour.
 - **`listening={false}`** : à poser sur tout `Layer`/node purement décoratif ou non-interactif (ex. une image de référence en overlay non cliquable) pour sortir du hit-graph et accélérer les events. *(Non encore utilisé dans le code — l'introduire dès qu'un node devient non-interactif.)*
 - **Hit-test ciblé** : `hitStrokeWidth` élargit la zone cliquable des traits fins ; à l'inverse, ne pas rendre cliquables des éléments qui n'ont pas à l'être.
 - **Persister sur `onDragEnd`, pas `onDragMove`** : muter le server state (React Query) à chaque frame de drag est à proscrire ; suivre en state local pendant le geste, persister à la fin (cf. minuties).
-- Éviter de remettre l'image en cache pour rien : le `cache()` est déclenché **par `useEffect([filters])`**, pas à chaque render.
+- Éviter de remettre l'image en cache pour rien : un seul effet de cache, dépendant de l'échelle du cache et **jamais de l'objet `filters`** — celui-ci est reconstruit à chaque rendu du parent, donc le mettre en dépendance rasterise l'image à chaque frame de déplacement.
 
 ## 9. Pièges spécifiques (déjà rencontrés / à surveiller)
 
