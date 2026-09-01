@@ -12,11 +12,7 @@ import ScaleBarOverlay from '@/features/biometric-image/components/canvas/ScaleB
 import CanvasGridOverlay from '@/features/biometric-image/components/canvas/CanvasGridOverlay'
 import CanvasToolbar from '@/features/biometric-image/components/toolbar/CanvasToolbar'
 import LayersPanelContainer from '@/features/biometric-image/components/layers/LayersPanelContainer'
-import {
-  useCanvasView,
-  type CanvasZoomHandle,
-  type ScaleChangeOrigin,
-} from '@/features/biometric-image/components/canvas/useCanvasView'
+import { useCanvasView, type CanvasZoomHandle } from '@/features/biometric-image/components/canvas/useCanvasView'
 import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
 import { useCanvasFilters } from '@/features/biometric-image/hooks/useCanvasFilters'
 import { useLayers, useUpdateLayer } from '@/features/biometric-image/hooks/useLayers'
@@ -33,7 +29,7 @@ import {
   type MinutiaType,
 } from '@/features/biometric-image/lib/minutiae'
 
-export type { CanvasZoomHandle, ScaleChangeOrigin }
+export type { CanvasZoomHandle }
 
 export type ExportHandle = {
   exportToBlob: () => Promise<Blob>
@@ -48,7 +44,7 @@ type BiometricImageCanvasProps = {
   isGridVisible?: boolean
   onCloseLayers?: () => void
   zoomHandleRef?: React.RefObject<CanvasZoomHandle | null>
-  onScaleChange?: (scale: number, origin: ScaleChangeOrigin) => void
+  onScaleChange?: (scale: number) => void
   onSourceGeometryChange?: (geometry: SourceGeometry | null) => void
   exportHandleRef?: React.RefObject<ExportHandle | null>
 }
