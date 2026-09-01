@@ -164,7 +164,20 @@ export default function CaseTracesPage() {
                         <NotProvided />
                       )}
                     </TableCell>
-                    <TableCell>{state && <Badge variant={state.variant}>{t(state.labelKey)}</Badge>}</TableCell>
+                    <TableCell>
+                      {state && (
+                        <Badge
+                          variant={state.variant}
+                          aria-label={
+                            state.labelKey === 'trace.state.notIdentified'
+                              ? t('trace.exploitability.notIdentifiedAria')
+                              : undefined
+                          }
+                        >
+                          {t(state.labelKey, state.params)}
+                        </Badge>
+                      )}
+                    </TableCell>
                     <TableCell>{new Date(trace.createdAt).toLocaleDateString(i18n.language)}</TableCell>
                     <TableCell className="text-right">
                       <Button

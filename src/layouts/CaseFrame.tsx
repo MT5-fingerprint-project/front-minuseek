@@ -11,11 +11,13 @@ type CaseFrameProps = {
   navbarCollapsed?: boolean
   /** Entrée de navigation active */
   activeNav: 'info' | 'subjects' | 'traces' | 'comparison' | 'history' | 'reports'
+  /** Icône de relance du tour guidé dans le pied de navbar (mode comparateur seulement) */
+  onRestartTour?: () => void
   children: ReactNode
 }
 
 /** Cadre partagé des pages d'une affaire : navbar + zone de contenu scrollable. */
-export default function CaseFrame({ navbarCollapsed = false, activeNav, children }: CaseFrameProps) {
+export default function CaseFrame({ navbarCollapsed = false, activeNav, onRestartTour, children }: CaseFrameProps) {
   const { slug, id } = useParams<{ slug: string; id: string }>()
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -70,7 +72,12 @@ export default function CaseFrame({ navbarCollapsed = false, activeNav, children
 
   return (
     <div className="flex h-screen w-full overflow-hidden bg-blue-dark-1">
-      <Navbar isCollapsed={navbarCollapsed} investigationCase={investigationCase} items={navItems} />
+      <Navbar
+        isCollapsed={navbarCollapsed}
+        investigationCase={investigationCase}
+        items={navItems}
+        onRestartTour={onRestartTour}
+      />
       <main className="flex w-full overflow-auto p-3 pl-0">{children}</main>
     </div>
   )

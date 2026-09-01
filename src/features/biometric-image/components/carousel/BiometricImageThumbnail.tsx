@@ -77,6 +77,14 @@ export default function BiometricImageThumbnail({
               {Math.round(matching.score)}
             </Badge>
           )}
+          {matching === undefined && image.cote && (
+            <Badge
+              className="absolute top-1 left-1 bg-blue-medium-1/90 text-white hover:bg-blue-medium-1/90"
+              aria-label={t('trace.exploitability.coteAria', { cote: image.cote })}
+            >
+              {image.cote}
+            </Badge>
+          )}
           <span className="absolute inset-x-0 bottom-0 truncate bg-[rgba(9,16,41,0.7)] px-0.5 py-0.5 text-center text-xs font-light text-white">
             {label}
           </span>

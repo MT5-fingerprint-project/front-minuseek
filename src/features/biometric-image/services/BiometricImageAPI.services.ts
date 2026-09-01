@@ -27,7 +27,8 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     url: dto.url,
     status: dto.status ?? null,
     identified: dto.identified ?? null,
-    score: dto.score,
+    notIdentified: dto.notIdentified ?? null,
+    cote: dto.cote ?? null,
     caseId: dto.caseId,
     subjectId: dto.subjectId ?? null,
     position: dto.position ?? null,
@@ -61,6 +62,21 @@ export const BiometricImageAPI = {
   describeTrace: (id: string, input: TraceDescriptionInput) =>
     apiClient
       .put<BiometricImageDto>(`/traces/${id}/description`, input)
+      .then((res) => mapDtoToBiometricImage(res.data)),
+
+  declareExploitability: (id: string, exploitable: boolean) =>
+    apiClient
+      .put<BiometricImageDto>(`/traces/${id}/exploitability`, { exploitable })
+      .then((res) => mapDtoToBiometricImage(res.data)),
+
+  declareNotIdentified: (id: string) =>
+    apiClient
+      .put<BiometricImageDto>(`/traces/${id}/not-identified`)
+      .then((res) => mapDtoToBiometricImage(res.data)),
+
+  withdrawNotIdentified: (id: string) =>
+    apiClient
+      .delete<BiometricImageDto>(`/traces/${id}/not-identified`)
       .then((res) => mapDtoToBiometricImage(res.data)),
 
   attachLocationPhoto: (traceId: string, file: File) => {

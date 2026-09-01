@@ -1,16 +1,20 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { CircleHelp } from 'lucide-react'
 import { Icon } from '@/features/shared/icons'
 import { cn } from '@/features/shared/lib/utils'
 import { useClickOutside } from '@/features/shared/hooks/useClickOutside'
 import { useAuth } from '@/features/shared/auth/auth-context'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/features/shared/ui/tooltip'
 
 type NavFooterProps = {
   isCollapsed?: boolean
+  /** Affiche l'icône de relance du tour guidé au-dessus du profil (mode comparateur seulement) */
+  onRestartTour?: () => void
 }
 
 /** Pied de navbar : bouton compte ouvrant un mini-menu (déconnexion, + d'actions à venir). */
-export default function NavFooter({ isCollapsed = false }: NavFooterProps) {
+export default function NavFooter({ isCollapsed = false, onRestartTour }: NavFooterProps) {
   const { t } = useTranslation()
   const { username, logout } = useAuth()
   const [isMenuOpen, setMenuOpen] = useState(false)
@@ -20,7 +24,20 @@ export default function NavFooter({ isCollapsed = false }: NavFooterProps) {
   const label = username ?? t('auth.account')
 
   return (
-    <div ref={containerRef} className="relative px-4">
+    <div ref={containerRef} className="relative flex flex-col items-start gap-1 px-4">
+      {onRestartTour && (
+        <Tooltip>
+          <TooltipTrigger
+            type="button"
+            onClick={onRestartTour}
+            aria-label={t('investigationCase.comparison.tour.restartLabel')}
+            className="flex items-center gap-2 rounded-md p-2 text-grey-light-2 transition-colors hover:bg-white/10"
+          >
+            <CircleHelp size={24} />
+          </TooltipTrigger>
+          <TooltipContent side="right">{t('investigationCase.comparison.tour.restartLabel')}</TooltipContent>
+        </Tooltip>
+      )}
       {isMenuOpen && (
         <div
           role="menu"

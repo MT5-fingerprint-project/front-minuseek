@@ -526,9 +526,30 @@
     },
     "state": {
       "identified": "Identifiée",
-      "exploitable": "Exploitable",
+      "notIdentified": "Non identifiée",
+      "cote": "Cote {{cote}}",
       "notExploitable": "Inexploitable",
       "toQualify": "À qualifier"
+    },
+    "exploitability": {
+      "title": "Exploitabilité",
+      "exploitable": "Exploitable",
+      "exploitableShort": "Exp",
+      "notExploitable": "Inexploitable",
+      "notExploitableShort": "Inex",
+      "notIdentified": "Non identifiée",
+      "notIdentifiedShort": "N.I.",
+      "notIdentifiedAria": "Aucune concordance relevée",
+      "withdrawNotIdentified": "Retirer la déclaration de non-identification",
+      "coteAria": "Trace cotée {{cote}}",
+      "hint": "La cote est attribuée automatiquement aux traces exploitables, dans l'ordre de leur numéro.",
+      "notIdentifiedHint": "Déclarez « non identifiée » lorsque vous avez comparé la trace à toutes les empreintes de référence du dossier sans relever de concordance. Tant que rien n'est déclaré, le rapport écrit « non examinée ».",
+      "success": "Exploitabilité enregistrée. Les cotes ont été mises à jour.",
+      "error": "L'enregistrement a échoué",
+      "notIdentifiedSuccess": "Déclaration enregistrée",
+      "notIdentifiedError": "L'enregistrement a échoué",
+      "withdrawNotIdentifiedSuccess": "Déclaration retirée",
+      "withdrawNotIdentifiedError": "Le retrait a échoué"
     },
     "panel": {
       "title": "Fiche de la trace",

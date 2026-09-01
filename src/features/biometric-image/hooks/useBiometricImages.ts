@@ -56,6 +56,58 @@ export function useDescribeTrace(caseId: string) {
   })
 }
 
+export function useDeclareExploitability(caseId: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ id, exploitable }: { id: string; exploitable: boolean }) =>
+      BiometricImageAPI.declareExploitability(id, exploitable),
+    onSuccess: (trace) => {
+      queryClient.invalidateQueries({ queryKey: biometricImageKeys.list('traces', caseId) })
+      queryClient.invalidateQueries({ queryKey: biometricImageKeys.trace(trace.id) })
+      toast.success(t('trace.exploitability.success'))
+    },
+    onError: () => {
+      toast.error(t('trace.exploitability.error'))
+    },
+  })
+}
+
+export function useDeclareNotIdentified(caseId: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: (id: string) => BiometricImageAPI.declareNotIdentified(id),
+    onSuccess: (trace) => {
+      queryClient.invalidateQueries({ queryKey: biometricImageKeys.list('traces', caseId) })
+      queryClient.invalidateQueries({ queryKey: biometricImageKeys.trace(trace.id) })
+      toast.success(t('trace.exploitability.notIdentifiedSuccess'))
+    },
+    onError: () => {
+      toast.error(t('trace.exploitability.notIdentifiedError'))
+    },
+  })
+}
+
+export function useWithdrawNotIdentified(caseId: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: (id: string) => BiometricImageAPI.withdrawNotIdentified(id),
+    onSuccess: (trace) => {
+      queryClient.invalidateQueries({ queryKey: biometricImageKeys.list('traces', caseId) })
+      queryClient.invalidateQueries({ queryKey: biometricImageKeys.trace(trace.id) })
+      toast.success(t('trace.exploitability.withdrawNotIdentifiedSuccess'))
+    },
+    onError: () => {
+      toast.error(t('trace.exploitability.withdrawNotIdentifiedError'))
+    },
+  })
+}
+
 function invalidateTrace(
   queryClient: ReturnType<typeof useQueryClient>,
   caseId: string,
