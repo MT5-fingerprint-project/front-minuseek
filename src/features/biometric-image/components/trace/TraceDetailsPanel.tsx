@@ -12,9 +12,12 @@ import {
   SheetTitle,
 } from '@/features/shared/ui/sheet'
 import { Spinner } from '@/features/shared/ui/spinner'
+import { Badge } from '@/features/shared/ui/badge'
+import TraceDeclarationButtons from '@/features/biometric-image/components/trace/TraceDeclarationButtons'
 import TraceDescriptionForm from '@/features/biometric-image/components/trace/TraceDescriptionForm'
 import TraceLocationPhotoCard from '@/features/biometric-image/components/trace/TraceLocationPhotoCard'
 import { useDescribeTrace, useTrace } from '@/features/biometric-image/hooks/useBiometricImages'
+import { exploitabilityBadge } from '@/features/biometric-image/lib/traceState'
 import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
 import type {
   RevelationTechnique,
@@ -75,14 +78,27 @@ export default function TraceDetailsPanel({ traceId, caseId, traces, isOpen, onC
   const isOutOfCase = trace !== undefined && trace.caseId !== caseId
   const isReadable = trace !== undefined && !isOutOfCase
   const depositedAt = trace ? new Date(trace.createdAt) : null
+  const stateBadge = isReadable ? exploitabilityBadge(trace) : null
 
   return (
     <Sheet open={isOpen} onOpenChange={(next) => !next && onClose()}>
       <SheetContent side="right" showCloseButton={false} className="gap-0 data-[side=right]:w-1/2 data-[side=right]:sm:max-w-[50%]">
         <SheetHeader className="flex-row items-start justify-between gap-2 border-b border-grey-light-2">
           <div className="flex flex-col gap-1.5">
-            <SheetTitle className="text-lg font-semibold">
+            <SheetTitle className="flex items-center gap-2 text-lg font-semibold">
               {isReadable ? trace.label : t('trace.panel.title')}
+              {stateBadge && (
+                <Badge
+                  variant={stateBadge.variant}
+                  aria-label={
+                    stateBadge.labelKey === 'trace.state.cote'
+                      ? t('trace.exploitability.coteAria', stateBadge.params)
+                      : undefined
+                  }
+                >
+                  {t(stateBadge.labelKey, stateBadge.params)}
+                </Badge>
+              )}
             </SheetTitle>
             <SheetDescription>
               {isReadable && depositedAt
@@ -121,6 +137,11 @@ export default function TraceDetailsPanel({ traceId, caseId, traces, isOpen, onC
               <Icon name="compare" size={20} color="currentColor" />
               {t('trace.panel.openInComparator')}
             </Link>
+
+            <section className="flex flex-col gap-3">
+              <h3 className="text-sm font-semibold">{t('trace.exploitability.title')}</h3>
+              <TraceDeclarationButtons trace={trace} caseId={caseId} />
+            </section>
 
             <section className="flex flex-col gap-3">
               <div className="flex items-center justify-between gap-2">

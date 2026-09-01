@@ -9,6 +9,7 @@ import { Icon } from '@/features/shared/icons'
 import WorkbenchWindow from '@/features/shared/components/window/WorkbenchWindow'
 import WindowActionButton from '@/features/shared/components/window/WindowActionButton'
 import { BiometricImageCarousel, BiometricImageCanvas } from '@/features/biometric-image'
+import TraceDeclarationButtons from '@/features/biometric-image/components/trace/TraceDeclarationButtons'
 import type { BiometricImageDecoration } from '@/features/biometric-image/types/biometricImage'
 import ZoomControls from '@/features/biometric-image/components/canvas/ZoomControls'
 import RecenterButton from '@/features/biometric-image/components/canvas/RecenterControl'
@@ -53,8 +54,6 @@ export type ComparisonWorkbenchProps = {
   onToggleDetach?: () => void
   /** Habillage des vignettes du carrousel par id d'image (libellé, bordure) */
   imageDecorations?: Record<string, BiometricImageDecoration>
-  /** Relance le tour guidé de l'atelier (uniquement câblé sur la fenêtre des traces) */
-  onRestartTour?: () => void
 }
 
 /**
@@ -77,7 +76,6 @@ export default function ComparisonWorkbench({
   isDetached,
   onToggleDetach,
   imageDecorations,
-  onRestartTour,
 }: ComparisonWorkbenchProps) {
   const { t } = useTranslation()
   const keys = TITLES[type]
@@ -95,21 +93,28 @@ export default function ComparisonWorkbench({
   const title = w.selectedTrace ? t(keys.selected, { label: w.selectedTrace.label }) : t(keys.base)
 
   const actions =
-    (type === 'traces' && w.selectedTrace) || onRestartTour ? (
+    type === 'traces' && w.selectedTrace ? (
       <>
-        {type === 'traces' && w.selectedTrace && (
-          <WindowActionButton
-            icon="information"
-            label={t('trace.panel.open')}
-            onClick={() => navigate(`/${slug}/affaires/${caseId}/traces?trace=${w.selectedTrace?.id}`)}
-          />
-        )}
-        {onRestartTour && (
-          <WindowActionButton
-            icon="information"
-            label={t('investigationCase.comparison.tour.restartLabel')}
-            onClick={onRestartTour}
-          />
+        <WindowActionButton
+          icon="information"
+          label={t('trace.panel.open')}
+          onClick={() => navigate(`/${slug}/affaires/${caseId}/traces?trace=${w.selectedTrace?.id}`)}
+        />
+        {side === 'left' && (
+          <Button
+            type="button"
+            variant="outline"
+            size="small"
+            disabled={isComparing}
+            onClick={onAnalyze}
+            data-tour="analyze-button"
+            className={cn(
+              'relative mr-1 overflow-hidden rounded-full border-white/30 bg-white/10 text-white hover:bg-white hover:text-blue-medium-1',
+            )}
+          >
+            {isComparing ? <Loader2 size={13} className="animate-spin" /> : <Sparkle size={13} />}
+            {t('investigationCase.comparison.analyzeButton')}
+          </Button>
         )}
       </>
     ) : undefined
@@ -135,6 +140,12 @@ export default function ComparisonWorkbench({
           onZoomIn={() => w.zoomRef.current?.zoomIn()}
           onZoomOut={() => w.zoomRef.current?.zoomOut()}
         />
+        <WindowActionButton
+          tone="footer"
+          icon={w.isGridVisible ? 'gridOff' : 'grid'}
+          label={t(w.isGridVisible ? 'common.window.hideGrid' : 'common.window.showGrid')}
+          onClick={w.toggleGrid}
+        />
         <RecenterButton onClick={() => w.zoomRef.current?.recenter()} />
         {w.selectedTrace && (
           <button
@@ -149,30 +160,11 @@ export default function ComparisonWorkbench({
             <Icon name="pen" size={14} color="currentColor" />
           </button>
         )}
-        <WindowActionButton
-          tone="footer"
-          icon={w.isGridVisible ? 'gridOff' : 'grid'}
-          label={t(w.isGridVisible ? 'common.window.hideGrid' : 'common.window.showGrid')}
-          onClick={w.toggleGrid}
-        />
       </div>
-      {/* Groupe droite : analyse IA (fenêtre traces) + annuler/rétablir + calques */}
+      {/* Groupe droite : exploitabilité (fenêtre traces) + annuler/rétablir + calques */}
       <div className="flex items-center gap-1">
-        {side === 'left' && w.selectedTrace && (
-          <Button
-            type="button"
-            variant="outline"
-            size="small"
-            disabled={isComparing}
-            onClick={onAnalyze}
-            data-tour="analyze-button"
-            className={cn(
-              'relative mr-1 overflow-hidden rounded-full border-blue-medium-1/40 text-blue-medium-1 hover:border-blue-medium-1 hover:bg-blue-medium-1 hover:text-white',
-            )}
-          >
-            {isComparing ? <Loader2 size={13} className="animate-spin" /> : <Sparkle size={13} />}
-            {t('investigationCase.comparison.analyzeButton')}
-          </Button>
+        {type === 'traces' && freshImage && (
+          <TraceDeclarationButtons trace={freshImage} caseId={caseId} variant="compact" />
         )}
         <WindowActionButton tone="footer" icon="redo" label={t('common.window.redo')} />
         <WindowActionButton tone="footer" icon="undo" label={t('common.window.undo')} />

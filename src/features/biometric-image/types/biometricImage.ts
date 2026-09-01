@@ -32,7 +32,8 @@ export interface BiometricImage {
   url: string | null
   status: BiometricImageStatus | null
   identified: boolean | null
-  score: number | null
+  notIdentified: boolean | null
+  cote: string | null
   caseId: string
   subjectId: string | null
   position: string | null
@@ -59,7 +60,8 @@ export interface BiometricImageDto {
   url: string | null
   status: BiometricImageStatus | null
   identified?: boolean | null
-  score: number | null
+  notIdentified?: boolean | null
+  cote?: string | null
   caseId: string
   subjectId?: string | null
   position?: string | null

@@ -13,9 +13,11 @@ type NavbarProps = {
   isCollapsed?: boolean
   investigationCase?: InvestigationCase
   items: NavItemConfig[]
+  /** Icône de relance du tour guidé, affichée au-dessus du profil (mode comparateur seulement) */
+  onRestartTour?: () => void
 }
 
-export default function Navbar({ isCollapsed = false, investigationCase, items }: NavbarProps) {
+export default function Navbar({ isCollapsed = false, investigationCase, items, onRestartTour }: NavbarProps) {
   const { t } = useTranslation()
   const { slug } = useParams<{ slug: string }>()
 
@@ -39,7 +41,7 @@ export default function Navbar({ isCollapsed = false, investigationCase, items }
             ))}
           </nav>
         </div>
-        <NavFooter isCollapsed />
+        <NavFooter isCollapsed onRestartTour={onRestartTour} />
       </aside >
     )
   }
@@ -73,7 +75,7 @@ export default function Navbar({ isCollapsed = false, investigationCase, items }
           ))}
         </nav>
       </div>
-      <NavFooter />
+      <NavFooter onRestartTour={onRestartTour} />
     </aside>
   )
 }
