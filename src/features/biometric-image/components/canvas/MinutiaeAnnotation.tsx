@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Circle, Line, Group, Text } from 'react-konva'
 import type { Layer } from '@/features/biometric-image/types/layer'
 import { toScreenLength, toSourceLength } from '@/features/biometric-image/lib/displayScale'
-import { DEFAULT_MINUTIA_TYPE, type MinutiaType } from '@/features/biometric-image/lib/minutiae'
+import { minutiaTypeOf, type MinutiaSettings } from '@/features/biometric-image/lib/minutiae'
 import { edgeAndTip, angleFromOffset } from './annotationUtils'
 
 const HANDLE_RADIUS = 4
@@ -31,18 +31,18 @@ export default function MinutiaeAnnotation({
   onPersist,
 }: MinutiaeAnnotationProps) {
   const { t } = useTranslation()
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const s = layer.settings as any
+  const settings = layer.settings as MinutiaSettings
   const [liveAngleDeg, setLiveAngleDeg] = useState<number | null>(null)
   // Track handle drag with state so it's safe to read during render
   const [draggingHandle, setDraggingHandle] = useState(false)
   const isDraggingHandle = useRef(false)
 
-  const angleDeg = liveAngleDeg ?? (s.angle ?? 0)
-  const radius = toScreenLength(s.radius as number, fitScale)
+  const hasDirection = settings.type === 'minutia'
+  const angleDeg = liveAngleDeg ?? settings.angle ?? 0
+  const radius = toScreenLength(settings.radius, fitScale)
   const { edge, tip } = edgeAndTip(angleDeg, radius)
 
-  const minutiaType = (s.minutiaType as MinutiaType) ?? DEFAULT_MINUTIA_TYPE
+  const minutiaType = minutiaTypeOf(settings)
   const typeLabel = t(
     isSelected
       ? `biometricImage.minutia.types.${minutiaType}`
@@ -53,14 +53,14 @@ export default function MinutiaeAnnotation({
   return (
     <Group
       name="annotation"
-      x={toScreenLength(s.x, fitScale)}
-      y={toScreenLength(s.y, fitScale)}
+      x={toScreenLength(settings.x, fitScale)}
+      y={toScreenLength(settings.y, fitScale)}
       draggable={!draggingHandle}
       onClick={(e) => { e.cancelBubble = true; onSelect() }}
       onDragEnd={(e) => {
         if (isDraggingHandle.current) return
         onPersist({
-          ...s,
+          ...settings,
           x: Math.round(toSourceLength(e.target.x(), fitScale)),
           y: Math.round(toSourceLength(e.target.y(), fitScale)),
         })
@@ -68,16 +68,18 @@ export default function MinutiaeAnnotation({
     >
       <Circle
         radius={radius}
-        stroke={s.color}
+        stroke={settings.color}
         strokeWidth={strokeWidth}
         hitStrokeWidth={12}
       />
-      <Line
-        points={[edge.x, edge.y, tip.x, tip.y]}
-        stroke={s.color}
-        strokeWidth={strokeWidth}
-        lineCap="round"
-      />
+      {hasDirection && (
+        <Line
+          points={[edge.x, edge.y, tip.x, tip.y]}
+          stroke={settings.color}
+          strokeWidth={strokeWidth}
+          lineCap="round"
+        />
+      )}
 
       <Group scaleX={mirrorScaleX} rotation={-rotationDeg} listening={false}>
         <Text
@@ -86,18 +88,18 @@ export default function MinutiaeAnnotation({
           y={0}
           offsetY={labelFontSize / 2}
           fontSize={labelFontSize}
-          fill={s.color}
+          fill={settings.color}
           listening={false}
         />
       </Group>
 
       {/* Rotation handle — visible when selected */}
-      {isSelected && (
+      {hasDirection && isSelected && (
         <Circle
           x={tip.x}
           y={tip.y}
           radius={HANDLE_RADIUS}
-          fill={s.color}
+          fill={settings.color}
           stroke="white"
           strokeWidth={STROKE_WIDTH}
           draggable
@@ -115,7 +117,7 @@ export default function MinutiaeAnnotation({
             isDraggingHandle.current = false
             setDraggingHandle(false)
             setLiveAngleDeg(null)
-            onPersist({ ...s, angle: Math.round(newAngle) % 360 })
+            onPersist({ ...settings, angle: Math.round(newAngle) % 360 })
           }}
         />
       )}

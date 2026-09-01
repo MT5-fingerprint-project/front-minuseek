@@ -238,6 +238,8 @@ export const IMAGE_TOOLS: ImageTool[] = [
 
 export type AnnotationToolType = 'circle' | 'circleArrow' | 'pencil'
 
+export const MINUTIA_TOOLS: AnnotationToolType[] = ['circle', 'circleArrow']
+
 type AnnotationPanel = 'color' | 'minutiaType'
 
 type AnnotationTool = {

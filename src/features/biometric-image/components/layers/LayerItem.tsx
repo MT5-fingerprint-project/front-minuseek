@@ -3,7 +3,7 @@ import { Icon } from '@/features/shared/icons'
 import type { IconName } from '@/features/shared/icons'
 import type { Layer } from '@/features/biometric-image/types/layer'
 import { FILTER_META } from '@/features/biometric-image/components/toolbar/canvasFilters'
-import { isMinutiaSettings } from '@/features/biometric-image/lib/minutiae'
+import { isMinutiaSettings, minutiaTypeOf } from '@/features/biometric-image/lib/minutiae'
 
 type LayerItemProps = {
   layer: Layer
@@ -16,7 +16,7 @@ type LayerItemProps = {
 export default function LayerItem({ layer, onToggleVisibility, onDelete, onMouseEnter, onMouseLeave }: LayerItemProps) {
   const { t } = useTranslation()
   const name = isMinutiaSettings(layer.settings)
-    ? t(`biometricImage.minutia.types.${layer.settings.minutiaType}`)
+    ? t(`biometricImage.minutia.types.${minutiaTypeOf(layer.settings)}`)
     : layer.name
 
   return (

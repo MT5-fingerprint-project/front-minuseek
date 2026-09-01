@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Layer as KonvaLayer, Circle, Line, Group } from 'react-konva'
+import { Layer as KonvaLayer, Line, Group } from 'react-konva'
 import type Konva from 'konva'
 import { useCreateLayer, useUpdateLayer, useDeleteLayer } from '@/features/biometric-image/hooks/useLayers'
 import type { Layer } from '@/features/biometric-image/types/layer'
@@ -126,6 +126,7 @@ export default function AnnotationLayer({
             y: sourcePos.y,
             radius: sourceRadius(),
             color: activeColor,
+            minutiaType: activeMinutiaType,
             frame: ANNOTATION_FRAME,
             schemaVersion: ANNOTATION_SCHEMA_VERSION,
           },
@@ -207,31 +208,8 @@ export default function AnnotationLayer({
     const isHighlighted = layer.id === hoveredLayerId
     const sw = (base: number) => base + (isSelected ? 1 : 0) + (isHighlighted ? 1.5 : 0)
 
-    const persistSourcePosition = (settings: Record<string, unknown>, screenX: number, screenY: number) =>
-      persistPosition({
-        ...settings,
-        x: Math.round(toSourceLength(screenX, fitScale)),
-        y: Math.round(toSourceLength(screenY, fitScale)),
-      })
-
     switch (s.type) {
       case 'circle':
-        return (
-          <Circle
-            key={layer.id}
-            name="annotation"
-            x={toScreenLength(s.x, fitScale)}
-            y={toScreenLength(s.y, fitScale)}
-            radius={toScreenLength(s.radius ?? RADIUS, fitScale)}
-            stroke={s.color}
-            strokeWidth={sw(STROKE_WIDTH)}
-            hitStrokeWidth={12}
-            draggable
-            onClick={(e) => { e.cancelBubble = true; select(isSelected ? null : layer.id) }}
-            onDragEnd={(e) => persistSourcePosition(s, e.target.x(), e.target.y())}
-          />
-        )
-
       case 'minutia':
         return (
           <MinutiaeAnnotation
