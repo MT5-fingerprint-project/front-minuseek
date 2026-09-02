@@ -264,3 +264,13 @@ export function useUploadBiometricImage(type: BiometricImageType, options?: UseU
     },
   })
 }
+
+export async function uploadImagesOneByOne(
+  upload: ReturnType<typeof useUploadBiometricImage>,
+  caseId: string,
+  files: File[],
+) {
+  for (const file of files) {
+    await upload.mutateAsync({ caseId, file }).catch(() => undefined)
+  }
+}

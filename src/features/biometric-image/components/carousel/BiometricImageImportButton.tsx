@@ -2,7 +2,11 @@ import { useRef } from 'react'
 import { Icon } from '@/features/shared/icons'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/features/shared/ui/button'
-import { useUploadBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
+import {
+  uploadImagesOneByOne,
+  useUploadBiometricImage,
+} from '@/features/biometric-image/hooks/useBiometricImages'
+import { UPLOADABLE_IMAGE_ACCEPT } from '@/features/biometric-image/lib/uploadableImage'
 import { useCaseIsClosed } from '@/features/investigation-case/hooks/useCaseIsClosed'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
 
@@ -10,7 +14,6 @@ type BiometricImageImportButtonProps = {
   type: BiometricImageType
   caseId: string
   onUploadSuccess?: (image: BiometricImage) => void
-  /** `blue` pour une tête de page, `ghost` pour la barre du carrousel. */
   variant?: 'blue' | 'ghost'
 }
 
@@ -28,7 +31,7 @@ export default function BiometricImageImportButton({
   const handleFileSelected = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? [])
     event.target.value = ''
-    for (const file of files) await upload.mutateAsync({ caseId, file })
+    await uploadImagesOneByOne(upload, caseId, files)
   }
 
   if (isCaseClosed) return null
@@ -62,7 +65,7 @@ export default function BiometricImageImportButton({
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept={UPLOADABLE_IMAGE_ACCEPT}
         className="hidden"
         multiple
         onChange={handleFileSelected}
