@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { Image as KonvaImage } from 'react-konva'
 import Konva from 'konva'
 import type { Filter } from 'konva/lib/Node'
 import type { CanvasFilters, KonvaFilterDef } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import { FILTER_META } from '@/features/biometric-image/components/toolbar/canvasFilters'
-import { fitAdjustmentFactor } from '@/features/biometric-image/lib/displayScale'
 
 // Au-delà, le canvas hors écran approche des limites du navigateur (Safari en premier),
 // qui rend alors une surface vide sans lever d'erreur.
@@ -20,9 +19,8 @@ export type ImageLayout = {
   rotation: number
 }
 
-/** Facteur de réduction affichage (`scale` ci-dessous) et dimensions naturelles de l'image source. */
+/** Dimensions naturelles de l'image source, qui sont aussi son repère de rendu. */
 export type SourceGeometry = {
-  fitScale: number
   sourceWidth: number
   sourceHeight: number
 }
@@ -52,7 +50,6 @@ function useImage(url: string) {
 
 type DraggableImageProps = {
   url: string
-  stageSize: { width: number; height: number }
   filters?: CanvasFilters
   isDraggable?: boolean
   viewScale?: number
@@ -62,7 +59,6 @@ type DraggableImageProps = {
 
 export default function DraggableImage({
   url,
-  stageSize,
   filters,
   isDraggable = true,
   viewScale = 1,
@@ -103,42 +99,41 @@ export default function DraggableImage({
     return props
   }, [transformSignature])
 
-  // Geometry — shared by the rendered image and the layout reported for annotation anchoring
-  const scale = image ? fitAdjustmentFactor(image.width, image.height) : 0
-  const width = image ? image.width * scale : 0
-  const height = image ? image.height * scale : 0
-  const centered = {
-    x: Math.max(0, (stageSize.width - width) / 2),
-    y: Math.max(0, (stageSize.height - height) / 2),
-  }
+  // L'image est rendue à sa taille naturelle : le repère de la scène est celui des pixels
+  // source, et l'ajustement au conteneur vit dans l'échelle du Stage.
+  const width = image?.width ?? 0
+  const height = image?.height ?? 0
   const scaleX = transformProps.scaleX ?? 1
   const rotation = transformProps.rotation ?? 0
   // Pivot toujours au centre : le miroir (scaleX = -1) se reflète sur place sans décaler l'image.
   const offsetX = width / 2
   const offsetY = height / 2
-  const baseX = position?.x ?? centered.x + width / 2
-  const baseY = position?.y ?? centered.y + height / 2
+  const baseX = position?.x ?? offsetX
+  const baseY = position?.y ?? offsetY
 
   const hasFilter = konvaFilters.length > 0
 
-  // Le cache est rasterisé en pixels physiques : sans `Konva.pixelRatio`, un écran Retina
-  // afficherait l'image filtrée à la moitié de la densité de l'image nue, donc plus floue.
-  // Par paliers de puissance de deux, pour ne pas rasteriser à chaque cran de molette.
-  const zoomTier = 2 ** Math.ceil(Math.log2(Math.max(1, viewScale)))
-  const sourceResolution = scale > 0 ? 1 / scale : 1
+  // Le cache est rasterisé en pixels physiques : il suit la densité réellement affichée
+  // (sans `Konva.pixelRatio`, un écran Retina rendrait l'image filtrée deux fois moins
+  // dense que l'image nue, donc plus floue), par paliers de puissance de deux, et sans
+  // dépasser la résolution de la source ni MAX_CACHE_SIDE de côté.
+  const displayDensity = (viewScale > 0 ? viewScale : 1) * Konva.pixelRatio
+  const densityTier = 2 ** Math.ceil(Math.log2(displayDensity))
   const renderedMaxSide = Math.max(width, height)
   const cacheSideLimit = renderedMaxSide > 0 ? MAX_CACHE_SIDE / renderedMaxSide : 1
-  const cachePixelRatio = Math.min(zoomTier * Konva.pixelRatio, sourceResolution, cacheSideLimit)
+  const cachePixelRatio = Math.min(densityTier, 1, cacheSideLimit)
 
   // Konva n'applique les filtres que sur un nœud caché : on (re)cache quand un
   // filtre est actif, on vide le cache sinon (rendu brut net, réversible à 0).
+  // `cache()` abandonne les canvas précédents sans les libérer, d'où le `clearCache()`
+  // systématique ; et son canvas de hit-test, lui, ignore `pixelRatio` — sans le sien
+  // il serait alloué à la taille pleine de la source.
   useEffect(() => {
     const node = imageRef.current
     if (!node || !image) return
+    node.clearCache()
     if (hasFilter) {
-      node.cache({ pixelRatio: cachePixelRatio })
-    } else {
-      node.clearCache()
+      node.cache({ pixelRatio: cachePixelRatio, hitCanvasPixelRatio: cachePixelRatio })
     }
     node.getLayer()?.batchDraw()
   }, [image, hasFilter, cachePixelRatio])
@@ -149,11 +144,13 @@ export default function DraggableImage({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [image, baseX, baseY, offsetX, offsetY, scaleX, rotation])
 
-  useEffect(() => {
+  // Effet de layout, pas d'effet passif : la vue s'ajuste à partir de ces dimensions,
+  // et le fait dans le même passage que le rendu qui les a produites.
+  useLayoutEffect(() => {
     if (!image) return
-    onSourceGeometryChange?.({ fitScale: scale, sourceWidth: image.width, sourceHeight: image.height })
+    onSourceGeometryChange?.({ sourceWidth: image.width, sourceHeight: image.height })
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [image, scale])
+  }, [image])
 
   if (!image) return null
 

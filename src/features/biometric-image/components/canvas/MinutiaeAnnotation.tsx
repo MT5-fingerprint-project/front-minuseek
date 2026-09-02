@@ -2,18 +2,20 @@ import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Circle, Line, Group, Text } from 'react-konva'
 import type { Layer } from '@/features/biometric-image/types/layer'
-import { toScreenLength, toSourceLength } from '@/features/biometric-image/lib/displayScale'
 import { minutiaTypeOf, type MinutiaSettings } from '@/features/biometric-image/lib/minutiae'
 import { edgeAndTip, angleFromOffset } from './annotationUtils'
 
 const HANDLE_RADIUS = 4
-const STROKE_WIDTH = 1.5
+const HANDLE_STROKE_WIDTH = 1.5
+const HIT_STROKE_WIDTH = 12
+const LABEL_MIN_FONT_SIZE = 8
+const LABEL_GAP = 4
 
 type MinutiaeAnnotationProps = {
   layer: Layer
   isSelected: boolean
   strokeWidth: number
-  fitScale: number
+  viewScale: number
   mirrorScaleX: number
   rotationDeg: number
   onSelect: () => void
@@ -24,7 +26,7 @@ export default function MinutiaeAnnotation({
   layer,
   isSelected,
   strokeWidth,
-  fitScale,
+  viewScale,
   mirrorScaleX,
   rotationDeg,
   onSelect,
@@ -39,8 +41,9 @@ export default function MinutiaeAnnotation({
 
   const hasDirection = settings.type === 'minutia'
   const angleDeg = liveAngleDeg ?? settings.angle ?? 0
-  const radius = toScreenLength(settings.radius, fitScale)
+  const radius = settings.radius
   const { edge, tip } = edgeAndTip(angleDeg, radius)
+  const onScreen = (screenPixels: number) => screenPixels / viewScale
 
   const minutiaType = minutiaTypeOf(settings)
   const typeLabel = t(
@@ -48,21 +51,21 @@ export default function MinutiaeAnnotation({
       ? `biometricImage.minutia.types.${minutiaType}`
       : `biometricImage.minutia.shortTypes.${minutiaType}`,
   )
-  const labelFontSize = Math.max(8, radius * 1.3)
+  const labelFontSize = Math.max(onScreen(LABEL_MIN_FONT_SIZE), radius * 1.3)
 
   return (
     <Group
       name="annotation"
-      x={toScreenLength(settings.x, fitScale)}
-      y={toScreenLength(settings.y, fitScale)}
+      x={settings.x}
+      y={settings.y}
       draggable={!draggingHandle}
       onClick={(e) => { e.cancelBubble = true; onSelect() }}
       onDragEnd={(e) => {
         if (isDraggingHandle.current) return
         onPersist({
           ...settings,
-          x: Math.round(toSourceLength(e.target.x(), fitScale)),
-          y: Math.round(toSourceLength(e.target.y(), fitScale)),
+          x: Math.round(e.target.x()),
+          y: Math.round(e.target.y()),
         })
       }}
     >
@@ -70,7 +73,7 @@ export default function MinutiaeAnnotation({
         radius={radius}
         stroke={settings.color}
         strokeWidth={strokeWidth}
-        hitStrokeWidth={12}
+        hitStrokeWidth={onScreen(HIT_STROKE_WIDTH)}
       />
       {hasDirection && (
         <Line
@@ -84,7 +87,7 @@ export default function MinutiaeAnnotation({
       <Group scaleX={mirrorScaleX} rotation={-rotationDeg} listening={false}>
         <Text
           text={typeLabel}
-          x={radius + 4}
+          x={radius + onScreen(LABEL_GAP)}
           y={0}
           offsetY={labelFontSize / 2}
           fontSize={labelFontSize}
@@ -98,10 +101,10 @@ export default function MinutiaeAnnotation({
         <Circle
           x={tip.x}
           y={tip.y}
-          radius={HANDLE_RADIUS}
+          radius={onScreen(HANDLE_RADIUS)}
           fill={settings.color}
           stroke="white"
-          strokeWidth={STROKE_WIDTH}
+          strokeWidth={onScreen(HANDLE_STROKE_WIDTH)}
           draggable
           onDragStart={() => {
             isDraggingHandle.current = true

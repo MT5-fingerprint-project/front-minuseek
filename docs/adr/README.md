@@ -14,3 +14,4 @@ On consigne ici les **décisions structurantes** du repo : choix techno, trade-o
 - [ADR-0003 — Le choix d'un compte du service se fait par une liste cherchée côté serveur](0003-choix-d-un-compte-par-liste-cherchee-cote-serveur.md)
 - [ADR-0004 — Les missions de vérification de l'appelant se lisent depuis `shared/`](0004-missions-de-verification-de-l-appelant-dans-shared.md)
 - [ADR-0005 — Visite guidée de l'atelier avec `driver.js`](0005-visite-guidee-driver-js.md)
+- [ADR-0006 — L'atelier travaille en pixels de l'image source, pas dans un repère d'affichage réduit](0006-atelier-en-pixels-source-plutot-qu-en-repere-d-affichage-reduit.md)

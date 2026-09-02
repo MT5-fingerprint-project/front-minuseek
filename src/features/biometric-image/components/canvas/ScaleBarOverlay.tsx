@@ -5,12 +5,11 @@ const ONE_CENTIMETER_MM = 10
 
 type ScaleBarOverlayProps = {
   resolutionDpi: number | null
-  fitScale: number
   viewScale: number
 }
 
 /** Barre d'échelle "1 cm", ou mention d'absence — habillage HTML au-dessus de la scène. */
-export default function ScaleBarOverlay({ resolutionDpi, fitScale, viewScale }: ScaleBarOverlayProps) {
+export default function ScaleBarOverlay({ resolutionDpi, viewScale }: ScaleBarOverlayProps) {
   const { t } = useTranslation()
 
   if (resolutionDpi === null) {
@@ -21,7 +20,7 @@ export default function ScaleBarOverlay({ resolutionDpi, fitScale, viewScale }: 
     )
   }
 
-  const widthPx = screenLengthOfMillimeters(ONE_CENTIMETER_MM, resolutionDpi, fitScale, viewScale)
+  const widthPx = screenLengthOfMillimeters(ONE_CENTIMETER_MM, resolutionDpi, viewScale)
 
   return (
     <div className="pointer-events-none absolute top-3 left-3 flex flex-col items-start gap-1">

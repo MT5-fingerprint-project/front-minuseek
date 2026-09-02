@@ -5,6 +5,8 @@ import type { ImageLayout } from '@/features/biometric-image/components/canvas/D
 import type { CalibrationPoint } from '@/features/biometric-image/lib/calibration'
 
 const POINT_RADIUS = 4
+const GUIDE_STROKE_WIDTH = 1
+const SEGMENT_STROKE_WIDTH = 2
 const GUIDE_REACH = 100_000 // grandes lignes de guidage : couvrent tout le viewport visible
 const RULER_COLOR = '#EF4444'
 
@@ -13,34 +15,42 @@ type Segment = { from: CalibrationPoint; to: CalibrationPoint | null }
 type CalibrationLayerProps = {
   isActive: boolean
   imageLayout: ImageLayout | null
+  viewScale: number
   onSegmentComplete: (from: CalibrationPoint, to: CalibrationPoint) => void
 }
 
-function CrosshairGuides({ point }: { point: CalibrationPoint }) {
+function CrosshairGuides({ point, strokeWidth }: { point: CalibrationPoint; strokeWidth: number }) {
   return (
     <>
       <Line
         points={[point.x, point.y - GUIDE_REACH, point.x, point.y + GUIDE_REACH]}
         stroke={RULER_COLOR}
-        strokeWidth={1}
+        strokeWidth={strokeWidth}
         listening={false}
       />
       <Line
         points={[point.x - GUIDE_REACH, point.y, point.x + GUIDE_REACH, point.y]}
         stroke={RULER_COLOR}
-        strokeWidth={1}
+        strokeWidth={strokeWidth}
         listening={false}
       />
     </>
   )
 }
 
-export default function CalibrationLayer({ isActive, imageLayout, onSegmentComplete }: CalibrationLayerProps) {
+export default function CalibrationLayer({
+  isActive,
+  imageLayout,
+  viewScale,
+  onSegmentComplete,
+}: CalibrationLayerProps) {
   const layerRef = useRef<Konva.Layer>(null)
-  // Group whose transform mirrors the image: the segment lives in the image's local frame,
+  // Group whose transform mirrors the image: the segment lives in the image's source frame,
   // exactly like AnnotationLayer, so it stays put across zoom/pan/mirror/rotation.
   const groupRef = useRef<Konva.Group>(null)
   const [segment, setSegment] = useState<Segment | null>(null)
+
+  const onScreen = (screenPixels: number) => screenPixels / viewScale
 
   useEffect(() => {
     const stage = layerRef.current?.getStage()
@@ -73,19 +83,31 @@ export default function CalibrationLayer({ isActive, imageLayout, onSegmentCompl
         <Group ref={groupRef} {...imageLayout}>
           {isActive && segment && (
             <>
-              <CrosshairGuides point={segment.from} />
-              {segment.to && <CrosshairGuides point={segment.to} />}
+              <CrosshairGuides point={segment.from} strokeWidth={onScreen(GUIDE_STROKE_WIDTH)} />
+              {segment.to && <CrosshairGuides point={segment.to} strokeWidth={onScreen(GUIDE_STROKE_WIDTH)} />}
               {segment.to && (
                 <Line
                   points={[segment.from.x, segment.from.y, segment.to.x, segment.to.y]}
                   stroke={RULER_COLOR}
-                  strokeWidth={2}
+                  strokeWidth={onScreen(SEGMENT_STROKE_WIDTH)}
                   listening={false}
                 />
               )}
-              <Circle x={segment.from.x} y={segment.from.y} radius={POINT_RADIUS} fill={RULER_COLOR} listening={false} />
+              <Circle
+                x={segment.from.x}
+                y={segment.from.y}
+                radius={onScreen(POINT_RADIUS)}
+                fill={RULER_COLOR}
+                listening={false}
+              />
               {segment.to && (
-                <Circle x={segment.to.x} y={segment.to.y} radius={POINT_RADIUS} fill={RULER_COLOR} listening={false} />
+                <Circle
+                  x={segment.to.x}
+                  y={segment.to.y}
+                  radius={onScreen(POINT_RADIUS)}
+                  fill={RULER_COLOR}
+                  listening={false}
+                />
               )}
             </>
           )}
