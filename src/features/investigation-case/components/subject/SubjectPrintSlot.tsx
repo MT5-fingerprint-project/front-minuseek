@@ -54,7 +54,7 @@ export default function SubjectPrintSlot({
       ) : print ? (
         <div className="group relative aspect-square overflow-hidden rounded-xs">
           <img
-            src={print.url ?? undefined}
+            src={print.thumbUrl ?? print.url ?? undefined}
             alt={label}
             loading="lazy"
             decoding="async"

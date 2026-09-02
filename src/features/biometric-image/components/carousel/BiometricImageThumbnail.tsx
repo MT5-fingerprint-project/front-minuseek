@@ -58,7 +58,7 @@ export default function BiometricImageThumbnail({
             />
           ) : (
             <img
-              src={image.url ?? undefined}
+              src={image.thumbUrl ?? image.url ?? undefined}
               alt={label}
               loading="lazy"
               decoding="async"
