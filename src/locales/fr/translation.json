@@ -627,6 +627,10 @@
       "button": "Importer",
       "uploading": "Envoi…"
     },
+    "drop": {
+      "hovered": "Relâchez pour importer",
+      "rejected": "Seules les images PNG, JPEG et TIFF peuvent être importées"
+    },
     "upload": {
       "success": "Image importée avec succès",
       "error": "L'import a échoué"

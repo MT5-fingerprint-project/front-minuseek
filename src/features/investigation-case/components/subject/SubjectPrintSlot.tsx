@@ -1,10 +1,17 @@
 import { useId } from 'react'
 import { Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
+import { cn } from '@/features/shared/lib/utils'
 import { Icon } from '@/features/shared/icons'
 import { Spinner } from '@/features/shared/ui/spinner'
+import { useFileDropZone } from '@/features/shared/hooks/useFileDropZone'
 import DestroyedImagePlaceholder from '@/features/biometric-image/components/DestroyedImagePlaceholder'
 import WithdrawPieceDialog from '@/features/biometric-image/components/WithdrawPieceDialog'
+import {
+  UPLOADABLE_IMAGE_ACCEPT,
+  UPLOADABLE_IMAGE_MIME_TYPES,
+} from '@/features/biometric-image/lib/uploadableImage'
 import type {
   BiometricImage,
   WithdrawalMotive,
@@ -29,6 +36,13 @@ export default function SubjectPrintSlot({
 }: SubjectPrintSlotProps) {
   const { t } = useTranslation()
   const inputId = useId()
+
+  const { isDraggingOver, dropZoneProps } = useFileDropZone({
+    acceptedMimeTypes: UPLOADABLE_IMAGE_MIME_TYPES,
+    enabled: !isReadOnly && !print && !isUploading,
+    onFilesAccepted: (files) => onUpload(files[0]),
+    onFilesRejected: () => toast.error(t('biometricImage.drop.rejected')),
+  })
 
   return (
     <div className="flex flex-col gap-2 rounded-sm bg-white p-2">
@@ -68,7 +82,13 @@ export default function SubjectPrintSlot({
         <label
           htmlFor={inputId}
           aria-label={t('subject.prints.import', { position: label })}
-          className="flex aspect-square cursor-pointer items-center justify-center rounded-xs border border-dashed border-grey-light-2 transition-colors hover:border-blue-medium-1"
+          {...dropZoneProps}
+          className={cn(
+            'flex aspect-square cursor-pointer items-center justify-center rounded-xs border border-dashed transition-colors',
+            isDraggingOver
+              ? 'border-blue-medium-1 bg-blue-light-1'
+              : 'border-grey-light-2 hover:border-blue-medium-1',
+          )}
         >
           {isUploading ? (
             <Spinner className="size-6" />
@@ -78,7 +98,7 @@ export default function SubjectPrintSlot({
           <input
             id={inputId}
             type="file"
-            accept="image/png,image/jpeg,image/tiff"
+            accept={UPLOADABLE_IMAGE_ACCEPT}
             className="hidden"
             disabled={isUploading}
             onChange={(event) => {

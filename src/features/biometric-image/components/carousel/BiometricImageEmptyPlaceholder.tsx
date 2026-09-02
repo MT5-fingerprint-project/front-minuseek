@@ -2,6 +2,7 @@ import { useRef, type ChangeEvent } from 'react'
 import { ImageUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useUploadBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
+import { UPLOADABLE_IMAGE_ACCEPT } from '@/features/biometric-image/lib/uploadableImage'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
 
 type BiometricImageEmptyPlaceholderProps = {
@@ -46,7 +47,7 @@ export default function BiometricImageEmptyPlaceholder({
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept={UPLOADABLE_IMAGE_ACCEPT}
         className="hidden"
         onChange={handleFileSelected}
       />
