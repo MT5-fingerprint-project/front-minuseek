@@ -198,6 +198,8 @@ export default function BiometricImageCanvas({
               fingerprintId={image.id}
               imageLayout={imageLayout}
               fitScale={sourceGeometry?.fitScale ?? 1}
+              sourceWidth={sourceGeometry?.sourceWidth ?? 0}
+              sourceHeight={sourceGeometry?.sourceHeight ?? 0}
               selectedId={selectedAnnotationId}
               onSelect={handleSelectAnnotation}
               hoveredLayerId={hoveredLayerId}
