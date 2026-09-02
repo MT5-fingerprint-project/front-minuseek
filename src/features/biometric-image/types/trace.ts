@@ -27,6 +27,9 @@ export type TraceDescriptionInput = z.infer<typeof traceDescriptionSchema>
 export type TraceLocationPhoto = {
   id: string
   url: string
+  thumbUrl: string | null
   sha256: string
   sealedAt: string
 }
+
+export type TraceLocationPhotoDto = Omit<TraceLocationPhoto, 'thumbUrl'> & { thumbUrl?: string | null }

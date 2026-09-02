@@ -1,4 +1,9 @@
-import type { RevelationTechnique, TraceLocationPhoto, TraceOrigin } from '@/features/biometric-image/types/trace'
+import type {
+  RevelationTechnique,
+  TraceLocationPhoto,
+  TraceLocationPhotoDto,
+  TraceOrigin,
+} from '@/features/biometric-image/types/trace'
 
 export type BiometricImageType = 'traces' | 'reference-prints'
 
@@ -30,6 +35,7 @@ export interface BiometricImage {
   label: string
   number: number | null
   url: string | null
+  thumbUrl: string | null
   status: BiometricImageStatus | null
   identified: boolean | null
   notIdentified: boolean | null
@@ -58,6 +64,7 @@ export interface BiometricImageDto {
   number?: number | null
   reference?: string | null
   url: string | null
+  thumbUrl?: string | null
   status: BiometricImageStatus | null
   identified?: boolean | null
   notIdentified?: boolean | null
@@ -77,5 +84,5 @@ export interface BiometricImageDto {
   location?: string | null
   revelationTechnique?: RevelationTechnique | null
   hasLocationPhoto?: boolean
-  locationPhoto?: TraceLocationPhoto | null
+  locationPhoto?: TraceLocationPhotoDto | null
 }
