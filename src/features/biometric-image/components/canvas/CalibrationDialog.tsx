@@ -8,18 +8,17 @@ import { resolutionFromSegment, type CalibrationPoint } from '@/features/biometr
 type CalibrationDialogProps = {
   from: CalibrationPoint
   to: CalibrationPoint
-  fitScale: number
   isSaving: boolean
   onValidate: (resolutionDpi: number) => void
   onCancel: () => void
 }
 
-export default function CalibrationDialog({ from, to, fitScale, isSaving, onValidate, onCancel }: CalibrationDialogProps) {
+export default function CalibrationDialog({ from, to, isSaving, onValidate, onCancel }: CalibrationDialogProps) {
   const { t } = useTranslation()
   const [rawDistance, setRawDistance] = useState('')
 
   const realDistanceMm = Number(rawDistance)
-  const outcome = resolutionFromSegment(from, to, realDistanceMm, fitScale)
+  const outcome = resolutionFromSegment(from, to, realDistanceMm)
   const isInvalid = rawDistance !== '' && outcome.status !== 'valid'
 
   return (

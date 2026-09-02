@@ -28,7 +28,7 @@ Un `Stage` par image, et **deux `Layer` séparés** : un pour l'image (+ filtres
   onWheel={handleWheel}
 >
   <Layer>
-    <DraggableImage key={`${image.url}-${recenterSignal}`} url={image.url} stageSize={size} /* … */ />
+    <DraggableImage key={`${image.url}-${recenterSignal}`} url={image.url} viewScale={view.scale} /* … */ />
   </Layer>
   <AnnotationLayer /* annotations, layerCount, activeTool, imageLayout… */ />
 </Stage>
@@ -65,53 +65,61 @@ Tant que l'image n'est pas chargée, le composant **retourne `null`** (`if (!ima
 Tout l'état de vue (`{ scale, x, y }`) vit dans `useCanvasView.ts`. Points à respecter :
 
 - **Zoom molette = vers le curseur** ; **zoom boutons = vers le centre** du Stage. La fonction `zoomToward(point, direction)` garde le point fixe en convertissant écran→contenu puis en recalculant `x/y`.
-- **Clamp du scale** : `MIN_SCALE = 0.2`, `MAX_SCALE = 15`, facteur `ZOOM_FACTOR = 1.1`. Garder ces bornes (ou les étendre ici) plutôt que d'introduire des constantes parallèles.
+- **Clamp du scale** : `MAX_SCALE = 100`, `ZOOM_FACTOR = 1.1`, et un plancher qui vaut `min(MIN_SCALE, échelle d'ajustement)` — sur une image de plus de 20 000 pixels de côté, l'ajustement passe sous `MIN_SCALE = 0.05` et c'est lui qui fait plancher, sinon l'image ne tiendrait plus entière. Garder ces bornes ici plutôt que d'introduire des constantes parallèles.
 - **`viewRef` miroir de `view`** : les zooms rapides successifs (double-clic, molette rafale) liraient une closure périmée sans ce ref. Toute nouvelle action de vue doit passer par `applyView()`, qui met à jour `viewRef.current` ET le state.
 - **`onScaleChange`** remonte le scale au parent (affiché en %, ex. `ZoomControls`).
-- **Recenter** = `applyView(DEFAULT_VIEW)` + incrément d'un `recenterSignal` ; ce signal sert de `key` à `DraggableImage` pour **remonter l'image et réinitialiser sa position de drag** (voir Pièges).
+- **Ajustement au conteneur** : `useCanvasView` reçoit `content` (les dimensions natives de l'image, `null` tant qu'aucune n'est chargée) et calcule l'échelle qui la fait tenir entière, marge `FIT_PADDING` comprise, plus le `x/y` qui la centre. L'ajustement rejoue **au chargement d'une image et au recentrage, jamais à un redimensionnement de panneau** — sinon il écraserait le zoom que l'opérateur vient de régler. Le garde est l'identité de l'objet `content` mémorisée dans un ref ; il vit dans un `useLayoutEffect` pour éviter une frame affichée à 100 %.
+- **Recenter** = `applyView(fitView(content, size))` + incrément d'un `recenterSignal` ; ce signal sert de `key` à `DraggableImage` pour **remonter l'image et réinitialiser sa position de drag** (voir Pièges).
 
 ```ts
 const pointTo = {
   x: (point.x - current.x) / current.scale,
   y: (point.y - current.y) / current.scale,
 }
-const newScale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, current.scale * ZOOM_FACTOR ** direction))
+const newScale = Math.min(MAX_SCALE, Math.max(minScale, current.scale * ZOOM_FACTOR ** direction))
 applyView({ scale: newScale, x: point.x - pointTo.x * newScale, y: point.y - pointTo.y * newScale })
 ```
 
 Le handle de zoom est exposé au parent via `useImperativeHandle(zoomHandleRef, …)` (`zoomIn`/`zoomOut`/`recenter`) — c'est ainsi que `ComparisonWindow` câble `ZoomControls`/`RecenterControl` à chaque fenêtre (`w.zoomRef.current?.zoomIn()`, etc.).
 
-## 4. Transformations de coordonnées (écran ↔ espace image)
+## 4. Repère des coordonnées : la scène EST l'image source
 
-C'est le point le plus subtil et le plus important pour le forensique : **une minutie doit rester collée au même pixel de l'empreinte** quels que soient le zoom, le pan, le miroir ou la rotation appliqués à l'image.
+C'est le point le plus important pour le forensique : **une minutie doit rester collée au même pixel de l'empreinte** quels que soient le zoom, le pan, le miroir ou la rotation appliqués à l'image.
 
-La solution en place : le rendu vit dans le **repère local de l'image** (réduit à `MAX_DISPLAY_SIZE`), via un `<Group {...imageLayout}>` qui **rejoue la transform de l'image** (position, `offsetX/offsetY`, `scaleX` du miroir, `rotation`). `DraggableImage` publie ce `ImageLayout` au parent (`onLayoutChange`) ; `AnnotationLayer` l'applique au Group.
+**Il n'y a plus de repère d'affichage intermédiaire.** L'image est rendue à sa taille naturelle (`width={image.width}`), donc une unité de scène = un pixel de l'image source, et l'ajustement au conteneur vit dans l'échelle du Stage (`view.scale`, cf. §3). Aucune conversion à écrire : `lib/displayScale.ts`, `fitScale`, `toSourceLength` et `toScreenLength` n'existent plus.
 
-- Pour obtenir la position du pointeur **dans ce repère local**, ne pas faire le calcul à la main : utiliser **`groupRef.current.getRelativePointerPosition()`** — il gère zoom + pan + offset + miroir + rotation d'un coup.
+Le rendu des annotations vit dans un `<Group {...imageLayout}>` qui **rejoue la transform de l'image** (position, `offsetX/offsetY`, `scaleX` du miroir, `rotation`). `DraggableImage` publie ce `ImageLayout` au parent (`onLayoutChange`) ; `AnnotationLayer` et `CalibrationLayer` l'appliquent à leur Group.
+
+- Pour obtenir la position du pointeur **en pixels source**, ne pas faire le calcul à la main : utiliser **`groupRef.current.getRelativePointerPosition()`** — il gère zoom + pan + offset + miroir + rotation d'un coup, et rend du sous-pixel à n'importe quel grossissement.
 
 ```ts
 const getPos = () => groupRef.current?.getRelativePointerPosition() ?? null
-// pos.x / pos.y sont dans le repère local (réduit), PAS le repère persisté — voir conversion ci-dessous
+// pos.x / pos.y sont déjà en pixels source : seul le Math.round du contrat serveur reste à faire
 ```
 
-**Contrat serveur (L5-6/L5-7) : les annotations sont persistées en pixels ENTIERS de l'image SOURCE** (`frame: 'source-pixels'`, `schemaVersion: 1`), jamais dans le repère local réduit ni en pixels écran. Le repère local et le repère source ne diffèrent que par `fitScale` (`fitAdjustmentFactor`, dans `lib/displayScale.ts`) : diviser une longueur locale par `fitScale` donne des pixels source, multiplier fait l'inverse. Toute écriture passe par `toSourceLength` + `Math.round` (entier obligatoire, sauf l'épaisseur du crayon qui reste flottante — l'arrondir l'épaissirait visiblement) ; toute lecture (rendu) passe par `toScreenLength` pour retrouver la taille/position à l'écran. `AnnotationLayer`/`MinutiaeAnnotation` reçoivent `fitScale` en props pour ça — un `fitScale` figé dans une closure périmée ferait mal convertir les nouvelles annotations, d'où sa présence dans le tableau de dépendances de l'effet qui attache les écouteurs de la scène.
+**Contrat serveur (L5-6/L5-7) : les annotations sont persistées en pixels ENTIERS de l'image SOURCE** (`frame: 'source-pixels'`, `schemaVersion: 1`), jamais en pixels écran. Écrire = `Math.round(pos.x)` (entier obligatoire, sauf l'épaisseur du crayon qui reste flottante — l'arrondir l'épaissirait visiblement) ; lire = poser la valeur telle quelle.
 
-Ne jamais persister une position/taille sans être passé par cette conversion, qu'elle vienne du repère local ou du repère écran.
+La règle qui remplace les conversions, et la seule à retenir en touchant au canvas :
+
+- **Ce qui appartient à l'image reste en pixels source** et grandit avec elle : position et rayon d'un marqueur, points et épaisseur d'un tracé, flèche de direction. Leur taille se dérive du plus grand côté de la source (`MARKER_RADIUS_RATIO`, `STROKE_RATIO`, avec un plancher pour les petites images), jamais d'une constante d'affichage.
+- **Ce qui appartient à l'outil se divise par `viewScale`** pour garder une taille constante à l'écran : poignée de rotation, plancher de police du libellé, `hitStrokeWidth`, renfort de sélection/survol, points et traits de la règle de calibrage. D'où le `viewScale` en prop de `AnnotationLayer`, `MinutiaeAnnotation` et `CalibrationLayer`, et le helper local `onScreen(px) => px / viewScale`.
+
+Ne jamais persister une position ou une taille lue en pixels écran : passer par le Group.
 
 ## 5. Dessin d'annotations / minuties
 
 Trois formes d'annotation, toutes persistées comme des **calques** (`type: 'ANNOTATION'`) via React Query (`useCreateLayer/useUpdateLayer/useDeleteLayer`), discriminées par `settings.type`. L'outil actif (`AnnotationToolType` = `'circle' | 'circleArrow' | 'pencil'`, nom de l'outil UI — ne pas confondre avec `settings.type`) détermine le `settings.type` créé :
 
 - `circle` — outil `circle` : un **point** (`Circle`).
-- `minutia` — outil `circleArrow` : un **point + flèche orientée** (`MinutiaeAnnotation` : `Group` = `Circle` + `Line`, avec poignée de rotation quand sélectionné). Porte aussi `angle` (entier 0–359, zéro en haut, sens horaire) et `minutiaType` (catalogue du contrat serveur, `'UNDETERMINED'` par défaut à la création). L'angle ↔ géométrie passe par `edgeAndTip(angleDeg, radius)` / `angleFromOffset(dx, dy)` dans `annotationUtils.ts` — `radius` doit y être passé **déjà converti en pixels écran** (`toScreenLength`), ces deux fonctions ignorent tout de `fitScale`.
-- `pencil` — outil `pencil` : un **tracé libre** (`Line` avec `tension`, `lineCap/lineJoin="round"`) construit par accumulation de points pendant le drag (`draft` + `draftRef`), en repère local (transitoire, jamais persisté tel quel) ; converti en pixels source à la fin du geste seulement.
+- `minutia` — outil `circleArrow` : un **point + flèche orientée** (`MinutiaeAnnotation` : `Group` = `Circle` + `Line`, avec poignée de rotation quand sélectionné). Porte aussi `angle` (entier 0–359, zéro en haut, sens horaire) et `minutiaType` (catalogue du contrat serveur, `'UNDETERMINED'` par défaut à la création). L'angle ↔ géométrie passe par `edgeAndTip(angleDeg, radius)` / `angleFromOffset(dx, dy)` dans `annotationUtils.ts` — `radius` y est en pixels source, et la longueur de la flèche en est un multiple (`ARROW_TO_RADIUS`) pour rester proportionnelle à l'empreinte.
+- `pencil` — outil `pencil` : un **tracé libre** (`Line` avec `tension`, `lineCap/lineJoin="round"`) construit par accumulation de points pendant le drag (`draft` + `draftRef`), déjà en pixels source ; arrondi à l'entier à la fin du geste seulement.
 
 Conventions de dessin à reproduire :
 
 - **Écoute des events au niveau du Stage** (`stage.on('mousedown.annot touchstart.annot', …)`) avec un **namespace** (`.annot`) pour pouvoir tout détacher proprement (`stage.off('.annot')`) au cleanup. Gérer souris ET tactile.
 - **Sélection / hit-testing** : remonter l'arbre Konva via `name() === 'annotation'` (`isAnnotationTarget`) pour distinguer "cliquer une forme existante" de "dessiner une nouvelle". Donner `name="annotation"` à chaque forme.
 - **`e.cancelBubble = true`** sur le `onClick` d'une forme pour empêcher le clic de propager (sinon il déclenche la désélection / un nouveau dessin).
-- **Hit area** : `hitStrokeWidth={12}` sur les traits fins (cercle/minutie) pour qu'ils restent cliquables même peu épais.
+- **Hit area** : `hitStrokeWidth` sur les traits fins (cercle/minutie) pour qu'ils restent cliquables même peu épais — en pixels écran divisés par `viewScale`, sinon la zone cliquable se réduit avec le zoom arrière (§4).
 - Suppression au clavier : `Delete`/`Backspace` sur l'annotation sélectionnée (listener `window` monté/démonté selon `selectedId`).
 - `zIndex` d'une nouvelle annotation = `layerCount` (nombre total de calques) pour éviter les collisions d'ordre.
 - Pendant un drag de poignée (rotation de minutie), suivre l'angle en **state local "live"** (`liveAngleDeg`) pour un rendu fluide, puis **persister une seule fois sur `onDragEnd`** — pas à chaque `onDragMove`.
@@ -120,19 +128,35 @@ Conventions de dessin à reproduire :
 
 Source unique : `FILTER_META` dans `components/toolbar/canvasFilters.ts`. Chaque filtre y déclare son binding Konva, de deux natures :
 
-- `type: 'filter'` → un `Konva.Filters.*` (Brighten, Contrast, HSL, Invert) appliqué via la prop `filters={[…]}` + la prop de valeur (`brightness`, `contrast`, `saturation`).
+- `type: 'filter'` → une fonction `Filter` appliquée via la prop `filters={[…]}` + la prop de valeur. À une exception près (`Konva.Filters.Invert`), ce sont des filtres **maison** définis dans ce fichier — luminosité, contraste, saturation, isolation de canal, niveaux, netteté locale — qui lisent des attributs de leur cru (`brightnessAmount`, `levelsGammaAmount`…). Konva ne les déclare pas, donc leur setter ne repasse pas `_filterUpToDate` à `false` : voir la règle ci-dessous.
 - `type: 'transform'` → une prop directe du node (`scaleX` pour le miroir, `rotation`).
 
 Les filtres sont eux aussi **persistés comme calques** (`type: 'FILTER'`), avec debounce (`useCanvasFilters.ts`, ~500 ms ; valeur revenue à 0 = calque supprimé). Pour ajouter un filtre : l'enregistrer dans `FILTER_META` (+ entrée dans `IMAGE_TOOLS`), ne pas câbler un `Konva.Filters.*` en dur dans `DraggableImage`.
 
-> **Règle Konva des filtres** : un node ne rend ses `filters` que s'il est **mis en cache**. D'où, à chaque changement de filtres :
+> **Règle Konva des filtres** : un node ne rend ses `filters` que s'il est **mis en cache**, et
+> `cache()` rasterise le node entier — un appel par frame suffit à faire saccader l'atelier. On ne
+> recache donc que quand l'échelle du cache change. Ce qui déclenche une nouvelle passe de filtrage,
+> c'est **l'identité du tableau passé en prop `filters`** (le setter de cet attribut remet
+> `_filterUpToDate` à `false`) : le mémoïser sur une signature des valeurs actives rend un
+> déplacement ou un zoom gratuits, et le fait changer dès qu'un curseur bouge. Ne pas compter sur
+> `Factory.afterSetFilter` : les filtres maison lisent des attributs que Konva ne déclare pas
+> (`brightnessAmount`, `levelsGammaAmount`…), ils ne se réappliquent pas d'eux-mêmes.
 > ```ts
+> const filterSignature = JSON.stringify(activeEntriesOfKind(filters, 'filter'))
+> const { konvaFilters, filterProps } = useMemo(() => /* … */, [filterSignature])
+>
 > useEffect(() => {
->   imageRef.current?.cache()
->   imageRef.current?.getLayer()?.batchDraw()
-> }, [filters])
+>   if (hasFilter) node.cache({ pixelRatio: cachePixelRatio })
+>   else node.clearCache()
+>   node.getLayer()?.batchDraw()
+> }, [image, hasFilter, cachePixelRatio])
 > ```
 > Oublier le `cache()` = filtres invisibles ; oublier le `batchDraw()` = rendu non rafraîchi.
+> `cachePixelRatio` se multiplie par `Konva.pixelRatio`, sans quoi l'image filtrée est rasterisée à
+> la moitié de la densité de l'image nue sur un écran Retina (donc visiblement plus floue), et se
+> plafonne pour que le canvas hors écran reste sous `MAX_CACHE_SIDE` — au-delà le navigateur rend
+> une surface vide sans lever d'erreur. Les transformations (miroir, rotation) portent leur propre
+> signature : les faire passer par celle des filtres refiltrerait l'image à chaque cran du curseur.
 
 ## 7. Overlay / superposition trace vs référence (approche prospective)
 
@@ -151,21 +175,21 @@ Approche cible pour un mode "overlay" dans un **Stage unique** :
 Le forensique implique des images détaillées et beaucoup d'annotations : limiter les redraws est essentiel.
 
 - **Layers séparés statique vs dynamique** : image (rare changement) dans un `Layer`, annotations (interactions fréquentes) dans un autre. Déjà en place — le conserver.
-- **`cache()` sur l'image** : nécessaire pour les filtres, et accélère le rendu d'un node coûteux. Re-`cache()` quand la géométrie/les filtres changent.
+- **`cache()` sur l'image** : nécessaire pour les filtres, et accélère le rendu d'un node coûteux. Ne re-`cache()` que quand la géométrie ou l'échelle du cache changent — pas à chaque changement de valeur de filtre, et surtout pas à chaque rendu.
 - **`batchDraw()`** (via `node.getLayer()?.batchDraw()`) plutôt que des redraws synchrones répétés ; regrouper les mises à jour.
 - **`listening={false}`** : à poser sur tout `Layer`/node purement décoratif ou non-interactif (ex. une image de référence en overlay non cliquable) pour sortir du hit-graph et accélérer les events. *(Non encore utilisé dans le code — l'introduire dès qu'un node devient non-interactif.)*
 - **Hit-test ciblé** : `hitStrokeWidth` élargit la zone cliquable des traits fins ; à l'inverse, ne pas rendre cliquables des éléments qui n'ont pas à l'être.
 - **Persister sur `onDragEnd`, pas `onDragMove`** : muter le server state (React Query) à chaque frame de drag est à proscrire ; suivre en state local pendant le geste, persister à la fin (cf. minuties).
-- Éviter de remettre l'image en cache pour rien : le `cache()` est déclenché **par `useEffect([filters])`**, pas à chaque render.
+- Éviter de remettre l'image en cache pour rien : un seul effet de cache, dépendant de l'échelle du cache et **jamais de l'objet `filters`** — celui-ci est reconstruit à chaque rendu du parent, donc le mettre en dépendance rasterise l'image à chaque frame de déplacement.
 
 ## 9. Pièges spécifiques (déjà rencontrés / à surveiller)
 
 - **Recréer des nodes à chaque render** : ne pas instancier d'objets Konva à la main dans le JSX. Les `key` doivent être **stables** (ex. `key={layer.id}`). Le `key={`${image.url}-${recenterSignal}`}` sur `DraggableImage` est **volontaire** : il force le remount pour réinitialiser la position de drag au recenter — c'est le seul remount intentionnel, ne pas en ajouter d'autres par accident (un `key` instable détruirait/recréerait l'image à chaque render → perf + perte d'état).
 - **Fuite mémoire au changement d'image** : toujours nettoyer `img.onload` et remettre l'état à `undefined` dans le cleanup du `useEffect` de chargement (cf. `useImage`). Une image non déchargée + node Konva caché accumulent de la mémoire au fil des sélections.
 - **Closure périmée sur le zoom** : passer par `viewRef` (cf. `useCanvasView`) pour toute lecture de la vue dans un handler appelé en rafale.
-- **Filtres invisibles** : symptôme classique = `filters={…}` posé sans `cache()`. Vérifier le `useEffect([filters])`.
+- **Filtres invisibles** : symptôme classique = `filters={…}` posé sans `cache()`. **Filtre figé** : le nœud est bien caché mais le tableau `filters` garde la même identité quand une valeur change, donc Konva ne refiltre pas (§6). Les deux se vérifient dans l'effet de cache et dans le `useMemo` qui construit le tableau.
 - **`crossOrigin`** : sans `crossOrigin = 'anonymous'` sur l'image, `cache()` + filtres lèvent une *tainted canvas error*. Le back doit servir les médias avec les en-têtes CORS adéquats.
-- **Coordonnées d'annotation en espace écran** : bug latent garanti — les annotations dériveraient au zoom/pan. Toujours stocker en repère local image (Group `{...imageLayout}` + `getRelativePointerPosition()`).
+- **Coordonnées d'annotation en espace écran** : bug latent garanti — les annotations dériveraient au zoom/pan. Toujours passer par le Group `{...imageLayout}` + `getRelativePointerPosition()`, qui rend directement des pixels source (§4).
 - **`layer.settings as any`** : `Layer.settings` est typé `Record<string, unknown>` (`types/layer.ts`) et le code de rendu le caste en `any` (`AnnotationLayer`/`MinutiaeAnnotation`). C'est une dette connue (à resserrer en union discriminée sur `settings.type`) — ne pas la propager ; préférer un typage par forme quand tu touches ces objets. *(Recoupé par le skill `front-review` : champ JSON polymorphe à valider/typer par forme.)*
 
 ## Avant de livrer du code canvas
@@ -173,7 +197,7 @@ Le forensique implique des images détaillées et beaucoup d'annotations : limit
 - `pnpm build` (typecheck `tsc -b` + `vite build`) et `pnpm lint` (`eslint .`) passent. (Aucun framework de test n'est en place ; pas de `pnpm test`.)
 - Format Prettier : `semi: false`, `singleQuote: true`, `printWidth: 120`, `trailingComma: 'es5'`.
 - Aucune coordonnée d'annotation persistée en pixels écran.
-- `cache()` + `batchDraw()` présents partout où des filtres sont appliqués.
+- Un seul effet de cache, dépendant de l'échelle du cache et jamais de l'objet `filters` ; tableau `filters` mémoïsé sur une signature des valeurs actives ; `batchDraw()` présent.
 - Cleanup de `useImage` et des listeners Stage (`.off('.annot')`) en place.
 - Filtres ajoutés via `FILTER_META`, pas en dur.
 - Textes UI via i18n (`t('biometricImage.…')`), conformément aux conventions front.

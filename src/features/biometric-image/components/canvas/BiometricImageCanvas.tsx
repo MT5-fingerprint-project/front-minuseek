@@ -1,4 +1,4 @@
-import { useImperativeHandle, useRef, useState } from 'react'
+import { useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stage, Layer } from 'react-konva'
 import type Konva from 'konva'
@@ -12,11 +12,7 @@ import ScaleBarOverlay from '@/features/biometric-image/components/canvas/ScaleB
 import CanvasGridOverlay from '@/features/biometric-image/components/canvas/CanvasGridOverlay'
 import CanvasToolbar from '@/features/biometric-image/components/toolbar/CanvasToolbar'
 import LayersPanelContainer from '@/features/biometric-image/components/layers/LayersPanelContainer'
-import {
-  useCanvasView,
-  type CanvasZoomHandle,
-  type ScaleChangeOrigin,
-} from '@/features/biometric-image/components/canvas/useCanvasView'
+import { useCanvasView, type CanvasZoomHandle } from '@/features/biometric-image/components/canvas/useCanvasView'
 import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
 import { useCanvasFilters } from '@/features/biometric-image/hooks/useCanvasFilters'
 import { useLayers, useUpdateLayer } from '@/features/biometric-image/hooks/useLayers'
@@ -33,7 +29,7 @@ import {
   type MinutiaType,
 } from '@/features/biometric-image/lib/minutiae'
 
-export type { CanvasZoomHandle, ScaleChangeOrigin }
+export type { CanvasZoomHandle }
 
 export type ExportHandle = {
   exportToBlob: () => Promise<Blob>
@@ -48,7 +44,7 @@ type BiometricImageCanvasProps = {
   isGridVisible?: boolean
   onCloseLayers?: () => void
   zoomHandleRef?: React.RefObject<CanvasZoomHandle | null>
-  onScaleChange?: (scale: number, origin: ScaleChangeOrigin) => void
+  onScaleChange?: (scale: number) => void
   onSourceGeometryChange?: (geometry: SourceGeometry | null) => void
   exportHandleRef?: React.RefObject<ExportHandle | null>
 }
@@ -70,13 +66,22 @@ export default function BiometricImageCanvas({
   const containerRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<Konva.Stage>(null)
   const size = useContainerSize(containerRef)
-  const { view, handleWheel, recenterSignal } = useCanvasView({ size, zoomHandleRef, onScaleChange })
+  const [sourceGeometry, setSourceGeometry] = useState<SourceGeometry | null>(null)
+  const imageId = image?.id ?? null
+  const sourceWidth = sourceGeometry?.sourceWidth ?? 0
+  const sourceHeight = sourceGeometry?.sourceHeight ?? 0
+  // Identité qui dit à la vue quand se réajuster : à l'image, pas à son URL. Une URL GCS
+  // re-signée remonte le même dossier sans faire perdre son zoom à l'opérateur.
+  const content = useMemo(
+    () => (imageId && sourceWidth > 0 && sourceHeight > 0 ? { width: sourceWidth, height: sourceHeight } : null),
+    [imageId, sourceWidth, sourceHeight],
+  )
+  const { view, handleWheel, recenterSignal } = useCanvasView({ size, content, zoomHandleRef, onScaleChange })
   const { sliderValues, effectiveFilters, handleFilterChange } = useCanvasFilters(image?.id)
   const [activeTool, setActiveTool] = useState<AnnotationToolType | null>(null)
   const [activeColor, setActiveColor] = useState<string>(ANNOTATION_COLORS[0])
   const [activeMinutiaType, setActiveMinutiaType] = useState<MinutiaType>(DEFAULT_MINUTIA_TYPE)
   const [imageLayout, setImageLayout] = useState<ImageLayout | null>(null)
-  const [sourceGeometry, setSourceGeometry] = useState<SourceGeometry | null>(null)
   const [hoveredLayerId, setHoveredLayerId] = useState<string | null>(null)
   const [selected, setSelected] = useState<{ id: string; tool: AnnotationToolType | null } | null>(null)
   const selectedAnnotationId = selected?.tool === activeTool ? selected.id : null
@@ -185,7 +190,6 @@ export default function BiometricImageCanvas({
               <DraggableImage
                 key={`${image.url}-${recenterSignal}`}
                 url={image.url}
-                stageSize={size}
                 filters={effectiveFilters}
                 isDraggable={activeTool === null && !isRulerActive}
                 viewScale={view.scale}
@@ -201,7 +205,9 @@ export default function BiometricImageCanvas({
               activeMinutiaType={activeMinutiaType}
               fingerprintId={image.id}
               imageLayout={imageLayout}
-              fitScale={sourceGeometry?.fitScale ?? 1}
+              viewScale={view.scale}
+              sourceWidth={sourceWidth}
+              sourceHeight={sourceHeight}
               selectedId={selectedAnnotationId}
               onSelect={handleSelectAnnotation}
               hoveredLayerId={hoveredLayerId}
@@ -210,13 +216,13 @@ export default function BiometricImageCanvas({
               key={`${image.id}-${calibrationResetSignal}`}
               isActive={isRulerActive}
               imageLayout={imageLayout}
+              viewScale={view.scale}
               onSegmentComplete={handleSegmentComplete}
             />
           </Stage>
           {isGridVisible && <CanvasGridOverlay />}
           <ScaleBarOverlay
             resolutionDpi={freshImage?.resolutionDpi ?? null}
-            fitScale={sourceGeometry?.fitScale ?? 1}
             viewScale={view.scale}
           />
           {expertise && (
@@ -224,11 +230,10 @@ export default function BiometricImageCanvas({
               <Badge variant="secondary">{t('biometricImage.toolbar.expertCaseBanner')}</Badge>
             </div>
           )}
-          {activeRulerSegment && sourceGeometry && (
+          {activeRulerSegment && (
             <CalibrationDialog
               from={activeRulerSegment.from}
               to={activeRulerSegment.to}
-              fitScale={sourceGeometry.fitScale}
               isSaving={calibrate.isPending}
               onValidate={handleValidateCalibration}
               onCancel={handleCancelCalibration}

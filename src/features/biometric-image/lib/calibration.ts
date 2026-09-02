@@ -11,24 +11,20 @@ export type CalibrationOutcome =
 
 /**
  * Déduit la résolution (points par pouce de l'image source) d'un segment
- * mesuré dans le repère local de l'image affichée, connaissant la distance
- * réelle qu'il représente.
+ * mesuré en pixels source, connaissant la distance réelle qu'il représente.
  */
 export function resolutionFromSegment(
   from: CalibrationPoint,
   to: CalibrationPoint,
   realDistanceMm: number,
-  fitScale: number,
 ): CalibrationOutcome {
   if (!Number.isFinite(realDistanceMm) || realDistanceMm <= 0) return { status: 'incomplete' }
-  if (!Number.isFinite(fitScale) || fitScale <= 0) return { status: 'incomplete' }
 
   const dx = to.x - from.x
   const dy = to.y - from.y
-  const localDistance = Math.sqrt(dx * dx + dy * dy)
-  if (localDistance === 0) return { status: 'incomplete' }
+  const sourcePixels = Math.sqrt(dx * dx + dy * dy)
+  if (sourcePixels === 0) return { status: 'incomplete' }
 
-  const sourcePixels = localDistance / fitScale
   const resolutionDpi = Math.round((sourcePixels * MILLIMETERS_PER_INCH) / realDistanceMm)
 
   if (resolutionDpi < MIN_RESOLUTION_DPI || resolutionDpi > MAX_RESOLUTION_DPI) {
@@ -41,8 +37,7 @@ export function resolutionFromSegment(
 export function screenLengthOfMillimeters(
   millimeters: number,
   resolutionDpi: number,
-  fitScale: number,
   viewScale: number,
 ): number {
-  return (resolutionDpi / MILLIMETERS_PER_INCH) * millimeters * fitScale * viewScale
+  return (resolutionDpi / MILLIMETERS_PER_INCH) * millimeters * viewScale
 }

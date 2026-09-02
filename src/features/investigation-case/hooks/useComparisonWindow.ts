@@ -19,11 +19,6 @@ export function useComparisonWindow() {
   const [selectedTrace, setSelectedTrace] = useState<BiometricImage>()
   const [sourceGeometry, setSourceGeometry] = useState<SourceGeometry | null>(null)
 
-  // L'origine (molette/bouton/recentrage) n'a plus d'usage sur cette branche, qui
-  // remplace les préréglages 1:1/5:1 par le dialogue de taille manuel : un paramètre
-  // en moins reste assignable au type `(scale, origin) => void` attendu par le canevas.
-  const handleScaleChange = (nextScale: number) => setScale(nextScale)
-
   const toggle = () => {
     const panel = panelRef.current
     if (!panel) return
@@ -47,8 +42,7 @@ export function useComparisonWindow() {
     isGridVisible,
     toggleGrid: () => setGridVisible((v) => !v),
     scale,
-    setScale,
-    handleScaleChange,
+    handleScaleChange: setScale,
     sourceGeometry,
     setSourceGeometry,
     selectedTrace,
