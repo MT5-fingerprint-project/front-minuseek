@@ -54,6 +54,12 @@ export type ComparisonWorkbenchProps = {
   onToggleDetach?: () => void
   /** Habillage des vignettes du carrousel par id d'image (libellé, bordure) */
   imageDecorations?: Record<string, BiometricImageDecoration>
+  /** Mode démonstration (L7-2b) : appariement des minuties entre trace et empreinte. */
+  isPairingMode?: boolean
+  armedMinutiaId?: string | null
+  minutiaNumbers?: Map<string, number>
+  onMinutiaClick?: (minutiaId: string) => void
+  onPairMiss?: () => void
 }
 
 /**
@@ -76,6 +82,11 @@ export default function ComparisonWorkbench({
   isDetached,
   onToggleDetach,
   imageDecorations,
+  isPairingMode = false,
+  armedMinutiaId = null,
+  minutiaNumbers,
+  onMinutiaClick,
+  onPairMiss,
 }: ComparisonWorkbenchProps) {
   const { t } = useTranslation()
   const keys = TITLES[type]
@@ -222,6 +233,11 @@ export default function ComparisonWorkbench({
             onScaleChange={w.handleScaleChange}
             onSourceGeometryChange={w.setSourceGeometry}
             exportHandleRef={w.exportRef}
+            isPairingMode={isPairingMode}
+            armedMinutiaId={armedMinutiaId}
+            minutiaNumbers={minutiaNumbers}
+            onMinutiaClick={onMinutiaClick}
+            onPairMiss={onPairMiss}
           />
           {isImageSizeDialogOpen && w.sourceGeometry && (
             <ImageSizeDialog

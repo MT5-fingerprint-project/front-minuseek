@@ -97,6 +97,18 @@
       "hitButtonDisabled": "Posez au moins 12 minuties sur la trace et sur l'empreinte pour déclarer un hit",
       "hitInsufficientMinutiae": "12 minuties requises sur la trace et sur l'empreinte pour déclarer un hit",
       "hitError": "Impossible de mettre à jour le hit",
+      "pairingLabel": "APPARIER",
+      "pairingButton": "Mode démonstration : apparier les minuties de la trace et de l'empreinte",
+      "pairingButtonActive": "Mode démonstration actif — cliquer pour quitter",
+      "pairingButtonDisabled": "Sélectionnez une trace et une empreinte pour apparier leurs minuties",
+      "pairingCount_one": "{{count}} paire",
+      "pairingCount_other": "{{count}} paires",
+      "pairingArmedHint": "Minutie sélectionnée — cliquez sa correspondante sur l'autre image",
+      "pairingCancelled": "Sélection annulée",
+      "pairingSameSideError": "Choisissez la minutie correspondante sur l'autre image",
+      "pairingMissHint": "Cliquez directement sur une minutie pour l'apparier",
+      "pairingCreated": "Paire {{number}} créée",
+      "pairingRemoved": "Paire retirée",
       "tour": {
         "next": "Suivant",
         "previous": "Précédent",
@@ -647,6 +659,9 @@
       "createError": "Impossible de créer le calque",
       "updateError": "Impossible de mettre à jour le calque",
       "deleteError": "Impossible de supprimer le calque"
+    },
+    "pairing": {
+      "layerName": "Paire de minuties"
     },
     "toolbar": {
       "modes": {

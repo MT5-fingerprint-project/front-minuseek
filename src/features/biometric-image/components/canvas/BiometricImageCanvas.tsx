@@ -47,6 +47,12 @@ type BiometricImageCanvasProps = {
   onScaleChange?: (scale: number) => void
   onSourceGeometryChange?: (geometry: SourceGeometry | null) => void
   exportHandleRef?: React.RefObject<ExportHandle | null>
+  /** Mode démonstration (L7-2b) : appariement des minuties entre trace et empreinte. */
+  isPairingMode?: boolean
+  armedMinutiaId?: string | null
+  minutiaNumbers?: Map<string, number>
+  onMinutiaClick?: (minutiaId: string) => void
+  onPairMiss?: () => void
 }
 
 export default function BiometricImageCanvas({
@@ -61,6 +67,11 @@ export default function BiometricImageCanvas({
   onScaleChange,
   onSourceGeometryChange,
   exportHandleRef,
+  isPairingMode = false,
+  armedMinutiaId = null,
+  minutiaNumbers,
+  onMinutiaClick,
+  onPairMiss,
 }: BiometricImageCanvasProps) {
   const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -211,6 +222,11 @@ export default function BiometricImageCanvas({
               selectedId={selectedAnnotationId}
               onSelect={handleSelectAnnotation}
               hoveredLayerId={hoveredLayerId}
+              isPairingMode={isPairingMode}
+              armedMinutiaId={armedMinutiaId}
+              minutiaNumbers={minutiaNumbers}
+              onMinutiaClick={onMinutiaClick}
+              onPairMiss={onPairMiss}
             />
             <CalibrationLayer
               key={`${image.id}-${calibrationResetSignal}`}
@@ -239,7 +255,7 @@ export default function BiometricImageCanvas({
               onCancel={handleCancelCalibration}
             />
           )}
-          {isToolbarVisible && (
+          {isToolbarVisible && !isPairingMode && (
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
               <CanvasToolbar
                 type={type}

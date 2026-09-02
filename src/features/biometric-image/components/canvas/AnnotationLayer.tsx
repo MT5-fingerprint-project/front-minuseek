@@ -38,6 +38,13 @@ type AnnotationLayerProps = {
   selectedId: string | null
   onSelect: (id: string | null) => void
   hoveredLayerId?: string | null
+  /** Mode démonstration (L7-2b) : appariement des minuties entre trace et empreinte. */
+  isPairingMode?: boolean
+  armedMinutiaId?: string | null
+  minutiaNumbers?: Map<string, number>
+  onMinutiaClick?: (minutiaId: string) => void
+  /** Clic dans le vide en mode démonstration (aucune minutie sous le pointeur). */
+  onPairMiss?: () => void
 }
 
 /** Walk up the Konva tree to find whether the clicked node belongs to an existing annotation. */
@@ -64,6 +71,11 @@ export default function AnnotationLayer({
   selectedId,
   onSelect,
   hoveredLayerId,
+  isPairingMode = false,
+  armedMinutiaId = null,
+  minutiaNumbers,
+  onMinutiaClick,
+  onPairMiss,
 }: AnnotationLayerProps) {
   const { t } = useTranslation()
   const layerRef = useRef<Konva.Layer>(null)
@@ -102,9 +114,23 @@ export default function AnnotationLayer({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedId])
 
+  // Mode démonstration : signale un clic qui ne touche aucune minutie, sinon un
+  // clic à côté ne fait rigoureusement rien et donne l'impression que ça ne marche pas.
   useEffect(() => {
     const stage = layerRef.current?.getStage()
-    if (!stage || !activeTool) return
+    if (!stage || !isPairingMode) return
+
+    const onMiss = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
+      if (isAnnotationTarget(e.target)) return
+      onPairMiss?.()
+    }
+    stage.on('mousedown.pairmiss touchstart.pairmiss', onMiss)
+    return () => { stage.off('.pairmiss') }
+  }, [isPairingMode, onPairMiss])
+
+  useEffect(() => {
+    const stage = layerRef.current?.getStage()
+    if (!stage || !activeTool || isPairingMode) return
 
     // Pointer position in source pixels (handles zoom/pan/offset/mirror/rotation).
     const getPos = () => groupRef.current?.getRelativePointerPosition() ?? null
@@ -207,7 +233,7 @@ export default function AnnotationLayer({
     return () => { stage.off('.annot') }
   // createLayer/updateLayer mutate refs are stable; re-bind when tool/color/zIndex base change
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTool, activeColor, activeMinutiaType, fingerprintId, layerCount, sourceRadius, sourceStrokeWidth])
+  }, [activeTool, activeColor, activeMinutiaType, fingerprintId, layerCount, sourceRadius, sourceStrokeWidth, isPairingMode])
 
   const renderShape = (layer: Layer) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -232,6 +258,10 @@ export default function AnnotationLayer({
             rotationDeg={imageLayout?.rotation ?? 0}
             onSelect={() => select(isSelected ? null : layer.id)}
             onPersist={persistPosition}
+            isPairingMode={isPairingMode}
+            pairNumber={minutiaNumbers?.get(layer.id) ?? null}
+            isArmed={layer.id === armedMinutiaId}
+            onPairClick={() => onMinutiaClick?.(layer.id)}
           />
         )
 
