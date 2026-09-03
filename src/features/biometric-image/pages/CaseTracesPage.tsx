@@ -135,7 +135,7 @@ export default function CaseTracesPage() {
                     </TableCell>
                     <TableCell>
                       <img
-                        src={trace.url ?? undefined}
+                        src={trace.thumbUrl ?? trace.url ?? undefined}
                         alt={trace.label}
                         loading="lazy"
                         decoding="async"

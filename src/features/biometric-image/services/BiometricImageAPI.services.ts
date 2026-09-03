@@ -5,7 +5,11 @@ import type {
   BiometricImageType,
   WithdrawalMotive,
 } from '@/features/biometric-image/types/biometricImage'
-import type { TraceDescriptionInput } from '@/features/biometric-image/types/trace'
+import type {
+  TraceDescriptionInput,
+  TraceLocationPhoto,
+  TraceLocationPhotoDto,
+} from '@/features/biometric-image/types/trace'
 
 const endpointByType: Record<BiometricImageType, string> = {
   traces: '/traces',
@@ -19,12 +23,23 @@ export type UploadInput = {
   position?: string
 }
 
+function mapDtoToTraceLocationPhoto(dto: TraceLocationPhotoDto): TraceLocationPhoto {
+  return {
+    id: dto.id,
+    url: dto.url,
+    thumbUrl: dto.thumbUrl ?? null,
+    sha256: dto.sha256,
+    sealedAt: dto.sealedAt,
+  }
+}
+
 function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
   return {
     id: dto.id,
     label: dto.reference ?? dto.path.split('/').pop() ?? dto.path,
     number: dto.number ?? null,
     url: dto.url,
+    thumbUrl: dto.thumbUrl ?? null,
     status: dto.status ?? null,
     identified: dto.identified ?? null,
     notIdentified: dto.notIdentified ?? null,
@@ -44,7 +59,7 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     location: dto.location ?? null,
     revelationTechnique: dto.revelationTechnique ?? null,
     hasLocationPhoto: dto.hasLocationPhoto ?? false,
-    locationPhoto: dto.locationPhoto ?? null,
+    locationPhoto: dto.locationPhoto ? mapDtoToTraceLocationPhoto(dto.locationPhoto) : null,
   }
 }
 
