@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from '@/features/shared/ui/select'
 import { useBiometricImages } from '@/features/biometric-image/hooks/useBiometricImages'
+import { useReferencePrintDecorations } from '@/features/investigation-case/hooks/useReferencePrintDecorations'
 import {
   useCompleteVerification,
   useRecordConclusion,
@@ -30,6 +31,7 @@ export default function VerificationPanel({ verificationId, caseId }: Verificati
   const { t } = useTranslation()
   const { data: traces = [] } = useBiometricImages('traces', caseId)
   const { data: referencePrints = [] } = useBiometricImages('reference-prints', caseId)
+  const referenceDecorations = useReferencePrintDecorations(caseId)
   const { data: verification, isPending } = useVerificationDetail(verificationId)
   const recordConclusion = useRecordConclusion(verificationId)
   const complete = useCompleteVerification(verificationId)
@@ -126,7 +128,7 @@ export default function VerificationPanel({ verificationId, caseId }: Verificati
                     </SelectItem>
                     {referencePrints.map((print) => (
                       <SelectItem key={print.id} value={print.id}>
-                        {print.label}
+                        {referenceDecorations[print.id]?.label ?? print.label}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -15,7 +15,12 @@ export function useCanvasFilters(fingerprintId: string | undefined) {
   const updateLayer = useUpdateLayer()
   const deleteLayer = useDeleteLayer()
 
-  // Restore slider values and layer ids from persisted filter layers on load
+
+  const persistedFilterIds = layers
+    .filter((layer) => layer.type === 'FILTER')
+    .map((layer) => layer.id)
+    .join('|')
+
   useEffect(() => {
     for (const layer of layers) {
       if (layer.type !== 'FILTER') continue
@@ -29,9 +34,9 @@ export function useCanvasFilters(fingerprintId: string | undefined) {
       }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [layers.length])
+  }, [persistedFilterIds])
 
-  // Remove stale refs and reset sliders when a layer is deleted externally
+
   useEffect(() => {
     const liveIds = new Set(layers.map((l) => l.id))
     const deletedKeys: string[] = []
@@ -69,7 +74,7 @@ export function useCanvasFilters(fingerprintId: string | undefined) {
       const settings = { filterKey: changedKey, value }
       const existingId = layerIdByKey.current[changedKey]
 
-      // Valeur revenue au neutre : l'outil n'a plus d'effet, on retire son calque.
+  
       if (value === 0) {
         if (existingId) {
           delete layerIdByKey.current[changedKey]
