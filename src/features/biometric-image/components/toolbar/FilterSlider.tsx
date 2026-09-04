@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Slider as SliderPrimitive } from 'radix-ui'
 import { cn } from '@/features/shared/lib/utils'
 
@@ -8,6 +9,7 @@ type FilterSliderProps = {
   step?: number
   unit?: string
   origin?: 'center' | 'left'
+  commitOnRelease?: boolean
   onChange: (value: number) => void
 }
 
@@ -18,11 +20,17 @@ export default function FilterSlider({
   step = 1,
   unit = '%',
   origin = 'center',
+  commitOnRelease = false,
   onChange,
 }: FilterSliderProps) {
+  // Marquée par la valeur d'où elle part : quand le parent applique celle du relâchement,
+  // le repère ne correspond plus et l'affichage repasse sur la valeur du parent.
+  const [dragged, setDragged] = useState<{ from: number; value: number } | null>(null)
+  const displayedValue = dragged?.from === value ? dragged.value : value
+
   const range = max - min
 
-  const thumbPct = ((value - min) / range) * 100
+  const thumbPct = ((displayedValue - min) / range) * 100
   const centerPct = ((0 - min) / range) * 100
 
   const fillLeft = origin === 'center' ? Math.min(thumbPct, centerPct) : 0
@@ -34,8 +42,19 @@ export default function FilterSlider({
         min={min}
         max={max}
         step={step}
-        value={[value]}
-        onValueChange={([v]) => onChange(v)}
+        value={[displayedValue]}
+        onValueChange={([next]) => {
+          if (!commitOnRelease) {
+            onChange(next)
+            return
+          }
+          setDragged({ from: value, value: next })
+        }}
+        onValueCommit={([next]) => {
+          if (!commitOnRelease) return
+          setDragged(null)
+          onChange(next)
+        }}
         className="relative flex flex-1 touch-none items-center select-none"
       >
         <SliderPrimitive.Track className="relative h-2 w-full grow rounded-full bg-grey-medium-1 overflow-hidden">
@@ -53,7 +72,7 @@ export default function FilterSlider({
         />
       </SliderPrimitive.Root>
       <span className="w-12 text-right text-sm tabular-nums text-white">
-        {value}{unit}
+        {displayedValue}{unit}
       </span>
     </div>
   )

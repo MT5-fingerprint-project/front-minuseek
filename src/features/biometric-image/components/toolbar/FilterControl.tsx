@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Switch } from '@/features/shared/ui/switch'
 import FilterSlider from './FilterSlider'
-import { FILTER_DEFAULTS, type FilterConfig } from './canvasFilters'
+import { FILTER_DEFAULTS, FILTER_META, type FilterConfig } from './canvasFilters'
 
 type FilterControlProps = {
   config: FilterConfig
@@ -25,6 +25,10 @@ export default function FilterControl({ config, value, onChange }: FilterControl
     )
   }
 
+  // La rotation et le miroir ne reposent qu'un attribut du nœud : ils suivent le curseur.
+  // Les autres relancent la passe de filtre sur toute l'image, d'où le relâchement.
+  const isNodeTransform = FILTER_META[config.filterKey]?.konva.type === 'transform'
+
   return (
     <div className="flex flex-col gap-1">
       {config.labelKey && <span className="text-xs text-white/60">{t(config.labelKey)}</span>}
@@ -34,6 +38,7 @@ export default function FilterControl({ config, value, onChange }: FilterControl
         max={config.max ?? FILTER_DEFAULTS.max}
         unit={config.unit ?? FILTER_DEFAULTS.unit}
         origin={config.origin ?? FILTER_DEFAULTS.origin}
+        commitOnRelease={!isNodeTransform}
         onChange={onChange}
       />
     </div>
