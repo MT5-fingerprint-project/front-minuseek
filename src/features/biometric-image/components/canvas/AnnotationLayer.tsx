@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Layer as KonvaLayer, Line, Group } from 'react-konva'
 import type Konva from 'konva'
 import { useCreateLayer, useUpdateLayer, useDeleteLayer } from '@/features/biometric-image/hooks/useLayers'
+import type { RequestMinutiaDeletion } from '@/features/biometric-image/hooks/useMinutiaDeletionGuard'
 import type { Layer } from '@/features/biometric-image/types/layer'
 import type { ImageLayout } from '@/features/biometric-image/components/canvas/DraggableImage'
 import type { AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
@@ -46,6 +47,8 @@ type AnnotationLayerProps = {
   onMinutiaClick?: (minutiaId: string) => void
   /** Clic dans le vide en mode démonstration (aucune minutie sous le pointeur). */
   onPairMiss?: () => void
+  /** Passe la suppression par la confirmation du canevas quand la minutie est appariée. */
+  onRequestMinutiaDeletion?: RequestMinutiaDeletion
 }
 
 /** Walk up the Konva tree to find whether the clicked node belongs to an existing annotation. */
@@ -78,14 +81,15 @@ export default function AnnotationLayer({
   minutiaNumbers,
   onMinutiaClick,
   onPairMiss,
+  onRequestMinutiaDeletion,
 }: AnnotationLayerProps) {
   const { t } = useTranslation()
   const layerRef = useRef<Konva.Layer>(null)
   // Group whose transform mirrors the image: annotation coords live in the image's source frame.
   const groupRef = useRef<Konva.Group>(null)
-  const createLayer = useCreateLayer(fingerprintId)
-  const updateLayer = useUpdateLayer(fingerprintId)
-  const deleteLayer = useDeleteLayer(fingerprintId)
+  const createLayer = useCreateLayer()
+  const updateLayer = useUpdateLayer()
+  const deleteLayer = useDeleteLayer()
 
   const [draft, setDraft] = useState<Draft | null>(null)
   const draftRef = useRef<Draft | null>(null)
@@ -112,16 +116,19 @@ export default function AnnotationLayer({
 
   useEffect(() => {
     if (!selectedId) return
+    const removeAnnotation = () => {
+      deleteLayer.mutate(selectedId)
+      select(null)
+    }
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Delete' || e.key === 'Backspace') {
-        deleteLayer.mutate(selectedId)
-        select(null)
-      }
+      if (e.key !== 'Delete' && e.key !== 'Backspace') return
+      if (onRequestMinutiaDeletion) onRequestMinutiaDeletion(selectedId, removeAnnotation)
+      else removeAnnotation()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId])
+  }, [selectedId, onRequestMinutiaDeletion])
 
   // Mode démonstration : signale un clic qui ne touche aucune minutie, sinon un
   // clic à côté ne fait rigoureusement rien et donne l'impression que ça ne marche pas.

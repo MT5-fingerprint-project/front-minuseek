@@ -109,6 +109,15 @@
       "pairingMissHint": "Cliquez directement sur une minutie pour l'apparier",
       "pairingCreated": "Paire {{number}} créée",
       "pairingRemoved": "Paire retirée",
+      "pairingCreateError": "Impossible de créer la paire",
+      "pairingRemoveError": "Impossible de retirer la paire",
+      "pairingConflict": "Appariement refusé : une des deux minuties est déjà appariée, leurs types ne concordent plus, ou le dossier est clos",
+      "pairingTypeMismatch": "Types incompatibles : {{traceType}} sur la trace, {{referenceType}} sur l'empreinte",
+      "pairingSideTrace": "la trace",
+      "pairingSideReference": "l'empreinte",
+      "pairingRequalifyTitle": "Requalifier la minutie ?",
+      "pairingRequalifyDescription": "La minutie de {{side}} est indéterminée : l'apparier la requalifiera en {{type}}.",
+      "pairingRequalifyConfirm": "Apparier et requalifier",
       "tour": {
         "next": "Suivant",
         "previous": "Précédent",
@@ -661,7 +670,10 @@
       "deleteError": "Impossible de supprimer le calque"
     },
     "pairing": {
-      "layerName": "Paire de minuties"
+      "deleteTitle": "Supprimer une minutie appariée ?",
+      "deleteDescription": "Cette minutie forme la paire {{number}} : la supprimer défera aussi la paire.",
+      "deleteConfirm": "Supprimer la minutie",
+      "typeLockedByPair": "Cette minutie est appariée : défaites la paire avant d'en changer le type"
     },
     "toolbar": {
       "modes": {

@@ -11,22 +11,33 @@ import ComparisonWindow from '@/features/investigation-case/components/compariso
 import ComparisonWorkbench from '@/features/investigation-case/components/comparison/ComparisonWorkbench'
 import HitButton from '@/features/investigation-case/components/comparison/HitButton'
 import PairingControls from '@/features/investigation-case/components/comparison/PairingControls'
+import PairRequalificationDialog from '@/features/investigation-case/components/comparison/PairRequalificationDialog'
 import ClosedCaseBanner from '@/features/investigation-case/components/ClosedCaseBanner'
 import BlindVerificationBanner from '@/features/investigation-case/components/comparison/BlindVerificationBanner'
 import VerificationPanel from '@/features/investigation-case/components/comparison/VerificationPanel'
 import { useMissionOnCase } from '@/features/investigation-case/hooks/useMissionOnCase'
 import { useMinutiaPairs } from '@/features/investigation-case/hooks/useMinutiaPairs'
+import { minutiaPairKeys } from '@/features/investigation-case/hooks/minutiaPairKeys'
+import { DETACHED_REFERENCE_TRACE_CHANGED } from '@/features/investigation-case/types/detachedReference'
 import { isInProgress } from '@/features/shared/types/verification'
 import { useCaseIsClosed } from '@/features/investigation-case/hooks/useCaseIsClosed'
 import { biometricImageKeys, useBiometricImages } from '@/features/biometric-image/hooks/useBiometricImages'
 import { useCompare } from '@/features/biometric-image/hooks/useCompare'
 import { layerKeys, useLayers } from '@/features/biometric-image/hooks/useLayers'
 import { useHits, useToggleHit } from '@/features/biometric-image/hooks/useHits'
-import { countMinutiae, REQUIRED_MINUTIAE } from '@/features/biometric-image/lib/minutiae'
+import { countMinutiae, REQUIRED_MINUTIAE, type MinutiaType } from '@/features/biometric-image/lib/minutiae'
+import { minutiaTypeInLayers, resolvePairType } from '@/features/biometric-image/lib/minutiaPairing'
 import { useAtelierTour } from '@/features/investigation-case/hooks/useAtelierTour'
 import { useComparisonTour } from '@/features/investigation-case/context/comparison-tour-context'
 
 type ArmedMinutia = { side: 'trace' | 'reference'; minutiaId: string }
+
+type PendingRequalification = {
+  traceMinutiaId: string
+  referenceMinutiaId: string
+  sideToQualify: 'TRACE' | 'REFERENCE'
+  newType: MinutiaType
+}
 
 export default function InvestigationCaseComparisonPage() {
   const { t } = useTranslation()
@@ -39,6 +50,8 @@ export default function InvestigationCaseComparisonPage() {
   // rattachement, on invalide ce qu'elle a pu modifier pour refléter ses édits.
   const referenceWindow = useDetachedWindow('minuseek-reference-prints', () => {
     queryClient.invalidateQueries({ queryKey: layerKeys.all })
+    // Supprimer une minutie dans la popup casse la paire côté base : les badges du canevas de trace mentent sinon.
+    queryClient.invalidateQueries({ queryKey: minutiaPairKeys.all })
     queryClient.invalidateQueries({ queryKey: biometricImageKeys.list('reference-prints', id ?? '') })
   })
 
@@ -72,6 +85,7 @@ export default function InvestigationCaseComparisonPage() {
 
   const [isPairingMode, setPairingMode] = useState(false)
   const [armed, setArmed] = useState<ArmedMinutia | null>(null)
+  const [pendingRequalification, setPendingRequalification] = useState<PendingRequalification | null>(null)
   const minutiaPairs = useMinutiaPairs(traceId, referenceId)
   const canPair = !!traceId && !!referenceId
 
@@ -82,12 +96,50 @@ export default function InvestigationCaseComparisonPage() {
   if (armedFor !== pairingKey) {
     setArmedFor(pairingKey)
     if (armed) setArmed(null)
+    if (pendingRequalification) setPendingRequalification(null)
   }
 
   const togglePairingMode = () => {
     if (!canPair) return
     setPairingMode((active) => !active)
     setArmed(null)
+    setPendingRequalification(null)
+  }
+
+  // Seule la page a les deux listes de calques : la règle de type se joue donc ici, avant l'appel.
+  const requestPair = (traceMinutiaId: string, referenceMinutiaId: string) => {
+    const traceType = minutiaTypeInLayers(traceLayers, traceMinutiaId)
+    const referenceType = minutiaTypeInLayers(referenceLayers, referenceMinutiaId)
+    if (!traceType || !referenceType) {
+      minutiaPairs.createPair(traceMinutiaId, referenceMinutiaId)
+      return
+    }
+    const decision = resolvePairType(traceType, referenceType)
+    if (decision.outcome === 'REFUSED') {
+      toast.error(
+        t('investigationCase.comparison.pairingTypeMismatch', {
+          traceType: t(`biometricImage.minutia.types.${decision.traceType}`),
+          referenceType: t(`biometricImage.minutia.types.${decision.referenceType}`),
+        })
+      )
+      return
+    }
+    if (decision.outcome === 'QUALIFIES') {
+      setPendingRequalification({
+        traceMinutiaId,
+        referenceMinutiaId,
+        sideToQualify: decision.sideToQualify,
+        newType: decision.type,
+      })
+      return
+    }
+    minutiaPairs.createPair(traceMinutiaId, referenceMinutiaId)
+  }
+
+  const confirmRequalification = () => {
+    if (!pendingRequalification) return
+    minutiaPairs.createPair(pendingRequalification.traceMinutiaId, pendingRequalification.referenceMinutiaId)
+    setPendingRequalification(null)
   }
 
   const handleMinutiaClick = (side: 'trace' | 'reference', minutiaId: string) => {
@@ -113,7 +165,7 @@ export default function InvestigationCaseComparisonPage() {
     }
     const traceMinutiaId = side === 'trace' ? minutiaId : armed.minutiaId
     const referenceMinutiaId = side === 'reference' ? minutiaId : armed.minutiaId
-    minutiaPairs.createPair(traceMinutiaId, referenceMinutiaId)
+    requestPair(traceMinutiaId, referenceMinutiaId)
     setArmed(null)
   }
 
@@ -142,14 +194,31 @@ export default function InvestigationCaseComparisonPage() {
 
   const isReferenceDetached = referenceWindow.isOpen
 
+  // La popup est une instance d'app à part : la trace choisie ici ne lui parvient
+  // que par l'adresse d'ouverture, puis par message. Sans elle, elle ignore les
+  // appariements et laisserait supprimer une minutie appariée sans un mot.
+  const detachedReferenceUrl =
+    slug && id
+      ? `${window.location.origin}/${slug}/affaires/${id}/comparaison/empreintes${
+          traceId ? `?trace=${traceId}` : ''
+        }`
+      : null
+
   const toggleDetachReference = () => {
     if (isReferenceDetached) {
       referenceWindow.close()
       return
     }
-    if (!slug || !id) return
-    referenceWindow.open(`${window.location.origin}/${slug}/affaires/${id}/comparaison/empreintes`)
+    if (!detachedReferenceUrl) return
+    referenceWindow.open(detachedReferenceUrl)
   }
+
+  // Changer de trace pendant le détachement : la popup est prévenue par message,
+  // sinon elle garderait les paires de la trace précédente.
+  const postToDetachedReference = referenceWindow.post
+  useEffect(() => {
+    postToDetachedReference({ type: DETACHED_REFERENCE_TRACE_CHANGED, traceId: traceId ?? null })
+  }, [traceId, postToDetachedReference])
 
   if (!id) return null
 
@@ -231,6 +300,14 @@ export default function InvestigationCaseComparisonPage() {
           onPairMiss={handlePairMiss}
         />
       </ResizablePanelGroup>
+      {pendingRequalification && (
+        <PairRequalificationDialog
+          sideToQualify={pendingRequalification.sideToQualify}
+          newType={pendingRequalification.newType}
+          onConfirm={confirmRequalification}
+          onCancel={() => setPendingRequalification(null)}
+        />
+      )}
       {mission && <VerificationPanel verificationId={mission.id} caseId={id} />}
     </div>
   )

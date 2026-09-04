@@ -11,9 +11,9 @@ export function useCanvasFilters(fingerprintId: string | undefined) {
   const debounceTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
 
   const { data: layers = [] } = useLayers(fingerprintId)
-  const createLayer = useCreateLayer(fingerprintId ?? '')
-  const updateLayer = useUpdateLayer(fingerprintId ?? '')
-  const deleteLayer = useDeleteLayer(fingerprintId ?? '')
+  const createLayer = useCreateLayer()
+  const updateLayer = useUpdateLayer()
+  const deleteLayer = useDeleteLayer()
 
   // Restore slider values and layer ids from persisted filter layers on load
   useEffect(() => {

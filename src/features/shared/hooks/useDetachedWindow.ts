@@ -62,6 +62,16 @@ export function useDetachedWindow(name: string, onClose?: () => void) {
     [name]
   )
 
+  /**
+   * Transmet un changement de contexte à une popup déjà ouverte. On ne repointe
+   * pas son adresse : `location.replace` rechargerait le document, ce qui vide
+   * son cache, perd le cadrage et tue les écritures debouncées en vol.
+   */
+  const post = useCallback((message: unknown) => {
+    if (!ref.current || ref.current.closed) return
+    ref.current.postMessage(message, window.location.origin)
+  }, [])
+
   const close = useCallback(() => {
     if (!ref.current) return
     ref.current.close()
@@ -88,5 +98,5 @@ export function useDetachedWindow(name: string, onClose?: () => void) {
     return () => ref.current?.close()
   }, [])
 
-  return { isOpen, open, close }
+  return { isOpen, open, post, close }
 }

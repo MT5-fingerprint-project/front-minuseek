@@ -1,11 +1,13 @@
 import { useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { Stage, Layer } from 'react-konva'
 import type Konva from 'konva'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
 import DraggableImage, { type ImageLayout, type SourceGeometry } from '@/features/biometric-image/components/canvas/DraggableImage'
 import DestroyedImagePlaceholder from '@/features/biometric-image/components/DestroyedImagePlaceholder'
 import AnnotationLayer from '@/features/biometric-image/components/canvas/AnnotationLayer'
+import PairedMinutiaDeletionDialog from '@/features/biometric-image/components/canvas/PairedMinutiaDeletionDialog'
 import CalibrationLayer from '@/features/biometric-image/components/canvas/CalibrationLayer'
 import CalibrationDialog from '@/features/biometric-image/components/canvas/CalibrationDialog'
 import ScaleBarOverlay from '@/features/biometric-image/components/canvas/ScaleBarOverlay'
@@ -16,6 +18,7 @@ import { useCanvasView, type CanvasZoomHandle } from '@/features/biometric-image
 import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
 import { useCanvasFilters } from '@/features/biometric-image/hooks/useCanvasFilters'
 import { useLayers, useUpdateLayer } from '@/features/biometric-image/hooks/useLayers'
+import { useMinutiaDeletionGuard } from '@/features/biometric-image/hooks/useMinutiaDeletionGuard'
 import { useBiometricImages, useCalibrateBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
 import { useCaseExpertise } from '@/features/investigation-case/hooks/useCaseExpertise'
 import { Badge } from '@/features/shared/ui/badge'
@@ -102,7 +105,8 @@ export default function BiometricImageCanvas({
   const [hoveredLayerId, setHoveredLayerId] = useState<string | null>(null)
   const [selected, setSelected] = useState<{ id: string; tool: AnnotationToolType | null } | null>(null)
   const selectedAnnotationId = selected?.tool === activeTool ? selected.id : null
-  const updateSelectedType = useUpdateLayer(image?.id ?? '')
+  const updateSelectedType = useUpdateLayer()
+  const minutiaDeletionGuard = useMinutiaDeletionGuard(minutiaNumbers)
   const [isRulerActive, setIsRulerActive] = useState(false)
   // Marqué par l'id de l'image : un changement d'image invalide le segment sans effet dédié.
   const [rulerSegment, setRulerSegment] = useState<
@@ -150,12 +154,17 @@ export default function BiometricImageCanvas({
 
   const handleActiveMinutiaTypeChange = (minutiaType: MinutiaType) => {
     setActiveMinutiaType(minutiaType)
-    if (selectedLayer && isMinutiaSettings(selectedLayer.settings)) {
-      updateSelectedType.mutate({
-        id: selectedLayer.id,
-        input: { settings: { ...selectedLayer.settings, minutiaType } },
-      })
+    if (!selectedLayer || !isMinutiaSettings(selectedLayer.settings)) return
+    // Le serveur refuse ce changement par un 409 : sans ce garde l'opérateur ne
+    // lirait que « impossible de mettre à jour le calque ».
+    if (minutiaNumbers?.has(selectedLayer.id)) {
+      toast.info(t('biometricImage.pairing.typeLockedByPair'))
+      return
     }
+    updateSelectedType.mutate({
+      id: selectedLayer.id,
+      input: { settings: { ...selectedLayer.settings, minutiaType } },
+    })
   }
 
   const handleToggleRuler = () => {
@@ -252,6 +261,7 @@ export default function BiometricImageCanvas({
               minutiaNumbers={minutiaNumbers}
               onMinutiaClick={onMinutiaClick}
               onPairMiss={onPairMiss}
+              onRequestMinutiaDeletion={minutiaDeletionGuard.requestDeletion}
             />
             <CalibrationLayer
               key={`${image.id}-${calibrationResetSignal}`}
@@ -303,9 +313,19 @@ export default function BiometricImageCanvas({
           )}
           {isLayersVisible && onCloseLayers && (
             <div className="absolute inset-y-0 right-0">
-              <LayersPanelContainer fingerprintId={image.id} onClose={onCloseLayers} onHoverLayer={setHoveredLayerId} />
+              <LayersPanelContainer
+                fingerprintId={image.id}
+                onClose={onCloseLayers}
+                onHoverLayer={setHoveredLayerId}
+                onRequestMinutiaDeletion={minutiaDeletionGuard.requestDeletion}
+              />
             </div>
           )}
+          <PairedMinutiaDeletionDialog
+            pairNumber={minutiaDeletionGuard.pendingPairNumber}
+            onConfirm={minutiaDeletionGuard.confirmDeletion}
+            onCancel={minutiaDeletionGuard.cancelDeletion}
+          />
         </>
       ) : (
         <>
