@@ -10,6 +10,7 @@ const HANDLE_STROKE_WIDTH = 1.5
 const HIT_STROKE_WIDTH = 12
 const LABEL_MIN_FONT_SIZE = 8
 const LABEL_GAP = 4
+const BADGE_RADIUS_MIN = 7
 
 type MinutiaeAnnotationProps = {
   layer: Layer
@@ -20,6 +21,11 @@ type MinutiaeAnnotationProps = {
   rotationDeg: number
   onSelect: () => void
   onPersist: (settings: Record<string, unknown>) => void
+  /** Mode démonstration (L7-2b) : appariement des minuties, le clic n'édite plus. */
+  isPairingMode?: boolean
+  pairNumber?: number | null
+  isArmed?: boolean
+  onPairClick?: () => void
 }
 
 export default function MinutiaeAnnotation({
@@ -31,6 +37,10 @@ export default function MinutiaeAnnotation({
   rotationDeg,
   onSelect,
   onPersist,
+  isPairingMode = false,
+  pairNumber = null,
+  isArmed = false,
+  onPairClick,
 }: MinutiaeAnnotationProps) {
   const { t } = useTranslation()
   const settings = layer.settings as MinutiaSettings
@@ -52,14 +62,19 @@ export default function MinutiaeAnnotation({
       : `biometricImage.minutia.shortTypes.${minutiaType}`,
   )
   const labelFontSize = Math.max(onScreen(LABEL_MIN_FONT_SIZE), radius * 1.3)
+  const badgeRadius = Math.max(onScreen(BADGE_RADIUS_MIN), radius * 0.8)
 
   return (
     <Group
       name="annotation"
       x={settings.x}
       y={settings.y}
-      draggable={!draggingHandle}
-      onClick={(e) => { e.cancelBubble = true; onSelect() }}
+      draggable={!draggingHandle && !isPairingMode}
+      onClick={(e) => {
+        e.cancelBubble = true
+        if (isPairingMode) onPairClick?.()
+        else onSelect()
+      }}
       onDragEnd={(e) => {
         if (isDraggingHandle.current) return
         onPersist({
@@ -69,6 +84,9 @@ export default function MinutiaeAnnotation({
         })
       }}
     >
+      {isArmed && (
+        <Circle radius={radius + 6} stroke="#D85703" strokeWidth={3} dash={[5, 3]} listening={false} />
+      )}
       <Circle
         radius={radius}
         stroke={settings.color}
@@ -84,20 +102,40 @@ export default function MinutiaeAnnotation({
         />
       )}
 
-      <Group scaleX={mirrorScaleX} rotation={-rotationDeg} listening={false}>
-        <Text
-          text={typeLabel}
-          x={radius + onScreen(LABEL_GAP)}
-          y={0}
-          offsetY={labelFontSize / 2}
-          fontSize={labelFontSize}
-          fill={settings.color}
-          listening={false}
-        />
-      </Group>
+      {!isPairingMode && (
+        <Group scaleX={mirrorScaleX} rotation={-rotationDeg} listening={false}>
+          <Text
+            text={typeLabel}
+            x={radius + onScreen(LABEL_GAP)}
+            y={0}
+            offsetY={labelFontSize / 2}
+            fontSize={labelFontSize}
+            fill={settings.color}
+            listening={false}
+          />
+        </Group>
+      )}
+
+      {pairNumber !== null && (
+        <Group scaleX={mirrorScaleX} rotation={-rotationDeg} listening={false}>
+          <Circle x={radius + onScreen(LABEL_GAP) + badgeRadius} y={0} radius={badgeRadius} fill={settings.color} />
+          <Text
+            text={String(pairNumber)}
+            x={radius + onScreen(LABEL_GAP)}
+            y={-badgeRadius}
+            width={badgeRadius * 2}
+            height={badgeRadius * 2}
+            align="center"
+            verticalAlign="middle"
+            fontSize={badgeRadius * 1.1}
+            fontStyle="bold"
+            fill="white"
+          />
+        </Group>
+      )}
 
       {/* Rotation handle — visible when selected */}
-      {hasDirection && isSelected && (
+      {hasDirection && isSelected && !isPairingMode && (
         <Circle
           x={tip.x}
           y={tip.y}

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Layer as KonvaLayer, Line, Group } from 'react-konva'
 import type Konva from 'konva'
 import { useCreateLayer, useUpdateLayer, useDeleteLayer } from '@/features/biometric-image/hooks/useLayers'
+import type { RequestMinutiaDeletion } from '@/features/biometric-image/hooks/useMinutiaDeletionGuard'
 import type { Layer } from '@/features/biometric-image/types/layer'
 import type { ImageLayout } from '@/features/biometric-image/components/canvas/DraggableImage'
 import type { AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
@@ -38,6 +39,16 @@ type AnnotationLayerProps = {
   selectedId: string | null
   onSelect: (id: string | null) => void
   hoveredLayerId?: string | null
+  isInteractive?: boolean
+  /** Mode démonstration (L7-2b) : appariement des minuties entre trace et empreinte. */
+  isPairingMode?: boolean
+  armedMinutiaId?: string | null
+  minutiaNumbers?: Map<string, number>
+  onMinutiaClick?: (minutiaId: string) => void
+  /** Clic dans le vide en mode démonstration (aucune minutie sous le pointeur). */
+  onPairMiss?: () => void
+  /** Passe la suppression par la confirmation du canevas quand la minutie est appariée. */
+  onRequestMinutiaDeletion?: RequestMinutiaDeletion
 }
 
 /** Walk up the Konva tree to find whether the clicked node belongs to an existing annotation. */
@@ -64,14 +75,21 @@ export default function AnnotationLayer({
   selectedId,
   onSelect,
   hoveredLayerId,
+  isInteractive = true,
+  isPairingMode = false,
+  armedMinutiaId = null,
+  minutiaNumbers,
+  onMinutiaClick,
+  onPairMiss,
+  onRequestMinutiaDeletion,
 }: AnnotationLayerProps) {
   const { t } = useTranslation()
   const layerRef = useRef<Konva.Layer>(null)
   // Group whose transform mirrors the image: annotation coords live in the image's source frame.
   const groupRef = useRef<Konva.Group>(null)
-  const createLayer = useCreateLayer(fingerprintId)
-  const updateLayer = useUpdateLayer(fingerprintId)
-  const deleteLayer = useDeleteLayer(fingerprintId)
+  const createLayer = useCreateLayer()
+  const updateLayer = useUpdateLayer()
+  const deleteLayer = useDeleteLayer()
 
   const [draft, setDraft] = useState<Draft | null>(null)
   const draftRef = useRef<Draft | null>(null)
@@ -89,22 +107,46 @@ export default function AnnotationLayer({
     setDraft(d)
   }
 
+  // Konva vide le canvas de hit-test du calque quand il devient sourd, et ne le redessine
+  // pas quand il redevient à l'écoute : sans ce redessin, plus rien n'y est cliquable après
+  // un passage en mode déplacement.
+  useEffect(() => {
+    if (isInteractive) layerRef.current?.drawHit()
+  }, [isInteractive])
+
   useEffect(() => {
     if (!selectedId) return
+    const removeAnnotation = () => {
+      deleteLayer.mutate(selectedId)
+      select(null)
+    }
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Delete' || e.key === 'Backspace') {
-        deleteLayer.mutate(selectedId)
-        select(null)
-      }
+      if (e.key !== 'Delete' && e.key !== 'Backspace') return
+      if (onRequestMinutiaDeletion) onRequestMinutiaDeletion(selectedId, removeAnnotation)
+      else removeAnnotation()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId])
+  }, [selectedId, onRequestMinutiaDeletion])
+
+  // Mode démonstration : signale un clic qui ne touche aucune minutie, sinon un
+  // clic à côté ne fait rigoureusement rien et donne l'impression que ça ne marche pas.
+  useEffect(() => {
+    const stage = layerRef.current?.getStage()
+    if (!stage || !isPairingMode) return
+
+    const onMiss = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
+      if (isAnnotationTarget(e.target)) return
+      onPairMiss?.()
+    }
+    stage.on('mousedown.pairmiss touchstart.pairmiss', onMiss)
+    return () => { stage.off('.pairmiss') }
+  }, [isPairingMode, onPairMiss])
 
   useEffect(() => {
     const stage = layerRef.current?.getStage()
-    if (!stage || !activeTool) return
+    if (!stage || !activeTool || isPairingMode) return
 
     // Pointer position in source pixels (handles zoom/pan/offset/mirror/rotation).
     const getPos = () => groupRef.current?.getRelativePointerPosition() ?? null
@@ -207,7 +249,7 @@ export default function AnnotationLayer({
     return () => { stage.off('.annot') }
   // createLayer/updateLayer mutate refs are stable; re-bind when tool/color/zIndex base change
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTool, activeColor, activeMinutiaType, fingerprintId, layerCount, sourceRadius, sourceStrokeWidth])
+  }, [activeTool, activeColor, activeMinutiaType, fingerprintId, layerCount, sourceRadius, sourceStrokeWidth, isPairingMode])
 
   const renderShape = (layer: Layer) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -232,6 +274,10 @@ export default function AnnotationLayer({
             rotationDeg={imageLayout?.rotation ?? 0}
             onSelect={() => select(isSelected ? null : layer.id)}
             onPersist={persistPosition}
+            isPairingMode={isPairingMode}
+            pairNumber={minutiaNumbers?.get(layer.id) ?? null}
+            isArmed={layer.id === armedMinutiaId}
+            onPairClick={() => onMinutiaClick?.(layer.id)}
           />
         )
 
@@ -255,7 +301,7 @@ export default function AnnotationLayer({
   }
 
   return (
-    <KonvaLayer ref={layerRef}>
+    <KonvaLayer ref={layerRef} listening={isInteractive}>
       {imageLayout && (
         <Group ref={groupRef} {...imageLayout} onClick={() => select(null)}>
           {annotations.filter((a) => a.isVisible).map(renderShape)}

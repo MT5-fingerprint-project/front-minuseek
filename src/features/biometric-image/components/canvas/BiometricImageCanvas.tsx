@@ -1,24 +1,28 @@
 import { useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { Stage, Layer } from 'react-konva'
 import type Konva from 'konva'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
 import DraggableImage, { type ImageLayout, type SourceGeometry } from '@/features/biometric-image/components/canvas/DraggableImage'
 import DestroyedImagePlaceholder from '@/features/biometric-image/components/DestroyedImagePlaceholder'
 import AnnotationLayer from '@/features/biometric-image/components/canvas/AnnotationLayer'
+import PairedMinutiaDeletionDialog from '@/features/biometric-image/components/canvas/PairedMinutiaDeletionDialog'
 import CalibrationLayer from '@/features/biometric-image/components/canvas/CalibrationLayer'
 import CalibrationDialog from '@/features/biometric-image/components/canvas/CalibrationDialog'
 import ScaleBarOverlay from '@/features/biometric-image/components/canvas/ScaleBarOverlay'
 import CanvasGridOverlay from '@/features/biometric-image/components/canvas/CanvasGridOverlay'
-import CanvasToolbar from '@/features/biometric-image/components/toolbar/CanvasToolbar'
+import CanvasToolbar, { type CanvasMode } from '@/features/biometric-image/components/toolbar/CanvasToolbar'
 import LayersPanelContainer from '@/features/biometric-image/components/layers/LayersPanelContainer'
 import { useCanvasView, type CanvasZoomHandle } from '@/features/biometric-image/components/canvas/useCanvasView'
 import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
 import { useCanvasFilters } from '@/features/biometric-image/hooks/useCanvasFilters'
 import { useLayers, useUpdateLayer } from '@/features/biometric-image/hooks/useLayers'
+import { useMinutiaDeletionGuard } from '@/features/biometric-image/hooks/useMinutiaDeletionGuard'
 import { useBiometricImages, useCalibrateBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
 import { useCaseExpertise } from '@/features/investigation-case/hooks/useCaseExpertise'
 import { Badge } from '@/features/shared/ui/badge'
+import { cn } from '@/features/shared/lib/utils'
 import { ANNOTATION_COLORS, type AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import type { CalibrationPoint } from '@/features/biometric-image/lib/calibration'
 import { stageToPngBlob } from '@/features/biometric-image/lib/exportImage'
@@ -28,6 +32,10 @@ import {
   minutiaTypeOf,
   type MinutiaType,
 } from '@/features/biometric-image/lib/minutiae'
+
+// `konvajs-content` est le div que Konva place autour de ses canvas : le viser plutôt que
+// le conteneur garde le curseur main sur l'image, et pas sur la barre d'outils.
+const PAN_CURSOR_CLASS = '[&_.konvajs-content]:cursor-grab [&_.konvajs-content:active]:cursor-grabbing'
 
 export type { CanvasZoomHandle }
 
@@ -47,6 +55,12 @@ type BiometricImageCanvasProps = {
   onScaleChange?: (scale: number) => void
   onSourceGeometryChange?: (geometry: SourceGeometry | null) => void
   exportHandleRef?: React.RefObject<ExportHandle | null>
+  /** Mode démonstration (L7-2b) : appariement des minuties entre trace et empreinte. */
+  isPairingMode?: boolean
+  armedMinutiaId?: string | null
+  minutiaNumbers?: Map<string, number>
+  onMinutiaClick?: (minutiaId: string) => void
+  onPairMiss?: () => void
 }
 
 export default function BiometricImageCanvas({
@@ -61,6 +75,11 @@ export default function BiometricImageCanvas({
   onScaleChange,
   onSourceGeometryChange,
   exportHandleRef,
+  isPairingMode = false,
+  armedMinutiaId = null,
+  minutiaNumbers,
+  onMinutiaClick,
+  onPairMiss,
 }: BiometricImageCanvasProps) {
   const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -76,8 +95,9 @@ export default function BiometricImageCanvas({
     () => (imageId && sourceWidth > 0 && sourceHeight > 0 ? { width: sourceWidth, height: sourceHeight } : null),
     [imageId, sourceWidth, sourceHeight],
   )
-  const { view, handleWheel, recenterSignal } = useCanvasView({ size, content, zoomHandleRef, onScaleChange })
+  const { view, handleWheel, panTo, recenterSignal } = useCanvasView({ size, content, zoomHandleRef, onScaleChange })
   const { sliderValues, effectiveFilters, handleFilterChange } = useCanvasFilters(image?.id)
+  const [mode, setMode] = useState<CanvasMode>('image')
   const [activeTool, setActiveTool] = useState<AnnotationToolType | null>(null)
   const [activeColor, setActiveColor] = useState<string>(ANNOTATION_COLORS[0])
   const [activeMinutiaType, setActiveMinutiaType] = useState<MinutiaType>(DEFAULT_MINUTIA_TYPE)
@@ -85,7 +105,8 @@ export default function BiometricImageCanvas({
   const [hoveredLayerId, setHoveredLayerId] = useState<string | null>(null)
   const [selected, setSelected] = useState<{ id: string; tool: AnnotationToolType | null } | null>(null)
   const selectedAnnotationId = selected?.tool === activeTool ? selected.id : null
-  const updateSelectedType = useUpdateLayer(image?.id ?? '')
+  const updateSelectedType = useUpdateLayer()
+  const minutiaDeletionGuard = useMinutiaDeletionGuard(minutiaNumbers)
   const [isRulerActive, setIsRulerActive] = useState(false)
   // Marqué par l'id de l'image : un changement d'image invalide le segment sans effet dédié.
   const [rulerSegment, setRulerSegment] = useState<
@@ -108,6 +129,21 @@ export default function BiometricImageCanvas({
   const freshImage = images?.find((img) => img.id === image?.id) ?? image
   const calibrate = useCalibrateBiometricImage(type, image?.caseId ?? '')
 
+  // L'appariement de la démonstration a besoin des clics sur les minuties : il passe devant le mode.
+  const isPanMode = mode === 'hand' && !isPairingMode
+
+  const handleModeChange = (next: CanvasMode) => {
+    setMode(next)
+    // Une annotation sélectionnée répond encore à la touche Suppr : on désélectionne en entrant.
+    if (next === 'hand') setSelected(null)
+  }
+
+  // `dragmove` remonte aussi de l'image quand c'est elle qu'on déplace : seul le Stage règle la vue.
+  const handleStagePan = (e: Konva.KonvaEventObject<DragEvent>) => {
+    if (e.target !== stageRef.current) return
+    panTo({ x: e.target.x(), y: e.target.y() })
+  }
+
   const handleActiveToolChange = (tool: AnnotationToolType | null) => {
     setActiveTool(tool)
     if (tool !== null) setIsRulerActive(false)
@@ -118,12 +154,17 @@ export default function BiometricImageCanvas({
 
   const handleActiveMinutiaTypeChange = (minutiaType: MinutiaType) => {
     setActiveMinutiaType(minutiaType)
-    if (selectedLayer && isMinutiaSettings(selectedLayer.settings)) {
-      updateSelectedType.mutate({
-        id: selectedLayer.id,
-        input: { settings: { ...selectedLayer.settings, minutiaType } },
-      })
+    if (!selectedLayer || !isMinutiaSettings(selectedLayer.settings)) return
+    // Le serveur refuse ce changement par un 409 : sans ce garde l'opérateur ne
+    // lirait que « impossible de mettre à jour le calque ».
+    if (minutiaNumbers?.has(selectedLayer.id)) {
+      toast.info(t('biometricImage.pairing.typeLockedByPair'))
+      return
     }
+    updateSelectedType.mutate({
+      id: selectedLayer.id,
+      input: { settings: { ...selectedLayer.settings, minutiaType } },
+    })
   }
 
   const handleToggleRuler = () => {
@@ -173,7 +214,7 @@ export default function BiometricImageCanvas({
   }
 
   return (
-    <div ref={containerRef} className="relative h-full w-full overflow-hidden">
+    <div ref={containerRef} className={cn('relative h-full w-full overflow-hidden', isPanMode && PAN_CURSOR_CLASS)}>
       {image?.url ? (
         <>
           <Stage
@@ -185,13 +226,16 @@ export default function BiometricImageCanvas({
             x={view.x}
             y={view.y}
             onWheel={handleWheel}
+            draggable={isPanMode}
+            onDragMove={handleStagePan}
+            onDragEnd={handleStagePan}
           >
             <Layer>
               <DraggableImage
                 key={`${image.url}-${recenterSignal}`}
                 url={image.url}
                 filters={effectiveFilters}
-                isDraggable={activeTool === null && !isRulerActive}
+                isDraggable={!isPanMode && activeTool === null && !isRulerActive}
                 viewScale={view.scale}
                 onLayoutChange={setImageLayout}
                 onSourceGeometryChange={handleSourceGeometryChange}
@@ -211,6 +255,13 @@ export default function BiometricImageCanvas({
               selectedId={selectedAnnotationId}
               onSelect={handleSelectAnnotation}
               hoveredLayerId={hoveredLayerId}
+              isInteractive={!isPanMode}
+              isPairingMode={isPairingMode}
+              armedMinutiaId={armedMinutiaId}
+              minutiaNumbers={minutiaNumbers}
+              onMinutiaClick={onMinutiaClick}
+              onPairMiss={onPairMiss}
+              onRequestMinutiaDeletion={minutiaDeletionGuard.requestDeletion}
             />
             <CalibrationLayer
               key={`${image.id}-${calibrationResetSignal}`}
@@ -239,10 +290,12 @@ export default function BiometricImageCanvas({
               onCancel={handleCancelCalibration}
             />
           )}
-          {isToolbarVisible && (
+          {isToolbarVisible && !isPairingMode && (
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
               <CanvasToolbar
                 type={type}
+                mode={mode}
+                onModeChange={handleModeChange}
                 filters={sliderValues}
                 isExpertCase={expertise !== null}
                 onFiltersChange={handleFilterChange}
@@ -260,9 +313,19 @@ export default function BiometricImageCanvas({
           )}
           {isLayersVisible && onCloseLayers && (
             <div className="absolute inset-y-0 right-0">
-              <LayersPanelContainer fingerprintId={image.id} onClose={onCloseLayers} onHoverLayer={setHoveredLayerId} />
+              <LayersPanelContainer
+                fingerprintId={image.id}
+                onClose={onCloseLayers}
+                onHoverLayer={setHoveredLayerId}
+                onRequestMinutiaDeletion={minutiaDeletionGuard.requestDeletion}
+              />
             </div>
           )}
+          <PairedMinutiaDeletionDialog
+            pairNumber={minutiaDeletionGuard.pendingPairNumber}
+            onConfirm={minutiaDeletionGuard.confirmDeletion}
+            onCancel={minutiaDeletionGuard.cancelDeletion}
+          />
         </>
       ) : (
         <>
