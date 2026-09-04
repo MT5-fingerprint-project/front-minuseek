@@ -28,7 +28,7 @@ export default function PublicSealVerificationPage() {
             <Icon name="verified" size={40} color="var(--color-blue-medium-1)" />
             <H1 className="text-3xl font-semibold text-blue-dark-2">{t('publicVerification.title')}</H1>
           </div>
-          <p className="leading-6 text-muted-foreground">{t('publicVerification.intro')}</p>
+          <p className="leading-6 text-grey-dark">{t('publicVerification.intro')}</p>
         </div>
 
         <section className="flex flex-col gap-5 rounded-sm bg-white p-6">
@@ -62,7 +62,7 @@ export default function PublicSealVerificationPage() {
           </div>
         </section>
 
-        <p className="text-xs text-grey-medium-2">{t('publicVerification.paperNotice')}</p>
+        <p className="text-xs text-grey-dark">{t('publicVerification.paperNotice')}</p>
       </main>
     </div>
   )
