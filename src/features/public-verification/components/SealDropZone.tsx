@@ -69,7 +69,7 @@ export default function SealDropZone({ isPending, fileName, onFile, onReset }: S
           }}
         />
 
-        <div className="flex flex-col gap-0.5 text-xs text-grey-medium-2">
+        <div className="flex flex-col gap-0.5 text-xs text-grey-dark">
           <p>{t('publicVerification.dropZone.hint')}</p>
           <p>{t('publicVerification.dropZone.limit')}</p>
         </div>

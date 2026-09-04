@@ -54,7 +54,7 @@ function FileDigest({ sha256 }: { sha256: string }) {
 
   return (
     <div className="flex flex-col gap-1 rounded-sm bg-grey-light-1/70 px-4 py-3">
-      <p className="text-xs font-medium text-grey-medium-2">{t('publicVerification.digest')}</p>
+      <p className="text-xs font-medium text-grey-dark">{t('publicVerification.digest')}</p>
       <p className="font-mono text-xs break-all select-all text-blue-dark-2">{sha256}</p>
     </div>
   )
