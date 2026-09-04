@@ -871,8 +871,26 @@
       "TECHNICAL": "Générer le rapport technique",
       "TRACEABILITY": "Générer l'annexe de traçabilité"
     },
-    "success": {
-      "generated": "Rapport généré et scellé."
+    "progress": {
+      "title": "On prépare votre rapport",
+      "description": "Le rassemblement des pièces, la composition du document et son scellement prennent quelques dizaines de secondes. Ne fermez pas cette fenêtre.",
+      "stages": {
+        "gathering": "Rassemblement des pièces du dossier",
+        "composing": "Composition du document",
+        "sealing": "Scellement et horodatage"
+      },
+      "longWait": "C'est plus long que d'habitude — la génération continue.",
+      "ready": {
+        "title": "Rapport {{number}} prêt",
+        "titleWithoutNumber": "Votre rapport est prêt",
+        "description": "Le document est scellé et son empreinte est enregistrée dans la chaîne d'audit."
+      },
+      "failed": {
+        "title": "La génération n'a pas abouti",
+        "description": "Le rapport n'a pas été enregistré. Vous pouvez relancer la génération."
+      },
+      "retry": "Réessayer",
+      "close": "Fermer"
     },
     "errors": {
       "downloadFailed": "Téléchargement impossible."
