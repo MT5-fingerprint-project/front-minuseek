@@ -5,10 +5,7 @@ import { useFileDropZone } from '@/features/shared/hooks/useFileDropZone'
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/features/shared/ui/carousel'
 import { getMatching } from '@/features/biometric-image/lib/matchingScore'
 import { UPLOADABLE_IMAGE_MIME_TYPES } from '@/features/biometric-image/lib/uploadableImage'
-import {
-  uploadImagesOneByOne,
-  useUploadBiometricImage,
-} from '@/features/biometric-image/hooks/useBiometricImages'
+import { useImportBiometricImages } from '@/features/biometric-image/hooks/useImportBiometricImages'
 import { useCaseIsClosed } from '@/features/investigation-case/hooks/useCaseIsClosed'
 import type {
   BiometricImage,
@@ -29,7 +26,7 @@ type BiometricImageCarouselViewProps = {
   caseId: string
   selectedId: string | undefined
   onSelect: (image: BiometricImage) => void
-  onUploadSuccess?: (image: BiometricImage) => void
+  onImported?: (image: BiometricImage) => void
   selectedTraceId?: string
   decorations?: Record<string, BiometricImageDecoration>
 }
@@ -52,25 +49,31 @@ export default function BiometricImageCarouselView({
   caseId,
   selectedId,
   onSelect,
-  onUploadSuccess,
+  onImported,
   selectedTraceId,
   decorations,
 }: BiometricImageCarouselViewProps) {
   const { t } = useTranslation()
-  const upload = useUploadBiometricImage(type, { onSuccess: onUploadSuccess })
   const isCaseClosed = useCaseIsClosed(caseId)
+  const importImages = useImportBiometricImages(type, caseId, { onImported })
 
   const { isDraggingOver, dropZoneProps } = useFileDropZone({
     acceptedMimeTypes: UPLOADABLE_IMAGE_MIME_TYPES,
     enabled: !isCaseClosed,
-    onFilesAccepted: (files) => uploadImagesOneByOne(upload, caseId, files),
+    onFilesAccepted: importImages.start,
     onFilesRejected: () => toast.error(t('biometricImage.drop.rejected')),
   })
 
   if (!isLoading && images.length === 0) {
     return (
       <div {...dropZoneProps} className={cn('relative', isDraggingOver && HIGHLIGHT_CLASS)}>
-        <BiometricImageEmptyPlaceholder type={type} caseId={caseId} onUploadSuccess={onUploadSuccess} />
+        <BiometricImageEmptyPlaceholder
+          type={type}
+          isImporting={importImages.isImporting}
+          progress={importImages.progress}
+          onFilesSelected={importImages.start}
+          isReadOnly={isCaseClosed}
+        />
         <DropHint isVisible={isDraggingOver} />
       </div>
     )
@@ -82,9 +85,15 @@ export default function BiometricImageCarouselView({
       className={cn('relative flex w-full items-center gap-2 p-2', isDraggingOver && HIGHLIGHT_CLASS)}
       data-tour={`carousel-${type}`}
     >
-      <span data-tour={`import-${type}`}>
-        <BiometricImageImportButton type={type} caseId={caseId} onUploadSuccess={onUploadSuccess} />
-      </span>
+      {!isCaseClosed && (
+        <span data-tour={`import-${type}`}>
+          <BiometricImageImportButton
+            isImporting={importImages.isImporting}
+            progress={importImages.progress}
+            onFilesSelected={importImages.start}
+          />
+        </span>
+      )}
 
       {isLoading ? (
         <BiometricImageCarouselSkeleton />

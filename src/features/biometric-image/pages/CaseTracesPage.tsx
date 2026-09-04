@@ -8,7 +8,7 @@ import { Spinner } from '@/features/shared/ui/spinner'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/features/shared/ui/table'
 import { H1 } from '@/features/shared/ui/typography'
 import { useInvestigationCase } from '@/features/investigation-case/hooks/useInvestigationCases'
-import BiometricImageImportButton from '@/features/biometric-image/components/carousel/BiometricImageImportButton'
+import BiometricImageImportButtonContainer from '@/features/biometric-image/components/carousel/BiometricImageImportButtonContainer'
 import TraceDetailsPanel from '@/features/biometric-image/components/trace/TraceDetailsPanel'
 import { useBiometricImages } from '@/features/biometric-image/hooks/useBiometricImages'
 import { traceStateBadge } from '@/features/biometric-image/lib/traceState'
@@ -90,7 +90,7 @@ export default function CaseTracesPage() {
               : t('trace.list.summary', { count: traces.length, identified: identifiedCount })}
           </p>
         </div>
-        <BiometricImageImportButton type="traces" caseId={caseId} variant="blue" />
+        <BiometricImageImportButtonContainer type="traces" caseId={caseId} variant="blue" />
       </div>
 
       <div className="rounded-sm bg-white">

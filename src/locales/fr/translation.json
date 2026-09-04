@@ -646,7 +646,13 @@
       "traces": "Importer vos traces ici",
       "referencePrints": "Importer vos empreintes ici",
       "button": "Importer",
-      "uploading": "Envoi…"
+      "uploading": "Envoi…",
+      "progress": "Envoi {{current}}/{{total}}…",
+      "imported_one": "{{count}} image importée",
+      "imported_other": "{{count}} images importées",
+      "failed_one": "{{count}} image n'a pas pu être importée : {{files}}",
+      "failed_other": "{{count}} images n'ont pas pu être importées : {{files}}",
+      "busy": "Un import est déjà en cours"
     },
     "drop": {
       "hovered": "Relâchez pour importer",

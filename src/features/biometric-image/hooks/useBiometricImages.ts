@@ -244,33 +244,18 @@ export function useCalibrateBiometricImage(type: BiometricImageType, caseId: str
   })
 }
 
-type UseUploadBiometricImageOptions = {
-  onSuccess?: (image: import('@/features/biometric-image/types/biometricImage').BiometricImage) => void
-}
-
-export function useUploadBiometricImage(type: BiometricImageType, options?: UseUploadBiometricImageOptions) {
+export function useUploadBiometricImage(type: BiometricImageType) {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (input: UploadInput) => BiometricImageAPI.upload(type, input),
-    onSuccess: (image, variables) => {
+    onSuccess: (_image, variables) => {
       queryClient.invalidateQueries({ queryKey: biometricImageKeys.list(type, variables.caseId) })
       toast.success(t('biometricImage.upload.success'))
-      options?.onSuccess?.(image)
     },
     onError: () => {
       toast.error(t('biometricImage.upload.error'))
     },
   })
-}
-
-export async function uploadImagesOneByOne(
-  upload: ReturnType<typeof useUploadBiometricImage>,
-  caseId: string,
-  files: File[],
-) {
-  for (const file of files) {
-    await upload.mutateAsync({ caseId, file }).catch(() => undefined)
-  }
 }
