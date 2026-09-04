@@ -665,6 +665,7 @@
     },
     "toolbar": {
       "modes": {
+        "hand": "Déplacement",
         "image": "Édition",
         "annotation": "Annotations"
       },

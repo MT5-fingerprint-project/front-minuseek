@@ -21,8 +21,12 @@ import {
 
 type AnnotationPanel = 'color' | 'minutiaType'
 
+export type CanvasMode = 'hand' | 'image' | 'annotation'
+
 type CanvasToolbarProps = {
   type: BiometricImageType
+  mode: CanvasMode
+  onModeChange: (mode: CanvasMode) => void
   filters: CanvasFilters
   isExpertCase?: boolean
   onFiltersChange: (filters: CanvasFilters) => void
@@ -39,6 +43,8 @@ type CanvasToolbarProps = {
 
 export default function CanvasToolbar({
   type,
+  mode,
+  onModeChange,
   filters,
   isExpertCase = false,
   onFiltersChange,
@@ -53,7 +59,6 @@ export default function CanvasToolbar({
   onToggleRuler,
 }: CanvasToolbarProps) {
   const { t } = useTranslation()
-  const [mode, setMode] = useState<'image' | 'annotation'>('image')
   const [openFilter, setOpenFilter] = useState<string | null>(null)
   const [openPanel, setOpenPanel] = useState<AnnotationPanel | null>(null)
 
@@ -67,13 +72,13 @@ export default function CanvasToolbar({
     ignoreSelector: TOUR_UI_SELECTOR,
   })
 
-  const switchMode = (next: 'image' | 'annotation') => {
-    setMode(next)
+  const switchMode = (next: CanvasMode) => {
+    onModeChange(next)
     setOpenFilter(null)
     setOpenPanel(null)
     onActiveToolChange(null)
     // La règle vit dans l'onglet Annotations : quitter cet onglet la referme aussi.
-    if (next === 'image' && isRulerActive) onToggleRuler()
+    if (next !== 'annotation' && isRulerActive) onToggleRuler()
   }
 
   const handleAnnotationClick = (
@@ -185,6 +190,12 @@ export default function CanvasToolbar({
       )}
       <div className="flex items-center gap-3 rounded-md bg-blue-dark-1 px-3 py-2 text-white shadow-lg">
         <div className="flex items-center gap-1 rounded-sm bg-white/25 p-1">
+          <ModeButton
+            icon="hand"
+            label={t('biometricImage.toolbar.modes.hand')}
+            isActive={mode === 'hand'}
+            onClick={() => switchMode('hand')}
+          />
           <span data-tour={`mode-image-${type}`}>
             <ModeButton
               icon="image"
@@ -202,40 +213,41 @@ export default function CanvasToolbar({
             />
           </span>
         </div>
-        {mode === 'image'
-          ? IMAGE_TOOLS.map(({ icon, label, filters: filterConfigs, isExpertOnly }) => {
-              const isLocked = isExpertOnly === true && !isExpertCase
-              return (
-                <ItemToolbar
-                  key={label}
-                  icon={icon}
-                  label={
-                    isLocked
-                      ? t('biometricImage.toolbar.expertLocked', { tool: t(label) })
-                      : t(label)
-                  }
-                  active={isToolActive(label, filterConfigs)}
-                  disabled={isLocked}
-                  onClick={() => handleToolClick(label, filterConfigs)}
+        {mode === 'image' &&
+          IMAGE_TOOLS.map(({ icon, label, filters: filterConfigs, isExpertOnly }) => {
+            const isLocked = isExpertOnly === true && !isExpertCase
+            return (
+              <ItemToolbar
+                key={label}
+                icon={icon}
+                label={
+                  isLocked
+                    ? t('biometricImage.toolbar.expertLocked', { tool: t(label) })
+                    : t(label)
+                }
+                active={isToolActive(label, filterConfigs)}
+                disabled={isLocked}
+                onClick={() => handleToolClick(label, filterConfigs)}
+              />
+            )
+          })}
+        {mode === 'annotation' &&
+          ANNOTATION_TOOLS.map(({ icon, label, tool, isRuler, panel }) => (
+            <div key={label} className="relative">
+              <ItemToolbar
+                icon={icon}
+                label={t(label)}
+                active={isAnnotationActive(tool, panel, isRuler)}
+                onClick={() => handleAnnotationClick(tool, panel, isRuler)}
+              />
+              {panel === 'color' && (
+                <span
+                  className="pointer-events-none absolute bottom-0.5 right-0.5 h-2.5 w-2.5 rounded-full border border-blue-dark-1"
+                  style={{ backgroundColor: activeColor }}
                 />
-              )
-            })
-          : ANNOTATION_TOOLS.map(({ icon, label, tool, isRuler, panel }) => (
-              <div key={label} className="relative">
-                <ItemToolbar
-                  icon={icon}
-                  label={t(label)}
-                  active={isAnnotationActive(tool, panel, isRuler)}
-                  onClick={() => handleAnnotationClick(tool, panel, isRuler)}
-                />
-                {panel === 'color' && (
-                  <span
-                    className="pointer-events-none absolute bottom-0.5 right-0.5 h-2.5 w-2.5 rounded-full border border-blue-dark-1"
-                    style={{ backgroundColor: activeColor }}
-                  />
-                )}
-              </div>
-            ))}
+              )}
+            </div>
+          ))}
       </div>
     </div>
   )

@@ -19,6 +19,7 @@ import FingerprintOff from './fingerprint-off.svg?react'
 import Folder from './folder.svg?react'
 import Grid from './grid.svg?react'
 import GridOff from './grid-off.svg?react'
+import Hand from './hand.svg?react'
 import Home from './home.svg?react'
 import Image from './image.svg?react'
 import Import from './import.svg?react'
@@ -86,6 +87,7 @@ export const icons = {
   folder: Folder,
   grid: Grid,
   gridOff: GridOff,
+  hand: Hand,
   home: Home,
   image: Image,
   import: Import,

@@ -10,7 +10,7 @@ import CalibrationLayer from '@/features/biometric-image/components/canvas/Calib
 import CalibrationDialog from '@/features/biometric-image/components/canvas/CalibrationDialog'
 import ScaleBarOverlay from '@/features/biometric-image/components/canvas/ScaleBarOverlay'
 import CanvasGridOverlay from '@/features/biometric-image/components/canvas/CanvasGridOverlay'
-import CanvasToolbar from '@/features/biometric-image/components/toolbar/CanvasToolbar'
+import CanvasToolbar, { type CanvasMode } from '@/features/biometric-image/components/toolbar/CanvasToolbar'
 import LayersPanelContainer from '@/features/biometric-image/components/layers/LayersPanelContainer'
 import { useCanvasView, type CanvasZoomHandle } from '@/features/biometric-image/components/canvas/useCanvasView'
 import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
@@ -19,6 +19,7 @@ import { useLayers, useUpdateLayer } from '@/features/biometric-image/hooks/useL
 import { useBiometricImages, useCalibrateBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
 import { useCaseExpertise } from '@/features/investigation-case/hooks/useCaseExpertise'
 import { Badge } from '@/features/shared/ui/badge'
+import { cn } from '@/features/shared/lib/utils'
 import { ANNOTATION_COLORS, type AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import type { CalibrationPoint } from '@/features/biometric-image/lib/calibration'
 import { stageToPngBlob } from '@/features/biometric-image/lib/exportImage'
@@ -28,6 +29,10 @@ import {
   minutiaTypeOf,
   type MinutiaType,
 } from '@/features/biometric-image/lib/minutiae'
+
+// `konvajs-content` est le div que Konva place autour de ses canvas : le viser plutôt que
+// le conteneur garde le curseur main sur l'image, et pas sur la barre d'outils.
+const PAN_CURSOR_CLASS = '[&_.konvajs-content]:cursor-grab [&_.konvajs-content:active]:cursor-grabbing'
 
 export type { CanvasZoomHandle }
 
@@ -87,8 +92,9 @@ export default function BiometricImageCanvas({
     () => (imageId && sourceWidth > 0 && sourceHeight > 0 ? { width: sourceWidth, height: sourceHeight } : null),
     [imageId, sourceWidth, sourceHeight],
   )
-  const { view, handleWheel, recenterSignal } = useCanvasView({ size, content, zoomHandleRef, onScaleChange })
+  const { view, handleWheel, panTo, recenterSignal } = useCanvasView({ size, content, zoomHandleRef, onScaleChange })
   const { sliderValues, effectiveFilters, handleFilterChange } = useCanvasFilters(image?.id)
+  const [mode, setMode] = useState<CanvasMode>('image')
   const [activeTool, setActiveTool] = useState<AnnotationToolType | null>(null)
   const [activeColor, setActiveColor] = useState<string>(ANNOTATION_COLORS[0])
   const [activeMinutiaType, setActiveMinutiaType] = useState<MinutiaType>(DEFAULT_MINUTIA_TYPE)
@@ -118,6 +124,21 @@ export default function BiometricImageCanvas({
   const { data: images } = useBiometricImages(type, image?.caseId ?? '')
   const freshImage = images?.find((img) => img.id === image?.id) ?? image
   const calibrate = useCalibrateBiometricImage(type, image?.caseId ?? '')
+
+  // L'appariement de la démonstration a besoin des clics sur les minuties : il passe devant le mode.
+  const isPanMode = mode === 'hand' && !isPairingMode
+
+  const handleModeChange = (next: CanvasMode) => {
+    setMode(next)
+    // Une annotation sélectionnée répond encore à la touche Suppr : on désélectionne en entrant.
+    if (next === 'hand') setSelected(null)
+  }
+
+  // `dragmove` remonte aussi de l'image quand c'est elle qu'on déplace : seul le Stage règle la vue.
+  const handleStagePan = (e: Konva.KonvaEventObject<DragEvent>) => {
+    if (e.target !== stageRef.current) return
+    panTo({ x: e.target.x(), y: e.target.y() })
+  }
 
   const handleActiveToolChange = (tool: AnnotationToolType | null) => {
     setActiveTool(tool)
@@ -184,7 +205,7 @@ export default function BiometricImageCanvas({
   }
 
   return (
-    <div ref={containerRef} className="relative h-full w-full overflow-hidden">
+    <div ref={containerRef} className={cn('relative h-full w-full overflow-hidden', isPanMode && PAN_CURSOR_CLASS)}>
       {image?.url ? (
         <>
           <Stage
@@ -196,13 +217,16 @@ export default function BiometricImageCanvas({
             x={view.x}
             y={view.y}
             onWheel={handleWheel}
+            draggable={isPanMode}
+            onDragMove={handleStagePan}
+            onDragEnd={handleStagePan}
           >
             <Layer>
               <DraggableImage
                 key={`${image.url}-${recenterSignal}`}
                 url={image.url}
                 filters={effectiveFilters}
-                isDraggable={activeTool === null && !isRulerActive}
+                isDraggable={!isPanMode && activeTool === null && !isRulerActive}
                 viewScale={view.scale}
                 onLayoutChange={setImageLayout}
                 onSourceGeometryChange={handleSourceGeometryChange}
@@ -222,6 +246,7 @@ export default function BiometricImageCanvas({
               selectedId={selectedAnnotationId}
               onSelect={handleSelectAnnotation}
               hoveredLayerId={hoveredLayerId}
+              isInteractive={!isPanMode}
               isPairingMode={isPairingMode}
               armedMinutiaId={armedMinutiaId}
               minutiaNumbers={minutiaNumbers}
@@ -259,6 +284,8 @@ export default function BiometricImageCanvas({
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
               <CanvasToolbar
                 type={type}
+                mode={mode}
+                onModeChange={handleModeChange}
                 filters={sliderValues}
                 isExpertCase={expertise !== null}
                 onFiltersChange={handleFilterChange}

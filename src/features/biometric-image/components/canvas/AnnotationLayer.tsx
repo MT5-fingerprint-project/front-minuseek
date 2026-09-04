@@ -38,6 +38,7 @@ type AnnotationLayerProps = {
   selectedId: string | null
   onSelect: (id: string | null) => void
   hoveredLayerId?: string | null
+  isInteractive?: boolean
   /** Mode démonstration (L7-2b) : appariement des minuties entre trace et empreinte. */
   isPairingMode?: boolean
   armedMinutiaId?: string | null
@@ -71,6 +72,7 @@ export default function AnnotationLayer({
   selectedId,
   onSelect,
   hoveredLayerId,
+  isInteractive = true,
   isPairingMode = false,
   armedMinutiaId = null,
   minutiaNumbers,
@@ -100,6 +102,13 @@ export default function AnnotationLayer({
     draftRef.current = d
     setDraft(d)
   }
+
+  // Konva vide le canvas de hit-test du calque quand il devient sourd, et ne le redessine
+  // pas quand il redevient à l'écoute : sans ce redessin, plus rien n'y est cliquable après
+  // un passage en mode déplacement.
+  useEffect(() => {
+    if (isInteractive) layerRef.current?.drawHit()
+  }, [isInteractive])
 
   useEffect(() => {
     if (!selectedId) return
@@ -285,7 +294,7 @@ export default function AnnotationLayer({
   }
 
   return (
-    <KonvaLayer ref={layerRef}>
+    <KonvaLayer ref={layerRef} listening={isInteractive}>
       {imageLayout && (
         <Group ref={groupRef} {...imageLayout} onClick={() => select(null)}>
           {annotations.filter((a) => a.isVisible).map(renderShape)}

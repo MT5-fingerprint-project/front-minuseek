@@ -93,6 +93,10 @@ export function useCanvasView({ size, content, zoomHandleRef, onScaleChange }: U
     zoomTowardPoint({ x: size.width / 2, y: size.height / 2 }, current.scale * ZOOM_FACTOR ** direction)
   }
 
+  const panTo = (position: { x: number; y: number }) => {
+    applyView({ ...viewRef.current, ...position })
+  }
+
   const recenter = () => {
     applyView(content && isMeasured ? fitView(content, size) : DEFAULT_VIEW)
     setRecenterSignal((n) => n + 1)
@@ -104,5 +108,5 @@ export function useCanvasView({ size, content, zoomHandleRef, onScaleChange }: U
     recenter,
   }))
 
-  return { view, handleWheel, recenterSignal }
+  return { view, handleWheel, panTo, recenterSignal }
 }
