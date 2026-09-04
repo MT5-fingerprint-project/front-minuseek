@@ -55,6 +55,8 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     withdrawalMotiveDetail: dto.withdrawalMotiveDetail ?? null,
     imageDestroyedAt: dto.imageDestroyedAt ?? null,
     resolutionDpi: dto.resolutionDpi ?? null,
+    sourceWidth: dto.sourceWidth ?? null,
+    sourceHeight: dto.sourceHeight ?? null,
     origin: dto.origin ?? null,
     location: dto.location ?? null,
     revelationTechnique: dto.revelationTechnique ?? null,

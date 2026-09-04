@@ -1,10 +1,10 @@
-import { useImperativeHandle, useMemo, useRef, useState } from 'react'
+import { useImperativeHandle, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { Stage, Layer } from 'react-konva'
 import type Konva from 'konva'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
-import DraggableImage, { type ImageLayout, type SourceGeometry } from '@/features/biometric-image/components/canvas/DraggableImage'
+import DraggableImage, { type DrawnFrame, type ImageLayout, type SourceGeometry } from '@/features/biometric-image/components/canvas/DraggableImage'
 import DestroyedImagePlaceholder from '@/features/biometric-image/components/DestroyedImagePlaceholder'
 import AnnotationLayer from '@/features/biometric-image/components/canvas/AnnotationLayer'
 import PairedMinutiaDeletionDialog from '@/features/biometric-image/components/canvas/PairedMinutiaDeletionDialog'
@@ -85,23 +85,31 @@ export default function BiometricImageCanvas({
   const containerRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<Konva.Stage>(null)
   const size = useContainerSize(containerRef)
-  const [sourceGeometry, setSourceGeometry] = useState<SourceGeometry | null>(null)
+
+  const [measuredGeometry, setMeasuredGeometry] = useState<{ imageId: string; geometry: SourceGeometry } | null>(null)
   const imageId = image?.id ?? null
+  // Les dimensions servies par l'API sont celles du fichier scellé : elles donnent le repère
+  // des minuties sans attendre le décodage. La mesure sur l'image ne sert plus que de repli.
+  const servedFrame: DrawnFrame | null =
+    image?.sourceWidth != null && image?.sourceHeight != null
+      ? { width: image.sourceWidth, height: image.sourceHeight }
+      : null
+  const measured = measuredGeometry?.imageId === imageId ? measuredGeometry.geometry : null
+  const sourceGeometry = servedFrame
+    ? { sourceWidth: servedFrame.width, sourceHeight: servedFrame.height }
+    : measured
   const sourceWidth = sourceGeometry?.sourceWidth ?? 0
   const sourceHeight = sourceGeometry?.sourceHeight ?? 0
-  // Identité qui dit à la vue quand se réajuster : à l'image, pas à son URL. Une URL GCS
-  // re-signée remonte le même dossier sans faire perdre son zoom à l'opérateur.
-  const content = useMemo(
-    () => (imageId && sourceWidth > 0 && sourceHeight > 0 ? { width: sourceWidth, height: sourceHeight } : null),
-    [imageId, sourceWidth, sourceHeight],
-  )
+  const [drawnFrame, setDrawnFrame] = useState<{ imageId: string; frame: DrawnFrame } | null>(null)
+  const content = drawnFrame?.imageId === imageId ? drawnFrame.frame : null
   const { view, handleWheel, panTo, recenterSignal } = useCanvasView({ size, content, zoomHandleRef, onScaleChange })
   const { sliderValues, effectiveFilters, handleFilterChange } = useCanvasFilters(image?.id)
   const [mode, setMode] = useState<CanvasMode>('image')
   const [activeTool, setActiveTool] = useState<AnnotationToolType | null>(null)
   const [activeColor, setActiveColor] = useState<string>(ANNOTATION_COLORS[0])
   const [activeMinutiaType, setActiveMinutiaType] = useState<MinutiaType>(DEFAULT_MINUTIA_TYPE)
-  const [imageLayout, setImageLayout] = useState<ImageLayout | null>(null)
+  const [measuredLayout, setMeasuredLayout] = useState<{ imageId: string; layout: ImageLayout } | null>(null)
+  const imageLayout = measuredLayout?.imageId === imageId ? measuredLayout.layout : null
   const [hoveredLayerId, setHoveredLayerId] = useState<string | null>(null)
   const [selected, setSelected] = useState<{ id: string; tool: AnnotationToolType | null } | null>(null)
   const selectedAnnotationId = selected?.tool === activeTool ? selected.id : null
@@ -129,16 +137,15 @@ export default function BiometricImageCanvas({
   const freshImage = images?.find((img) => img.id === image?.id) ?? image
   const calibrate = useCalibrateBiometricImage(type, image?.caseId ?? '')
 
-  // L'appariement de la démonstration a besoin des clics sur les minuties : il passe devant le mode.
   const isPanMode = mode === 'hand' && !isPairingMode
 
   const handleModeChange = (next: CanvasMode) => {
     setMode(next)
-    // Une annotation sélectionnée répond encore à la touche Suppr : on désélectionne en entrant.
+  
     if (next === 'hand') setSelected(null)
   }
 
-  // `dragmove` remonte aussi de l'image quand c'est elle qu'on déplace : seul le Stage règle la vue.
+
   const handleStagePan = (e: Konva.KonvaEventObject<DragEvent>) => {
     if (e.target !== stageRef.current) return
     panTo({ x: e.target.x(), y: e.target.y() })
@@ -155,8 +162,7 @@ export default function BiometricImageCanvas({
   const handleActiveMinutiaTypeChange = (minutiaType: MinutiaType) => {
     setActiveMinutiaType(minutiaType)
     if (!selectedLayer || !isMinutiaSettings(selectedLayer.settings)) return
-    // Le serveur refuse ce changement par un 409 : sans ce garde l'opérateur ne
-    // lirait que « impossible de mettre à jour le calque ».
+
     if (minutiaNumbers?.has(selectedLayer.id)) {
       toast.info(t('biometricImage.pairing.typeLockedByPair'))
       return
@@ -197,8 +203,19 @@ export default function BiometricImageCanvas({
   }))
 
   const handleSourceGeometryChange = (geometry: SourceGeometry) => {
-    setSourceGeometry(geometry)
+    if (!imageId) return
+    setMeasuredGeometry({ imageId, geometry })
     onSourceGeometryChange?.(geometry)
+  }
+
+  const handleDrawnFrameChange = (frame: DrawnFrame) => {
+    if (!imageId || frame.width <= 0 || frame.height <= 0) return
+    setDrawnFrame({ imageId, frame })
+  }
+
+  const handleLayoutChange = (layout: ImageLayout) => {
+    if (!imageId) return
+    setMeasuredLayout({ imageId, layout })
   }
 
   if (image?.imageDestroyedAt) {
@@ -234,11 +251,14 @@ export default function BiometricImageCanvas({
               <DraggableImage
                 key={`${image.url}-${recenterSignal}`}
                 url={image.url}
+                thumbUrl={image.thumbUrl}
+                sourceSize={servedFrame}
                 filters={effectiveFilters}
                 isDraggable={!isPanMode && activeTool === null && !isRulerActive}
                 viewScale={view.scale}
-                onLayoutChange={setImageLayout}
+                onLayoutChange={handleLayoutChange}
                 onSourceGeometryChange={handleSourceGeometryChange}
+                onDrawnFrameChange={handleDrawnFrameChange}
               />
             </Layer>
             <AnnotationLayer
@@ -272,10 +292,14 @@ export default function BiometricImageCanvas({
             />
           </Stage>
           {isGridVisible && <CanvasGridOverlay />}
-          <ScaleBarOverlay
-            resolutionDpi={freshImage?.resolutionDpi ?? null}
-            viewScale={view.scale}
-          />
+          {/* La réglette convertit l'échelle de la vue en millimètres : tant que la vignette
+              tient la place, ce repère n'est pas celui des pixels source et la longueur serait fausse. */}
+          {sourceGeometry && (
+            <ScaleBarOverlay
+              resolutionDpi={freshImage?.resolutionDpi ?? null}
+              viewScale={view.scale}
+            />
+          )}
           {expertise && (
             <div className="pointer-events-none absolute top-3 left-1/2 z-10 -translate-x-1/2">
               <Badge variant="secondary">{t('biometricImage.toolbar.expertCaseBanner')}</Badge>

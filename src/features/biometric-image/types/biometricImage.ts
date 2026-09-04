@@ -51,6 +51,10 @@ export interface BiometricImage {
   withdrawalMotiveDetail: string | null
   imageDestroyedAt: string | null
   resolutionDpi: number | null
+  // Dimensions du fichier scellé, orientation appliquée : le repère dans lequel
+  // les minuties sont enregistrées. `null` pour une pièce déposée avant leur mesure.
+  sourceWidth: number | null
+  sourceHeight: number | null
   origin: TraceOrigin | null
   location: string | null
   revelationTechnique: RevelationTechnique | null
@@ -80,6 +84,8 @@ export interface BiometricImageDto {
   withdrawalMotiveDetail?: string | null
   imageDestroyedAt?: string | null
   resolutionDpi?: number | null
+  sourceWidth?: number | null
+  sourceHeight?: number | null
   origin?: TraceOrigin | null
   location?: string | null
   revelationTechnique?: RevelationTechnique | null

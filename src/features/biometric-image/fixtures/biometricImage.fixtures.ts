@@ -26,6 +26,8 @@ const makeFixture = (id: string, label: string): BiometricImage => ({
   withdrawalMotiveDetail: null,
   imageDestroyedAt: null,
   resolutionDpi: null,
+  sourceWidth: null,
+  sourceHeight: null,
   origin: null,
   location: null,
   revelationTechnique: null,
