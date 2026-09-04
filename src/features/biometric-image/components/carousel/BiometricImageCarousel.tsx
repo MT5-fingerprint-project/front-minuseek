@@ -40,7 +40,7 @@ export default function BiometricImageCarousel({
       caseId={caseId}
       selectedId={selectedId}
       onSelect={onSelect}
-      onUploadSuccess={onSelect}
+      onImported={onSelect}
       selectedTraceId={selectedTraceId}
       decorations={decorations}
     />
