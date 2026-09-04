@@ -910,15 +910,17 @@
   },
   "publicVerification": {
     "title": "Vérifier un document ou une image",
-    "intro": "Cette page vous a été mise à disposition par le service vous ayant remis vos documents. Elle vous permet de vérifier si les fichiers que vous déposez n'ont pas éta altérés par un tiers, et à quelle date. Elle ne partage aucune information sur le contenu du fichier, ni sur le dossier auquel il appartient.",
+    "intro": "Cette page vous a été mise à disposition par le service vous ayant remis vos documents. Elle vous permet de vérifier si les fichiers que vous déposez n'ont pas été altérés par un tiers, et à quelle date. Elle ne partage aucune information sur le contenu du fichier, ni sur le dossier auquel il appartient.",
     "stayLocal": "Le fichier ne quitte pas votre ordinateur : seule son empreinte numérique est envoyée.",
     "pending": "Calcul de l'empreinte en cours…",
     "another": "Vérifier un autre fichier",
     "paperNotice": "La vérification porte sur un fichier. Un exemplaire imprimé ne peut pas être vérifié ici.",
+    "digest": "Empreinte numérique du fichier déposé",
     "dropZone": {
       "label": "Choisir un fichier, ou le faire glisser ici",
       "hovered": "Relâchez pour vérifier ce fichier",
-      "hint": "Le rapport que vous avez reçu, ou l'une de ses images."
+      "hint": "Le rapport que vous avez reçu, ou l'une de ses images.",
+      "limit": "Taille maximale : 100 Mo."
     },
     "kind": {
       "TRACE": "une trace papillaire",
