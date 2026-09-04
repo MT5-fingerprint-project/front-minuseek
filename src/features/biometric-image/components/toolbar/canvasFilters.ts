@@ -96,37 +96,75 @@ const Levels: Filter = function (imageData) {
   }
 }
 
+// La planche « après traitements » du rapport rejoue cette formule
+// (`back-minuseek/app/src/reporting/infrastructure/pdf/pixel-treatments.ts`) : la somme
+// du voisinage reste entière et l'écriture reste un seul passage par
+// `Uint8ClampedArray`, sinon les octets divergent de ce que l'opérateur a vu.
 const LocalSharpening: Filter = function (imageData) {
   const { data, width, height } = imageData
   const amount = Number(this.getAttr('sharpeningAmount')) || 0
   if (amount <= 0) return
 
   const source = new Uint8ClampedArray(data)
+  const rowLength = width * 4
+
+  for (let y = 1; y < height - 1; y += 1) {
+    const above = (y - 1) * rowLength
+    const middle = y * rowLength
+    const below = (y + 1) * rowLength
+    for (let x = 1; x < width - 1; x += 1) {
+      const left = (x - 1) * 4
+      const centre = x * 4
+      const right = (x + 1) * 4
+      for (let channel = 0; channel < 3; channel += 1) {
+        const neighbourhood =
+          source[above + left + channel] +
+          source[above + centre + channel] +
+          source[above + right + channel] +
+          source[middle + left + channel] +
+          source[middle + centre + channel] +
+          source[middle + right + channel] +
+          source[below + left + channel] +
+          source[below + centre + channel] +
+          source[below + right + channel]
+        const pixel = middle + centre + channel
+        const value = source[pixel]
+        data[pixel] = value + amount * (value - neighbourhood / 9)
+      }
+    }
+  }
+
   const sampleAt = (x: number, y: number, channel: number) => {
     const clampedX = Math.min(width - 1, Math.max(0, x))
     const clampedY = Math.min(height - 1, Math.max(0, y))
     return source[(clampedY * width + clampedX) * 4 + channel]
   }
 
-  for (let y = 0; y < height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
-      const pixel = (y * width + x) * 4
-      for (let channel = 0; channel < 3; channel += 1) {
-        let neighbourhood = 0
-        for (let offsetY = -1; offsetY <= 1; offsetY += 1) {
-          for (let offsetX = -1; offsetX <= 1; offsetX += 1) {
-            neighbourhood += sampleAt(x + offsetX, y + offsetY, channel)
-          }
+  const sharpenAt = (x: number, y: number) => {
+    const pixel = (y * width + x) * 4
+    for (let channel = 0; channel < 3; channel += 1) {
+      let neighbourhood = 0
+      for (let offsetY = -1; offsetY <= 1; offsetY += 1) {
+        for (let offsetX = -1; offsetX <= 1; offsetX += 1) {
+          neighbourhood += sampleAt(x + offsetX, y + offsetY, channel)
         }
-        const value = source[pixel + channel]
-        data[pixel + channel] = value + amount * (value - neighbourhood / 9)
       }
+      const value = source[pixel + channel]
+      data[pixel + channel] = value + amount * (value - neighbourhood / 9)
     }
+  }
+
+  for (let x = 0; x < width; x += 1) {
+    sharpenAt(x, 0)
+    if (height > 1) sharpenAt(x, height - 1)
+  }
+  for (let y = 1; y < height - 1; y += 1) {
+    sharpenAt(0, y)
+    if (width > 1) sharpenAt(width - 1, y)
   }
 }
 
 // ─── Per-filter metadata ───────────────────────────────────────────────────────
-// Single source of truth: label key, icon, and Konva binding for each filterKey
 
 export const FILTER_META: Record<string, { labelKey: string; icon: IconName; konva: KonvaFilterDef }> = {
   brightness: {
