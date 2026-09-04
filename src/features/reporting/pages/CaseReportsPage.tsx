@@ -8,9 +8,22 @@ import { Spinner } from '@/features/shared/ui/spinner'
 import { H1 } from '@/features/shared/ui/typography'
 import { useCurrentUser } from '@/features/shared/hooks/useCurrentUser'
 import CaseReportList from '@/features/reporting/components/CaseReportList'
+import ReportGenerationDialog, {
+  type ReportGenerationStatus,
+} from '@/features/reporting/components/ReportGenerationDialog'
 import { useCaseReports, useDownloadReport, useGenerateReport } from '@/features/reporting/hooks/useCaseReports'
+import type { GenerateReportInput, ReportType } from '@/features/reporting/types/report'
 
 const JOURNAL_DETAIL_FIELD_ID = 'report-journal-detail'
+
+/**
+ * Durées mesurées sur dev le 04/09 : 10,6 s à 16,8 s pour un rapport technique avec
+ * ses planches. L'annexe de traçabilité n'embarque aucune image, elle est bien plus courte.
+ */
+const EXPECTED_SECONDS: Record<ReportType, number> = {
+  TECHNICAL: 15,
+  TRACEABILITY: 5,
+}
 
 export default function CaseReportsPage() {
   const { id } = useParams<{ id: string }>()
@@ -21,7 +34,24 @@ export default function CaseReportsPage() {
   const generate = useGenerateReport(caseId)
   const download = useDownloadReport()
   const [detailedJournal, setDetailedJournal] = useState(false)
+  const [attempt, setAttempt] = useState<{ input: GenerateReportInput; startedAt: number } | null>(null)
   const journalDetail = detailedJournal ? 'FULL' : 'SUMMARY'
+
+  const generatedReportNumber = generate.data
+    ? reports?.find((report) => report.id === generate.data.id)?.number
+    : undefined
+  const dialogStatus: ReportGenerationStatus =
+    generate.status === 'success' || generate.status === 'error' ? generate.status : 'pending'
+
+  function launchGeneration(input: GenerateReportInput) {
+    setAttempt({ input, startedAt: Date.now() })
+    generate.mutate(input)
+  }
+
+  function closeDialog() {
+    setAttempt(null)
+    generate.reset()
+  }
 
   if (isPending) return <Spinner className="size-6" />
 
@@ -58,7 +88,7 @@ export default function CaseReportsPage() {
             variant="dark"
             size="small"
             disabled={generate.isPending}
-            onClick={() => generate.mutate({ type: 'TECHNICAL', journalDetail })}
+            onClick={() => launchGeneration({ type: 'TECHNICAL', journalDetail })}
           >
             {t('reporting.generate.EXPLOITATION')}
           </Button>
@@ -66,7 +96,7 @@ export default function CaseReportsPage() {
             variant="grey"
             size="small"
             disabled={generate.isPending}
-            onClick={() => generate.mutate({ type: 'TRACEABILITY', journalDetail: 'SUMMARY' })}
+            onClick={() => launchGeneration({ type: 'TRACEABILITY', journalDetail: 'SUMMARY' })}
           >
             {t('reporting.generate.TRACEABILITY')}
           </Button>
@@ -83,6 +113,18 @@ export default function CaseReportsPage() {
           downloadingReportId={download.isPending ? download.variables : undefined}
         />
       </section>
+
+      <ReportGenerationDialog
+        open={attempt !== null}
+        status={dialogStatus}
+        startedAt={attempt?.startedAt ?? 0}
+        expectedSeconds={EXPECTED_SECONDS[attempt?.input.type ?? 'TECHNICAL']}
+        reportNumber={generatedReportNumber}
+        isDownloading={download.isPending}
+        onDownload={() => generate.data && download.mutate(generate.data.id)}
+        onRetry={() => attempt && launchGeneration(attempt.input)}
+        onClose={closeDialog}
+      />
     </div>
   )
 }

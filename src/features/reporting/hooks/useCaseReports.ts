@@ -19,13 +19,11 @@ export function useCaseReports(caseId: string) {
 
 export function useGenerateReport(caseId: string) {
   const queryClient = useQueryClient()
-  const { t } = useTranslation()
 
   return useMutation({
     mutationFn: (input: GenerateReportInput) => ReportAPI.generate(caseId, input),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: reportKeys.case(caseId) })
-      toast.success(t('reporting.success.generated'))
     },
   })
 }
