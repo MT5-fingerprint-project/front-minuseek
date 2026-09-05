@@ -25,18 +25,18 @@ export default function HitButton({ isHit, disabled, onClick }: HitButtonProps) 
       title={title}
       aria-pressed={isHit}
       className={cn(
-        'inline-flex items-center gap-1 rounded-full px-3 py-1 font-medium text-white shadow-sm ring-[5px] ring-white transition-colors',
+        'inline-flex items-center gap-1 rounded-full px-2 py-1 font-medium text-white shadow-sm ring-[3px] ring-white transition-colors',
         !disabled && !isHit && 'bg-grey-medium-2 hover:bg-grey-dark',
         !disabled && isHit && 'bg-green-medium',
         disabled && 'cursor-not-allowed bg-grey-medium-1'
       )}
     >
-      <span className={cn('text-base leading-none', disabled && 'opacity-70')}>
+      <span className={cn('text-sm leading-none', disabled && 'opacity-70')}>
         {t('investigationCase.comparison.hitLabel')}
       </span>
       <Icon
         name={isHit ? 'fingerprintCheck' : 'fingerprintOff'}
-        size={20}
+        size={16}
         color="white"
         aria-hidden
         className={cn(disabled && 'opacity-70')}

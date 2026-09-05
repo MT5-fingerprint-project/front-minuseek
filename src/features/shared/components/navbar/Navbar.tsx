@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
 import NavItem from './NavItem'
 import NavFooter from './NavFooter'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/features/shared/ui/tooltip'
 import type { ComponentProps } from 'react'
 import type { InvestigationCase } from '@/features/investigation-case/types/investigationCase'
 
@@ -26,13 +27,17 @@ export default function Navbar({ isCollapsed = false, investigationCase, items, 
       <aside className="flex flex-col items-center justify-between bg-blue-dark-1 text-white w-14 py-4 shrink-0">
         <div className="flex flex-col gap-8">
           <div className="px-3">
-            <Link
-              to={`/${slug}/affaires`}
-              className="flex items-center justify-center p-1 hover:bg-white/10 rounded-md transition-colors"
-              title={t('navigation.backToCases')}
-            >
-              <Icon name="home" size={24} color="blue-light-1" />
-            </Link>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  to={`/${slug}/affaires`}
+                  className="flex items-center justify-center p-1 hover:bg-white/10 rounded-md transition-colors"
+                >
+                  <Icon name="home" size={24} color="blue-light-1" />
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="right">{t('navigation.backToCases')}</TooltipContent>
+            </Tooltip>
           </div>
           <div className="w-full border-t border-blue-light-1" />
           <nav className="flex flex-col gap-3 px-3">

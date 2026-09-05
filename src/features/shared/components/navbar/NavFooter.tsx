@@ -57,21 +57,34 @@ export default function NavFooter({ isCollapsed = false, onRestartTour }: NavFoo
           </button>
         </div>
       )}
-      <button
-        type="button"
-        onClick={() => setMenuOpen((open) => !open)}
-        title={label}
-        aria-label={label}
-        aria-haspopup="menu"
-        aria-expanded={isMenuOpen}
-        className={cn(
-          'flex items-center gap-2 rounded-md p-2 text-grey-light-2 transition-colors hover:bg-white/10',
-          !isCollapsed && 'text-sm',
-        )}
-      >
-        <Icon name="personProfile" size={24} color="grey-light-2" />
-        {!isCollapsed && <span className="capitalize">{label}</span>}
-      </button>
+      {(() => {
+        const accountButton = (
+          <button
+            type="button"
+            onClick={() => setMenuOpen((open) => !open)}
+            title={!isCollapsed ? label : undefined}
+            aria-label={label}
+            aria-haspopup="menu"
+            aria-expanded={isMenuOpen}
+            className={cn(
+              'flex items-center gap-2 rounded-md p-2 text-grey-light-2 transition-colors hover:bg-white/10',
+              !isCollapsed && 'text-sm',
+            )}
+          >
+            <Icon name="personProfile" size={24} color="grey-light-2" />
+            {!isCollapsed && <span className="capitalize">{label}</span>}
+          </button>
+        )
+
+        if (!isCollapsed) return accountButton
+
+        return (
+          <Tooltip>
+            <TooltipTrigger asChild>{accountButton}</TooltipTrigger>
+            <TooltipContent side="right">{label}</TooltipContent>
+          </Tooltip>
+        )
+      })()}
     </div>
   )
 }
