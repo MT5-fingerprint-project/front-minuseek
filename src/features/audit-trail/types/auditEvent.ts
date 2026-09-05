@@ -33,6 +33,7 @@ export const AUDIT_EVENT_TYPES = [
   'TRACE_LOCATION_STATED',
   'LOCATION_PHOTO_UPLOADED',
   'LOCATION_PHOTO_DELETED',
+  'CONCORDANCE_VIDEO_DEPOSITED',
 ] as const
 
 export type AuditEventType = (typeof AUDIT_EVENT_TYPES)[number]

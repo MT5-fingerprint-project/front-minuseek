@@ -1,13 +1,13 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import type { MinutiaPair } from '@/features/investigation-case/types/minutiaPair'
-import { LINK_COLOR, LINK_STROKE_WIDTH, LINK_STROKE_WIDTH_ACTIVE } from '@/features/investigation-case/lib/concordanceLinkStyle'
+import { LINK_COLOR, LINK_STROKE_WIDTH } from '@/features/investigation-case/lib/concordanceLinkStyle'
 
 type ScreenPosition = { x: number; y: number }
 
 type ConcordanceLinkOverlayProps = {
   isActive: boolean
-  /** Paires à relier, dans l'ordre de révélation (révélées + la paire en cours d'entrée). */
+  /** Paires révélées, dans l'ordre : seule celle qui porte `activePairId` est reliée. */
   pairs: MinutiaPair[]
   activePairId: string | null
   getTracePosition: (minutiaId: string) => ScreenPosition | null
@@ -22,6 +22,9 @@ type ConcordanceLinkOverlayProps = {
  * mute les attributs DOM directement, sans passer par le state React — c'est
  * ce qui garde le zoom/pan de chaque canevas utilisable pendant la lecture
  * sans que le trait se désynchronise ni ne saccade.
+ *
+ * Un seul trait est tracé, celui de la paire commentée : douze traits simultanés
+ * font un filet illisible, et la démonstration se lit repère par repère.
  */
 export default function ConcordanceLinkOverlay({
   isActive,
@@ -30,15 +33,17 @@ export default function ConcordanceLinkOverlay({
   getTracePosition,
   getReferencePosition,
 }: ConcordanceLinkOverlayProps) {
-  const linesRef = useRef(new Map<string, SVGLineElement>())
+  const lineRef = useRef<SVGLineElement | null>(null)
 
   // Refs "dernière valeur" : évite de redémarrer la boucle rAF à chaque rendu
   // du parent (mêmes fonctions recréées à l'identique par la page).
   const getTraceRef = useRef(getTracePosition)
   const getReferenceRef = useRef(getReferencePosition)
+  const shownRef = useRef<MinutiaPair | undefined>(undefined)
   useEffect(() => {
     getTraceRef.current = getTracePosition
     getReferenceRef.current = getReferencePosition
+    shownRef.current = pairs.find((pair) => pair.id === activePairId)
   })
 
   useEffect(() => {
@@ -46,44 +51,38 @@ export default function ConcordanceLinkOverlay({
 
     let frameId: number
     const tick = () => {
-      for (const pair of pairs) {
-        const line = linesRef.current.get(pair.id)
-        if (!line) continue
-        const from = getTraceRef.current(pair.traceMinutiaLayerId)
-        const to = getReferenceRef.current(pair.referenceMinutiaLayerId)
+      const line = lineRef.current
+      const shown = shownRef.current
+      if (line) {
+        const from = shown ? getTraceRef.current(shown.traceMinutiaLayerId) : null
+        const to = shown ? getReferenceRef.current(shown.referenceMinutiaLayerId) : null
         if (!from || !to) {
           line.style.visibility = 'hidden'
-          continue
+        } else {
+          line.style.visibility = 'visible'
+          line.setAttribute('x1', String(from.x))
+          line.setAttribute('y1', String(from.y))
+          line.setAttribute('x2', String(to.x))
+          line.setAttribute('y2', String(to.y))
         }
-        line.style.visibility = 'visible'
-        line.setAttribute('x1', String(from.x))
-        line.setAttribute('y1', String(from.y))
-        line.setAttribute('x2', String(to.x))
-        line.setAttribute('y2', String(to.y))
       }
       frameId = requestAnimationFrame(tick)
     }
     frameId = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frameId)
-  }, [isActive, pairs])
+  }, [isActive])
 
   if (!isActive) return null
 
   return createPortal(
     <svg className="pointer-events-none fixed inset-0 z-[999] h-screen w-screen">
-      {pairs.map((pair) => (
-        <line
-          key={pair.id}
-          ref={(node) => {
-            if (node) linesRef.current.set(pair.id, node)
-            else linesRef.current.delete(pair.id)
-          }}
-          stroke={LINK_COLOR}
-          strokeWidth={pair.id === activePairId ? LINK_STROKE_WIDTH_ACTIVE : LINK_STROKE_WIDTH}
-          strokeLinecap="round"
-          className="transition-[stroke-width,opacity] duration-300"
-        />
-      ))}
+      <line
+        ref={lineRef}
+        style={{ visibility: 'hidden' }}
+        stroke={LINK_COLOR}
+        strokeWidth={LINK_STROKE_WIDTH}
+        strokeLinecap="round"
+      />
     </svg>,
     document.body
   )

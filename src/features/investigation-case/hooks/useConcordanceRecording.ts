@@ -24,16 +24,18 @@ export type ConcordanceRecordingResult = { blob: Blob; format: ConcordanceVideoF
 type StartParams = {
   trace: React.RefObject<VideoFrameHandle | null>
   reference: React.RefObject<VideoFrameHandle | null>
-  /** Figés pour toute la durée de l'enregistrement : quelle fenêtre est laquelle. */
-  traceLabel: string
-  referenceLabel: string
+  /** Figées pour toute la durée de l'enregistrement : la désignation écrite
+   * sous chaque image. */
+  traceCaption: string
+  referenceCaption: string
   getTracePosition: (minutiaId: string) => ScreenPosition | null
   getReferencePosition: (minutiaId: string) => ScreenPosition | null
 }
 
 /**
  * Enregistrement vidéo de la démonstration des concordances (L7-4) : compose
- * les deux `Stage` Konva du comparateur + le trait de liaison sur un canvas
+ * les deux `Stage` Konva du comparateur, leurs désignations et le trait de
+ * liaison de la paire montrée, sur un canvas
  * hors-écran, redessiné à intervalle régulier pendant que `MediaRecorder`
  * capture son flux (`captureStream`). Pur état UI éphémère côté client —
  * aucune donnée serveur, rien n'est enregistré côté back.
@@ -73,8 +75,8 @@ export function useConcordanceRecording() {
       pixelRatio: VIDEO_FRAME_PIXEL_RATIO,
       traceFrame,
       referenceFrame,
-      traceLabel: params.traceLabel,
-      referenceLabel: params.referenceLabel,
+      traceCaption: params.traceCaption,
+      referenceCaption: params.referenceCaption,
       counterLabel,
       pairs,
       activePairId,
