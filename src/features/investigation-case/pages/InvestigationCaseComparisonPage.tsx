@@ -22,7 +22,6 @@ import { useConcordanceRecording } from '@/features/investigation-case/hooks/use
 import { useInvestigationCase } from '@/features/investigation-case/hooks/useInvestigationCases'
 import { minutiaPairKeys } from '@/features/investigation-case/hooks/minutiaPairKeys'
 import ConcordancePlaybackControls from '@/features/investigation-case/components/comparison/ConcordancePlaybackControls'
-import ConcordanceRecordButton from '@/features/investigation-case/components/comparison/ConcordanceRecordButton'
 import ConcordanceLinkOverlay from '@/features/investigation-case/components/comparison/ConcordanceLinkOverlay'
 import { downloadBlob } from '@/features/biometric-image/lib/exportImage'
 import {
@@ -404,6 +403,9 @@ export default function InvestigationCaseComparisonPage() {
                   onSpeedChange={playback.setSpeed}
                   onStop={recording.isRecording ? cancelRecording : playback.stop}
                   isRecording={recording.isRecording}
+                  onDownload={startRecording}
+                  canDownload={recording.canRecord}
+                  downloadFormatLabel={videoFormatLabel}
                 />
               ) : (
                 <>
@@ -430,19 +432,9 @@ export default function InvestigationCaseComparisonPage() {
                     onToggle={playback.toggle}
                     onSpeedChange={playback.setSpeed}
                     onStop={playback.stop}
-                  />
-                  <ConcordanceRecordButton
-                    disabledReason={
-                      sortedPairs.length === 0
-                        ? 'noPairs'
-                        : isPairingMode
-                          ? 'pairingActive'
-                          : !recording.canRecord
-                            ? 'unsupported'
-                            : null
-                    }
-                    formatLabel={videoFormatLabel}
-                    onClick={startRecording}
+                    onDownload={startRecording}
+                    canDownload={recording.canRecord}
+                    downloadFormatLabel={videoFormatLabel}
                   />
                 </>
               ))}

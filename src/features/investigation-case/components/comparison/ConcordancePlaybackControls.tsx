@@ -1,4 +1,4 @@
-import { Pause, Play, X } from 'lucide-react'
+import { Download, Pause, Play, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/features/shared/lib/utils'
 import type { PlaybackSpeed, PlaybackStatus } from '@/features/investigation-case/hooks/useConcordancePlayback'
@@ -20,6 +20,11 @@ type ConcordancePlaybackControlsProps = {
   /** Export vidéo (L7-4) : un enregistrement est un passage verrouillé à la
    * vitesse choisie au clic — pause/vitesse désactivés le temps qu'il tourne. */
   isRecording?: boolean
+  /** Télécharge la démonstration en cours en vidéo (relance une lecture complète
+   * en arrière-plan pour garantir un fichier sans image manquante). */
+  onDownload: () => void
+  canDownload: boolean
+  downloadFormatLabel: string
 }
 
 /** Contrôles de la démonstration des concordances (L7-3) : lecture, pause/reprise, vitesse, compteur. */
@@ -34,6 +39,9 @@ export default function ConcordancePlaybackControls({
   onSpeedChange,
   onStop,
   isRecording = false,
+  onDownload,
+  canDownload,
+  downloadFormatLabel,
 }: ConcordancePlaybackControlsProps) {
   const { t } = useTranslation()
 
@@ -117,6 +125,23 @@ export default function ConcordancePlaybackControls({
       <span className="rounded-full bg-white px-2 py-1 text-sm font-medium text-grey-dark">
         {t('investigationCase.comparison.concordanceCounter', { current: revealedCount, total: pairCount })}
       </span>
+
+      <button
+        type="button"
+        onClick={onDownload}
+        disabled={isRecording || !canDownload}
+        title={
+          canDownload
+            ? t('investigationCase.comparison.recordButtonTitle', { format: downloadFormatLabel })
+            : t('investigationCase.comparison.recordButtonDisabledUnsupported')
+        }
+        className={cn(
+          'flex h-7 w-7 items-center justify-center rounded-full text-white hover:bg-white/10',
+          (isRecording || !canDownload) && 'cursor-not-allowed opacity-50'
+        )}
+      >
+        <Download size={16} aria-hidden />
+      </button>
 
       <button
         type="button"
