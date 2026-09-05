@@ -28,13 +28,18 @@ export function boundingRectOf(a: DOMRect, b: DOMRect): CompositeRect {
   return { x, y, width: right - x, height: bottom - y }
 }
 
-/** Taille du canvas composite : le rectangle englobant à `pixelRatio`, plus les
- * deux bandeaux (eux aussi mis à l'échelle, pour rester proportionnés). */
+
+function even(value: number): number {
+  const rounded = Math.max(2, Math.round(value))
+  return rounded - (rounded % 2)
+}
+
+
 export function compositeCanvasSize(bounds: CompositeRect, pixelRatio: number): { width: number; height: number } {
   const bands = Math.round(VIDEO_HEADER_HEIGHT * pixelRatio) + Math.round(VIDEO_FOOTER_HEIGHT * pixelRatio)
   return {
-    width: Math.max(1, Math.round(bounds.width * pixelRatio)),
-    height: Math.max(1, Math.round(bounds.height * pixelRatio) + bands),
+    width: even(bounds.width * pixelRatio),
+    height: even(bounds.height * pixelRatio + bands),
   }
 }
 
@@ -67,8 +72,6 @@ function finalPlacements(
   }
 }
 
-/** Coupe une désignation trop longue pour la largeur de sa fenêtre : mieux vaut
- * une fin tronquée qu'un texte qui déborde sur celle d'à côté. */
 function fitted(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string {
   if (maxWidth <= 0 || ctx.measureText(text).width <= maxWidth) return text
   let kept = text
@@ -93,8 +96,6 @@ function drawHeader(
   ctx.fillText(counterLabel, ctx.canvas.width / 2, headerHeight / 2)
 }
 
-/** Chaque désignation est centrée sur SA fenêtre, pas sur le composite : les
- * deux panneaux sont redimensionnables et n'ont presque jamais la même largeur. */
 function drawFooter(
   ctx: CanvasRenderingContext2D,
   params: {
@@ -129,18 +130,12 @@ function drawFooter(
 
 type DrawCompositeFrameParams = {
   origin: { x: number; y: number }
-  /** Même ratio que celui utilisé pour rastériser `traceFrame`/`referenceFrame`
-   * (`stage.toCanvas({ pixelRatio })`) : les deux doivent avancer ensemble,
-   * sinon les images nettes se retrouveraient réduites dans un cadre flou. */
   pixelRatio: number
   traceFrame: FrameCapture
   referenceFrame: FrameCapture
-  /** Désignation de chaque pièce, écrite sous la sienne et figée pour toute la
-   * durée de l'enregistrement. */
   traceCaption: string
   referenceCaption: string
   counterLabel: string
-  /** Type de la minutie de la paire montrée, écrit au milieu du trait. */
   activeTypeLabel: string
   pairs: MinutiaPair[]
   activePairId: string | null
@@ -148,10 +143,6 @@ type DrawCompositeFrameParams = {
   getReferencePosition: (minutiaId: string) => ScreenPosition | null
 }
 
-/** Dessine, dans le repère local du canvas composite, les deux bandeaux, les
- * deux stages aplatis, puis le trait de la seule paire montrée — même style que
- * `ConcordanceLinkOverlay` (SVG à l'écran), pour que la vidéo enregistrée reste
- * fidèle à ce qui est affiché. */
 export function drawCompositeFrame(ctx: CanvasRenderingContext2D, params: DrawCompositeFrameParams): void {
   const {
     origin,
@@ -182,9 +173,6 @@ export function drawCompositeFrame(ctx: CanvasRenderingContext2D, params: DrawCo
 
   drawHeader(ctx, { pixelRatio, headerHeight, counterLabel })
   drawFooter(ctx, { pixelRatio, footerHeight, trace, reference, traceCaption, referenceCaption })
-
-  // Un seul trait à l'écran : celui de la paire commentée. Les repères posés
-  // restent, eux, cumulatifs — c'est ce qui construit la démonstration.
   const shown = pairs.find((pair) => pair.id === activePairId)
   if (!shown) return
   const from = getTracePosition(shown.traceMinutiaLayerId)
@@ -202,9 +190,7 @@ export function drawCompositeFrame(ctx: CanvasRenderingContext2D, params: DrawCo
   ctx.lineCap = 'round'
   ctx.stroke()
 
-  // Même halo que l'overlay SVG à l'écran (`paint-order: stroke`) : le contour
-  // blanc est tracé avant le remplissage, sinon il rongerait les lettres.
-  if (activeTypeLabel.length === 0) return
+  if (!activeTypeLabel) return
   ctx.font = `600 ${LINK_LABEL_FONT_SIZE * pixelRatio}px system-ui, sans-serif`
   ctx.textAlign = 'center'
   ctx.textBaseline = 'middle'

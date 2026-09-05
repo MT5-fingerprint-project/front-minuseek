@@ -157,6 +157,11 @@ export function useConcordanceRecording() {
     recorder.ondataavailable = (event) => {
       if (event.data.size > 0) chunksRef.current.push(event.data)
     }
+
+    recorder.onerror = (event) => {
+      const failure = (event as Event & { error?: DOMException }).error
+      console.error('[concordance] MediaRecorder a échoué', failure ?? event)
+    }
     recorderRef.current = recorder
     recorder.start()
     intervalRef.current = setInterval(drawTick, DRAW_INTERVAL_MS)
@@ -164,7 +169,6 @@ export function useConcordanceRecording() {
     return true
   }
 
-  /** Arrête proprement et résout le blob vidéo final (`null` si rien n'a pu être capturé). */
   const finish = (): Promise<ConcordanceRecordingResult | null> => {
     const recorder = recorderRef.current
     if (!recorder || recorder.state === 'inactive') {
@@ -184,7 +188,7 @@ export function useConcordanceRecording() {
     })
   }
 
-  /** Abandon (pas de fichier) : détachement de la fenêtre référence, suppression d'une paire pendant la lecture… */
+
   const cancel = () => {
     const recorder = recorderRef.current
     if (recorder && recorder.state !== 'inactive') {

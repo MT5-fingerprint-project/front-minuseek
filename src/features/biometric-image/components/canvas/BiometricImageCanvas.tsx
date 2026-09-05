@@ -151,8 +151,6 @@ export default function BiometricImageCanvas({
   const [selected, setSelected] = useState<{ id: string; tool: AnnotationToolType | null } | null>(null)
   const selectedAnnotationId = selected?.tool === activeTool ? selected.id : null
   const updateSelectedType = useUpdateLayer()
-  // La requalification d'une minutie appariée emporte celle de sa correspondante :
-  // le back écrit les deux, l'opérateur le confirme avant.
   const [pendingTypeChange, setPendingTypeChange] = useState<{
     pairNumber: number
     minutiaType: MinutiaType
@@ -161,13 +159,10 @@ export default function BiometricImageCanvas({
   } | null>(null)
   const minutiaDeletionGuard = useMinutiaDeletionGuard(minutiaNumbers)
   const [isRulerActive, setIsRulerActive] = useState(false)
-  // Marqué par l'id de l'image : un changement d'image invalide le segment sans effet dédié.
   const [rulerSegment, setRulerSegment] = useState<
     { imageId: string; from: CalibrationPoint; to: CalibrationPoint } | null
   >(null)
   const activeRulerSegment = rulerSegment?.imageId === image?.id ? rulerSegment : null
-  // Incrémenté à la validation et à l'annulation : force le remontage du calque de
-  // calibrage pour effacer son segment tracé, sur le modèle de `recenterSignal`.
   const [calibrationResetSignal, setCalibrationResetSignal] = useState(0)
   const { data: layers = [] } = useLayers(image?.id)
   const expertise = useCaseExpertise(image?.caseId ?? '')
