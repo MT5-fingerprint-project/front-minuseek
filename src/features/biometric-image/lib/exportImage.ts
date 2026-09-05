@@ -23,7 +23,7 @@ export async function stageToPngBlob(stage: Konva.Stage): Promise<Blob> {
   })
 }
 
-function sanitizeCaseNumber(caseNumber: string): string {
+export function sanitizeCaseNumber(caseNumber: string): string {
   return caseNumber
     .replace(/[^a-zA-Z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '')

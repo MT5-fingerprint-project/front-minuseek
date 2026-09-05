@@ -1,10 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import type { MinutiaPair } from '@/features/investigation-case/types/minutiaPair'
-
-const LINK_COLOR = '#D85703'
-const LINK_STROKE_WIDTH = 2.5
-const LINK_STROKE_WIDTH_ACTIVE = 4
+import { LINK_COLOR, LINK_STROKE_WIDTH, LINK_STROKE_WIDTH_ACTIVE } from '@/features/investigation-case/lib/concordanceLinkStyle'
 
 type ScreenPosition = { x: number; y: number }
 

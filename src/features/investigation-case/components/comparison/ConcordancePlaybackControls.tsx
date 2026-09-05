@@ -17,6 +17,9 @@ type ConcordancePlaybackControlsProps = {
   onToggle: () => void
   onSpeedChange: (speed: PlaybackSpeed) => void
   onStop: () => void
+  /** Export vidéo (L7-4) : un enregistrement est un passage verrouillé à la
+   * vitesse choisie au clic — pause/vitesse désactivés le temps qu'il tourne. */
+  isRecording?: boolean
 }
 
 /** Contrôles de la démonstration des concordances (L7-3) : lecture, pause/reprise, vitesse, compteur. */
@@ -30,6 +33,7 @@ export default function ConcordancePlaybackControls({
   onToggle,
   onSpeedChange,
   onStop,
+  isRecording = false,
 }: ConcordancePlaybackControlsProps) {
   const { t } = useTranslation()
 
@@ -68,25 +72,40 @@ export default function ConcordancePlaybackControls({
 
   return (
     <div className="flex items-center gap-2 rounded-full bg-grey-dark px-2 py-1 shadow-sm ring-[5px] ring-white">
+      {isRecording && (
+        <span className="flex items-center gap-1 pl-1 text-xs font-bold text-red-medium">
+          <span className="h-2 w-2 rounded-full bg-red-medium" aria-hidden />
+          {t('investigationCase.comparison.recordingIndicatorLabel')}
+        </span>
+      )}
       <button
         type="button"
         onClick={onToggle}
+        disabled={isRecording}
         title={t(isPlaying ? 'investigationCase.comparison.concordancePauseButton' : 'investigationCase.comparison.concordanceResumeButton')}
-        className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-medium-1 text-white"
+        className={cn(
+          'flex h-7 w-7 items-center justify-center rounded-full bg-blue-medium-1 text-white',
+          isRecording && 'cursor-not-allowed opacity-50'
+        )}
       >
         {isPlaying ? <Pause size={16} aria-hidden /> : <Play size={16} aria-hidden />}
       </button>
 
-      <div className="flex items-center rounded-full bg-white/10 p-0.5" title={t('investigationCase.comparison.concordanceSpeedTitle')}>
+      <div
+        className={cn('flex items-center rounded-full bg-white/10 p-0.5', isRecording && 'opacity-50')}
+        title={t('investigationCase.comparison.concordanceSpeedTitle')}
+      >
         {SPEEDS.map((option) => (
           <button
             key={option}
             type="button"
             onClick={() => onSpeedChange(option)}
+            disabled={isRecording}
             aria-pressed={speed === option}
             title={t('investigationCase.comparison.concordanceSpeedOption', { speed: option })}
             className={cn(
               'rounded-full px-2 py-1 text-sm font-medium transition-colors',
+              isRecording && 'cursor-not-allowed',
               speed === option ? 'bg-white text-grey-dark' : 'text-white/80 hover:text-white'
             )}
           >
@@ -102,7 +121,11 @@ export default function ConcordancePlaybackControls({
       <button
         type="button"
         onClick={onStop}
-        title={t('investigationCase.comparison.concordanceStopButton')}
+        title={t(
+          isRecording
+            ? 'investigationCase.comparison.recordingCancelButton'
+            : 'investigationCase.comparison.concordanceStopButton'
+        )}
         className="flex h-7 w-7 items-center justify-center rounded-full text-white hover:bg-white/10"
       >
         <X size={16} aria-hidden />

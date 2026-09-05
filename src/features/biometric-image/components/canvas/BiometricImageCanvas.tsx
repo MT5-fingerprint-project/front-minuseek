@@ -26,6 +26,7 @@ import { cn } from '@/features/shared/lib/utils'
 import { ANNOTATION_COLORS, type AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import type { CalibrationPoint } from '@/features/biometric-image/lib/calibration'
 import { stageToPngBlob } from '@/features/biometric-image/lib/exportImage'
+import { VIDEO_FRAME_PIXEL_RATIO } from '@/features/investigation-case/lib/exportConcordanceVideo'
 import {
   DEFAULT_MINUTIA_TYPE,
   isMinutiaSettings,
@@ -46,6 +47,13 @@ export type ExportHandle = {
 /** Mode lecture des concordances (L7-3) : position écran courante d'une minutie. */
 export type ConcordanceHandle = {
   getMinutiaScreenPosition: (minutiaId: string) => { x: number; y: number } | null
+}
+
+/** Export vidéo de la démonstration (L7-4) : image aplatie du stage, appelée
+ * plusieurs fois par seconde pendant l'enregistrement — synchrone, contrairement
+ * à `ExportHandle.exportToBlob` qui est pensé pour un export ponctuel. */
+export type VideoFrameHandle = {
+  captureFrame: () => { canvas: HTMLCanvasElement; rect: DOMRect } | null
 }
 
 /** Arme la règle depuis le pied de fenêtre, où la pastille annonce l'absence d'échelle. */
@@ -77,6 +85,8 @@ type BiometricImageCanvasProps = {
   isConcordanceMode?: boolean
   revealedMinutiaIds?: Set<string>
   activeMinutiaId?: string | null
+  /** Export vidéo de la démonstration (L7-4). */
+  videoFrameHandleRef?: React.RefObject<VideoFrameHandle | null>
 }
 
 export default function BiometricImageCanvas({
@@ -101,6 +111,7 @@ export default function BiometricImageCanvas({
   isConcordanceMode = false,
   revealedMinutiaIds,
   activeMinutiaId = null,
+  videoFrameHandleRef,
 }: BiometricImageCanvasProps) {
   const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
@@ -244,6 +255,15 @@ export default function BiometricImageCanvas({
       const abs = node.getAbsolutePosition()
       const rect = container.getBoundingClientRect()
       return { x: rect.left + abs.x, y: rect.top + abs.y }
+    },
+  }))
+
+  useImperativeHandle(videoFrameHandleRef, () => ({
+    captureFrame: () => {
+      const stage = stageRef.current
+      const container = containerRef.current
+      if (!stage || !container) return null
+      return { canvas: stage.toCanvas({ pixelRatio: VIDEO_FRAME_PIXEL_RATIO }), rect: container.getBoundingClientRect() }
     },
   }))
 

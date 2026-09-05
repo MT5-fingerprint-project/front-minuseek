@@ -18,9 +18,18 @@ import VerificationPanel from '@/features/investigation-case/components/comparis
 import { useMissionOnCase } from '@/features/investigation-case/hooks/useMissionOnCase'
 import { useMinutiaPairs } from '@/features/investigation-case/hooks/useMinutiaPairs'
 import { useConcordancePlayback } from '@/features/investigation-case/hooks/useConcordancePlayback'
+import { useConcordanceRecording } from '@/features/investigation-case/hooks/useConcordanceRecording'
+import { useInvestigationCase } from '@/features/investigation-case/hooks/useInvestigationCases'
 import { minutiaPairKeys } from '@/features/investigation-case/hooks/minutiaPairKeys'
 import ConcordancePlaybackControls from '@/features/investigation-case/components/comparison/ConcordancePlaybackControls'
+import ConcordanceRecordButton from '@/features/investigation-case/components/comparison/ConcordanceRecordButton'
 import ConcordanceLinkOverlay from '@/features/investigation-case/components/comparison/ConcordanceLinkOverlay'
+import { downloadBlob } from '@/features/biometric-image/lib/exportImage'
+import {
+  concordanceVideoFileName,
+  pickConcordanceVideoFormat,
+  RECORDING_STOP_GRACE_MS,
+} from '@/features/investigation-case/lib/exportConcordanceVideo'
 import { DETACHED_REFERENCE_TRACE_CHANGED } from '@/features/investigation-case/types/detachedReference'
 import { isInProgress } from '@/features/shared/types/verification'
 import { useCaseIsClosed } from '@/features/investigation-case/hooks/useCaseIsClosed'
@@ -98,7 +107,35 @@ export default function InvestigationCaseComparisonPage() {
     () => [...minutiaPairs.pairs].sort((a, b) => a.number - b.number),
     [minutiaPairs.pairs]
   )
-  const playback = useConcordancePlayback(sortedPairs.length)
+  const { data: investigationCase } = useInvestigationCase(id ?? '')
+  const recording = useConcordanceRecording()
+  // Vérif navigateur bon marché (pas d'appel réseau) : sert uniquement à annoncer
+  // le format dans l'interface avant de lancer l'enregistrement (cf. critère du ticket).
+  const videoFormatLabel = pickConcordanceVideoFormat()?.label ?? 'WebM'
+  const getTracePosition = (minutiaId: string) => trace.concordanceRef.current?.getMinutiaScreenPosition(minutiaId) ?? null
+  const getReferencePosition = (minutiaId: string) =>
+    reference.concordanceRef.current?.getMinutiaScreenPosition(minutiaId) ?? null
+
+  // Export vidéo (L7-4) : la lecture pilotée par l'enregistrement se termine
+  // toujours à sa dernière paire — un délai de grâce laisse un tick de dessin
+  // capturer cet état final avant de couper le flux (sinon la dernière minutie
+  // révélée peut manquer à l'appel).
+  const handlePlaybackComplete = () => {
+    if (!recording.isRecording) return
+    window.setTimeout(() => {
+      recording.finish().then((result) => {
+        if (!result) {
+          toast.error(t('investigationCase.comparison.recordingAbortedToast'))
+          return
+        }
+        const fileName = concordanceVideoFileName(investigationCase?.caseNumber ?? '', new Date(), result.format.extension)
+        downloadBlob(result.blob, fileName)
+        toast.success(t('investigationCase.comparison.recordingSavedToast', { format: result.format.label }))
+      })
+    }, RECORDING_STOP_GRACE_MS)
+  }
+
+  const playback = useConcordancePlayback(sortedPairs.length, handlePlaybackComplete)
   const isConcordanceMode = playback.status !== 'idle'
   const activePair = playback.activeIndex != null ? (sortedPairs[playback.activeIndex] ?? null) : null
   // `activePair` fait toujours partie de `revealedPairs` (revealedCount = activeIndex + 1).
@@ -111,6 +148,16 @@ export default function InvestigationCaseComparisonPage() {
     () => new Set(revealedPairs.map((pair) => pair.referenceMinutiaLayerId)),
     [revealedPairs]
   )
+
+  // Tient le compositeur vidéo à jour des paires à dessiner, qu'un enregistrement
+  // soit en cours ou non (écriture de ref bon marché, sans effet si pas de recording).
+  useEffect(() => {
+    recording.setLinkState(
+      revealedPairs,
+      activePair?.id ?? null,
+      t('investigationCase.comparison.concordanceCounter', { current: playback.revealedCount, total: sortedPairs.length })
+    )
+  })
 
   // Changer de trace ou d'empreinte périme la sélection en cours d'appariement.
   // Ajustée pendant le rendu (pas dans un effet) : évite un rendu supplémentaire.
@@ -134,6 +181,30 @@ export default function InvestigationCaseComparisonPage() {
     setPairingMode(false)
     setArmed(null)
     playback.play()
+  }
+
+  // L'enregistrement pilote lui-même une lecture complète depuis la paire 1,
+  // peu importe l'état de lecture manuelle en cours : c'est ce qui garantit un
+  // fichier qui rejoue l'animation en entier, à chaque fois.
+  const startRecording = () => {
+    if (isPairingMode || sortedPairs.length === 0 || !recording.canRecord) return
+    setPairingMode(false)
+    setArmed(null)
+    playback.stop()
+    playback.play()
+    recording.start({
+      trace: trace.videoFrameRef,
+      reference: reference.videoFrameRef,
+      traceLabel: t('investigationCase.comparison.tracesWindow'),
+      referenceLabel: t('investigationCase.comparison.referencePrintsWindow'),
+      getTracePosition,
+      getReferencePosition,
+    })
+  }
+
+  const cancelRecording = () => {
+    recording.cancel()
+    playback.stop()
   }
 
   // Seule la page a les deux listes de calques : la règle de type se joue donc ici, avant l'appel.
@@ -231,6 +302,18 @@ export default function InvestigationCaseComparisonPage() {
     if (isReferenceDetached && isConcordanceMode) stopPlayback()
   }, [isReferenceDetached, isConcordanceMode, stopPlayback])
 
+  // Un enregistrement en cours qui voit la lecture retomber à l'arrêt sans être
+  // passée par sa fin normale (détachement ci-dessus, ou suppression d'une
+  // paire pendant la lecture) n'a pas de démonstration complète à livrer.
+  const cancelRecordingSilently = recording.cancel
+  useEffect(() => {
+    if (playback.status === 'idle' && recording.isRecording) {
+      cancelRecordingSilently()
+      toast.error(t('investigationCase.comparison.recordingAbortedToast'))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playback.status, recording.isRecording, cancelRecordingSilently])
+
   // La popup est une instance d'app à part : la trace choisie ici ne lui parvient
   // que par l'adresse d'ouverture, puis par message. Sans elle, elle ignore les
   // appariements et laisserait supprimer une minutie appariée sans un mot.
@@ -319,7 +402,8 @@ export default function InvestigationCaseComparisonPage() {
                   onPlay={startConcordance}
                   onToggle={playback.toggle}
                   onSpeedChange={playback.setSpeed}
-                  onStop={playback.stop}
+                  onStop={recording.isRecording ? cancelRecording : playback.stop}
+                  isRecording={recording.isRecording}
                 />
               ) : (
                 <>
@@ -346,6 +430,19 @@ export default function InvestigationCaseComparisonPage() {
                     onToggle={playback.toggle}
                     onSpeedChange={playback.setSpeed}
                     onStop={playback.stop}
+                  />
+                  <ConcordanceRecordButton
+                    disabledReason={
+                      sortedPairs.length === 0
+                        ? 'noPairs'
+                        : isPairingMode
+                          ? 'pairingActive'
+                          : !recording.canRecord
+                            ? 'unsupported'
+                            : null
+                    }
+                    formatLabel={videoFormatLabel}
+                    onClick={startRecording}
                   />
                 </>
               ))}
@@ -375,10 +472,8 @@ export default function InvestigationCaseComparisonPage() {
         isActive={isConcordanceMode}
         pairs={revealedPairs}
         activePairId={activePair?.id ?? null}
-        getTracePosition={(minutiaId) => trace.concordanceRef.current?.getMinutiaScreenPosition(minutiaId) ?? null}
-        getReferencePosition={(minutiaId) =>
-          reference.concordanceRef.current?.getMinutiaScreenPosition(minutiaId) ?? null
-        }
+        getTracePosition={getTracePosition}
+        getReferencePosition={getReferencePosition}
       />
       {pendingRequalification && (
         <PairRequalificationDialog

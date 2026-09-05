@@ -12,8 +12,14 @@ const STEP_MS = 1500
  * `setTimeout` récursif — la vitesse courante n'est lue qu'au moment de
  * planifier le pas suivant, donc un changement de vitesse s'applique
  * immédiatement au pas suivant sans resynchroniser une horloge globale.
+ *
+ * `onComplete` (optionnel, L7-4) se déclenche une seule fois, dès que la
+ * dernière paire vient d'être révélée — que ce soit synchrone (une seule
+ * paire, révélée immédiatement par `play()`) ou asynchrone (via le `setTimeout`
+ * planifié). N'affecte pas `status`, qui reste `'playing'` comme avant : seul
+ * l'appelant (l'enregistrement vidéo) réagit à ce callback.
  */
-export function useConcordancePlayback(pairCount: number) {
+export function useConcordancePlayback(pairCount: number, onComplete?: () => void) {
   const [status, setStatus] = useState<PlaybackStatus>('idle')
   const [speed, setSpeed] = useState<PlaybackSpeed>(1)
   const [revealedCount, setRevealedCount] = useState(0)
@@ -29,6 +35,10 @@ export function useConcordancePlayback(pairCount: number) {
   useEffect(() => {
     pairCountRef.current = pairCount
   }, [pairCount])
+  const onCompleteRef = useRef(onComplete)
+  useEffect(() => {
+    onCompleteRef.current = onComplete
+  }, [onComplete])
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const clearTimer = () => {
@@ -37,9 +47,15 @@ export function useConcordancePlayback(pairCount: number) {
     timeoutRef.current = null
   }
 
+  const revealAndMaybeComplete = (index: number) => {
+    setActiveIndex(index)
+    setRevealedCount(index + 1)
+    if (index + 1 >= pairCountRef.current) onCompleteRef.current?.()
+  }
+
   const scheduleNext = (index: number) => {
     clearTimer()
-    if (index >= pairCount) return
+    if (index >= pairCountRef.current) return
     timeoutRef.current = setTimeout(() => {
       // Une paire supprimée pendant la lecture (suppression concurrente) peut
       // avoir fait chuter `pairCount` sous l'index déjà planifié : s'arrêter
@@ -50,8 +66,7 @@ export function useConcordancePlayback(pairCount: number) {
         setActiveIndex(null)
         return
       }
-      setActiveIndex(index)
-      setRevealedCount(index + 1)
+      revealAndMaybeComplete(index)
       scheduleNext(index + 1)
     }, STEP_MS / speedRef.current)
   }
@@ -59,8 +74,7 @@ export function useConcordancePlayback(pairCount: number) {
   const play = () => {
     if (pairCount === 0) return
     setStatus('playing')
-    setActiveIndex(0)
-    setRevealedCount(1)
+    revealAndMaybeComplete(0)
     scheduleNext(1)
   }
 

@@ -262,6 +262,7 @@ export default function ComparisonWorkbench({
             onMinutiaClick={onMinutiaClick}
             onPairMiss={onPairMiss}
             concordanceHandleRef={w.concordanceRef}
+            videoFrameHandleRef={w.videoFrameRef}
             isConcordanceMode={isConcordanceMode}
             revealedMinutiaIds={revealedMinutiaIds}
             activeMinutiaId={activeMinutiaId}
