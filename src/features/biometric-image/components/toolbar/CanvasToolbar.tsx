@@ -14,6 +14,7 @@ import {
   IMAGE_TOOLS,
   ANNOTATION_TOOLS,
   MINUTIA_TOOLS,
+  RULER_TOOL,
   type CanvasFilters,
   type FilterConfig,
   type AnnotationToolType,
@@ -77,20 +78,18 @@ export default function CanvasToolbar({
     setOpenFilter(null)
     setOpenPanel(null)
     onActiveToolChange(null)
-    // La règle vit dans l'onglet Annotations : quitter cet onglet la referme aussi.
-    if (next !== 'annotation' && isRulerActive) onToggleRuler()
+  }
+
+  const handleRulerClick = () => {
+    onToggleRuler()
+    setOpenFilter(null)
+    setOpenPanel(null)
   }
 
   const handleAnnotationClick = (
     tool: AnnotationToolType | undefined,
     panel: AnnotationPanel | undefined,
-    isRuler?: boolean,
   ) => {
-    if (isRuler) {
-      onToggleRuler()
-      if (openPanel === 'minutiaType') setOpenPanel(null)
-      return
-    }
     if (tool && MINUTIA_TOOLS.includes(tool)) {
       if (activeTool !== tool) {
         onActiveToolChange(tool)
@@ -154,11 +153,8 @@ export default function CanvasToolbar({
     return openFilter === label
   }
 
-  const isAnnotationActive = (
-    tool: AnnotationToolType | undefined,
-    panel: AnnotationPanel | undefined,
-    isRuler?: boolean,
-  ) => (isRuler ? isRulerActive : tool ? activeTool === tool : openPanel === panel)
+  const isAnnotationActive = (tool: AnnotationToolType | undefined, panel: AnnotationPanel | undefined) =>
+    tool ? activeTool === tool : openPanel === panel
 
   const displayedMinutiaType = selectedMinutiaType ?? activeMinutiaType
 
@@ -213,6 +209,13 @@ export default function CanvasToolbar({
             />
           </span>
         </div>
+        <ItemToolbar
+          icon={RULER_TOOL.icon}
+          label={t(RULER_TOOL.label)}
+          active={isRulerActive}
+          onClick={handleRulerClick}
+        />
+        <span className="h-6 w-px bg-white/25" />
         {mode === 'image' &&
           IMAGE_TOOLS.map(({ icon, label, filters: filterConfigs, isExpertOnly }) => {
             const isLocked = isExpertOnly === true && !isExpertCase
@@ -232,13 +235,13 @@ export default function CanvasToolbar({
             )
           })}
         {mode === 'annotation' &&
-          ANNOTATION_TOOLS.map(({ icon, label, tool, isRuler, panel }) => (
+          ANNOTATION_TOOLS.map(({ icon, label, tool, panel }) => (
             <div key={label} className="relative">
               <ItemToolbar
                 icon={icon}
                 label={t(label)}
-                active={isAnnotationActive(tool, panel, isRuler)}
-                onClick={() => handleAnnotationClick(tool, panel, isRuler)}
+                active={isAnnotationActive(tool, panel)}
+                onClick={() => handleAnnotationClick(tool, panel)}
               />
               {panel === 'color' && (
                 <span
