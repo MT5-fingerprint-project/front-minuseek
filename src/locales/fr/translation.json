@@ -38,7 +38,7 @@
     "cases": "Affaires",
     "users": "Utilisateurs",
     "settings": "Paramètres",
-    "casesToVerify": "Dossiers à vérifier",
+    "peerReviewCases": "Dossiers pairs",
     "traces": "Traces",
     "backToHome": "Retour à l'accueil"
   },
@@ -400,9 +400,9 @@
       }
     },
     "toVerify": {
-      "title": "Dossiers à vérifier",
-      "subtitle": "Les dossiers dont la vérification vous a été confiée.",
-      "empty": "Aucune vérification ne vous est confiée pour l'instant.",
+      "title": "Dossiers pairs",
+      "subtitle": "Les dossiers dont la relecture vous a été confiée.",
+      "empty": "Aucun dossier pair ne vous est confié pour l'instant.",
       "caseNumber": "Affaire n°{{caseNumber}}"
     },
     "blindBanner": "Vérification en aveugle : vous ne voyez ni les calques, ni les identifications, ni les déclarations de l'opérateur du dossier.",
@@ -1267,6 +1267,75 @@
       "oldestCaseDetail": "{{days}} jours, {{operator}}",
       "over90DaysDetail": "dont {{count}} au-delà de 90 jours",
       "serviceRow": "Service"
+    }
+  },
+  "operatorHome": {
+    "hero": {
+      "since": "Depuis le 1ᵉʳ janvier, sur vos dossiers :",
+      "summary": "{{collected}} traces relevées, {{identified}} identifiées.",
+      "collected_one": "trace relevée,",
+      "collected_other": "traces relevées,",
+      "identified_one": "identifiée.",
+      "identified_other": "identifiées.",
+      "figureLabel": "Sur les {{collected}} traces relevées sur vos dossiers depuis le 1ᵉʳ janvier, {{identified}} sont identifiées.",
+      "identifiedInside_one": "{{count}} identifiée",
+      "identifiedInside_other": "{{count}} identifiées",
+      "collectedInside_one": "sur {{count}} relevée",
+      "collectedInside_other": "sur {{count}} relevées",
+      "figures": "Voir les chiffres",
+      "step": {
+        "collected": "Traces relevées",
+        "exploitable": "Traces exploitables",
+        "compared": "Traces confrontées",
+        "identified": "Traces identifiées"
+      }
+    },
+    "workload": {
+      "openCases_one": "dossier en cours",
+      "openCases_other": "dossiers en cours",
+      "openCasesWithOldest_one": "dossier en cours — ouvert depuis {{days}} jours",
+      "openCasesWithOldest_other": "dossiers en cours — le plus ancien depuis {{days}} jours",
+      "peerReviews_one": "dossier pair à rendre",
+      "peerReviews_other": "dossiers pairs à rendre",
+      "peerReviewsWithOldest_one": "dossier pair à rendre — il attend depuis {{days}} jours",
+      "peerReviewsWithOldest_other": "dossiers pairs à rendre — le plus ancien attend depuis {{days}} jours",
+      "bracketsLabel": "Ancienneté de vos dossiers en cours : {{over}} au-delà de six mois, {{between}} de trois à six mois, {{under}} de moins de trois mois.",
+      "bracket": {
+        "overSixMonths": "plus de 6 mois",
+        "threeToSixMonths": "3 à 6 mois",
+        "underThreeMonths": "moins de 3 mois"
+      }
+    },
+    "queue": {
+      "title": "Ce qui vous attend",
+      "allClear": "Rien n'attend sur vos dossiers.",
+      "inCase": "— {{caseNumber}}",
+      "inCases_one": "— {{caseNumber}} et {{count}} autre",
+      "inCases_other": "— {{caseNumber}} et {{count}} autres",
+      "peerReviews": {
+        "title": "Dossiers pairs qui vous sont confiés",
+        "context": "{{caseNumber}} — confié le {{date}}, {{days}} jours d'attente",
+        "review": "RELIRE"
+      },
+      "discordances": {
+        "title": "Discordances à lever",
+        "context": "{{caseNumber}} — un troisième examen est nécessaire",
+        "resume": "REPRENDRE"
+      },
+      "pendingTraces": {
+        "title": "Traces en attente dans vos dossiers",
+        "neverCompared_one": "1 trace exploitable jamais confrontée",
+        "neverCompared_other": "{{count}} traces exploitables jamais confrontées",
+        "notQualified_one": "1 trace déposée, pas encore qualifiée",
+        "notQualified_other": "{{count}} traces déposées, pas encore qualifiées",
+        "compare": "CONFRONTER",
+        "qualify": "QUALIFIER"
+      },
+      "oldestCases": {
+        "title": "Vos dossiers les plus anciens",
+        "context": "{{caseNumber}} — ouvert il y a {{days}} jours",
+        "open": "OUVRIR"
+      }
     }
   }
 }

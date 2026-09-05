@@ -22,7 +22,7 @@ import DetachedReferencePrintsPage from './features/investigation-case/pages/Det
 import CaseTracesPage from './features/biometric-image/pages/CaseTracesPage.tsx'
 import CaseHistoryPage from './features/audit-trail/pages/CaseHistoryPage.tsx'
 import CaseReportsPage from './features/reporting/pages/CaseReportsPage.tsx'
-import ServiceHomePage from './features/statistics/pages/ServiceHomePage.tsx'
+import HomeRoute from './layouts/HomeRoute.tsx'
 import ServiceUsersPage from './features/users/pages/ServiceUsersPage.tsx'
 import ServiceSettingsPage from './features/settings/pages/ServiceSettingsPage.tsx'
 import PublicSealVerificationPage from './features/public-verification/pages/PublicSealVerificationPage.tsx'
@@ -34,9 +34,9 @@ const router = createBrowserRouter([
     path: '/:slug',
     element: <TenantAuthBoundary />,
     children: [
-      { index: true, element: <ServiceHomePage /> },
+      { index: true, element: <HomeRoute /> },
       { path: 'affaires', element: <InvestigationCasesPage /> },
-      { path: 'verifications', element: <CasesToVerifyPage /> },
+      { path: 'dossier-pair', element: <CasesToVerifyPage /> },
       { path: 'utilisateurs', element: <ServiceUsersPage /> },
       { path: 'parametres', element: <ServiceSettingsPage /> },
       {
