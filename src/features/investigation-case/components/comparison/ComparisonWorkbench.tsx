@@ -256,6 +256,7 @@ export default function ComparisonWorkbench({
             onSourceGeometryChange={w.setSourceGeometry}
             exportHandleRef={w.exportRef}
             rulerHandleRef={w.rulerRef}
+            onRequestManualResolution={() => setIsImageSizeDialogOpen(true)}
             isPairingMode={isPairingMode}
             armedMinutiaId={armedMinutiaId}
             minutiaNumbers={minutiaNumbers}

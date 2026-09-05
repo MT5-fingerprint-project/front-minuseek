@@ -5,6 +5,9 @@ import type { CaseRecipient } from '@/features/investigation-case/types/reportRe
 export const investigationCaseStatusSchema = z.enum(['OPEN', 'IN_PROGRESS', 'UNDER_REVIEW', 'CLOSED'])
 export type InvestigationCaseStatus = z.infer<typeof investigationCaseStatusSchema>
 
+export const SELECTABLE_CASE_STATUSES = ['IN_PROGRESS', 'UNDER_REVIEW'] as const
+export type SelectableCaseStatus = (typeof SELECTABLE_CASE_STATUSES)[number]
+
 export type CaseUser = {
   id: string
   firstName: string

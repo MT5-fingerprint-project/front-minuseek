@@ -74,6 +74,8 @@ type BiometricImageCanvasProps = {
   onSourceGeometryChange?: (geometry: SourceGeometry | null) => void
   exportHandleRef?: React.RefObject<ExportHandle | null>
   rulerHandleRef?: React.RefObject<RulerHandle | null>
+  /** Ouvre la saisie clavier de la résolution, pour une image sans réglette photographiée. */
+  onRequestManualResolution?: () => void
   /** Mode démonstration (L7-2b) : appariement des minuties entre trace et empreinte. */
   isPairingMode?: boolean
   armedMinutiaId?: string | null
@@ -102,6 +104,7 @@ export default function BiometricImageCanvas({
   onSourceGeometryChange,
   exportHandleRef,
   rulerHandleRef,
+  onRequestManualResolution,
   isPairingMode = false,
   armedMinutiaId = null,
   minutiaNumbers,
@@ -228,6 +231,14 @@ export default function BiometricImageCanvas({
   const handleCancelCalibration = () => {
     setRulerSegment(null)
     setCalibrationResetSignal((n) => n + 1)
+  }
+
+  // Saisir la résolution au clavier abandonne la mesure : les deux dialogues se
+  // superposeraient, et le segment tracé ne vaut plus rien une fois la valeur saisie.
+  const handleManualResolution = () => {
+    handleCancelCalibration()
+    setIsRulerActive(false)
+    onRequestManualResolution?.()
   }
 
   const handleSegmentComplete = (from: CalibrationPoint, to: CalibrationPoint) => {
@@ -381,6 +392,7 @@ export default function BiometricImageCanvas({
               isSaving={calibrate.isPending}
               onValidate={handleValidateCalibration}
               onCancel={handleCancelCalibration}
+              onManualEntry={onRequestManualResolution && handleManualResolution}
             />
           )}
           {isToolbarVisible && !isPairingMode && !isConcordanceMode && (

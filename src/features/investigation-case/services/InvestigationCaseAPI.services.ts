@@ -5,6 +5,7 @@ import type {
   InvestigationCase,
   InvestigationCaseCorrections,
   InvestigationCaseCreateInput,
+  SelectableCaseStatus,
 } from '@/features/investigation-case/types/investigationCase'
 import type { CaseRecipientInput } from '@/features/investigation-case/types/reportRecipient'
 
@@ -50,6 +51,11 @@ export const InvestigationCaseAPI = {
   reopen: (id: string, reason: string) =>
     apiClient
       .post<InvestigationCase>(`/investigation-cases/${id}/reopening`, { reason })
+      .then((res) => res.data),
+
+  changeStatus: (id: string, status: SelectableCaseStatus) =>
+    apiClient
+      .put<InvestigationCase>(`/investigation-cases/${id}/status`, { status })
       .then((res) => res.data),
 
   declareExpertise: (id: string, declaration: CaseExpertiseDeclaration) =>

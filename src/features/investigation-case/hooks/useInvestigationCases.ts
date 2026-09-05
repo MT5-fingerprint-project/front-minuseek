@@ -6,6 +6,7 @@ import type {
   CaseExpertiseDeclaration,
   InvestigationCaseCorrections,
   InvestigationCaseCreateInput,
+  SelectableCaseStatus,
 } from '@/features/investigation-case/types/investigationCase'
 import type { CaseRecipientInput } from '@/features/investigation-case/types/reportRecipient'
 
@@ -41,6 +42,20 @@ export function useCreateInvestigationCase() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: investigationCaseKeys.lists() })
       toast.success(t('investigationCase.success.created'))
+    },
+  })
+}
+
+export function useChangeCaseStatus(id: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: (status: SelectableCaseStatus) => InvestigationCaseAPI.changeStatus(id, status),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: investigationCaseKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: investigationCaseKeys.detail(id) })
+      toast.success(t('investigationCase.workStatus.changed'))
     },
   })
 }

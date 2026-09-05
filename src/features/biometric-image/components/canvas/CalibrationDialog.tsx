@@ -11,9 +11,18 @@ type CalibrationDialogProps = {
   isSaving: boolean
   onValidate: (resolutionDpi: number) => void
   onCancel: () => void
+  /** Repli des images sans réglette dans le cadre : absent, la saisie clavier n'est pas proposée. */
+  onManualEntry?: () => void
 }
 
-export default function CalibrationDialog({ from, to, isSaving, onValidate, onCancel }: CalibrationDialogProps) {
+export default function CalibrationDialog({
+  from,
+  to,
+  isSaving,
+  onValidate,
+  onCancel,
+  onManualEntry,
+}: CalibrationDialogProps) {
   const { t } = useTranslation()
   const [rawDistance, setRawDistance] = useState('')
 
@@ -52,7 +61,16 @@ export default function CalibrationDialog({ from, to, isSaving, onValidate, onCa
         )}
       </Field>
 
-      <div className="flex justify-end gap-2">
+      <div className="flex items-center justify-end gap-2">
+        {onManualEntry && (
+          <button
+            type="button"
+            onClick={onManualEntry}
+            className="mr-auto text-xs text-grey-medium-1 underline hover:text-grey-dark"
+          >
+            {t('biometricImage.calibration.manualEntry')}
+          </button>
+        )}
         <Button type="button" variant="outline" size="small" onClick={onCancel}>
           {t('common.actions.cancel')}
         </Button>
