@@ -49,6 +49,11 @@
       "UNDER_REVIEW": "En vérification",
       "CLOSED": "Clôturée"
     },
+    "workStatus": {
+      "start": "Mettre en cours",
+      "label": "Statut du dossier",
+      "changed": "Statut du dossier mis à jour"
+    },
     "list": {
       "title": "Vos affaires",
       "subtitle": "Créez et retrouvez toutes vos affaires ici.",

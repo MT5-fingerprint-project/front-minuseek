@@ -24,6 +24,7 @@ import CaseRecipientSummary from '@/features/investigation-case/components/CaseR
 import WithdrawnPiecesSection from '@/features/investigation-case/components/WithdrawnPiecesSection'
 import CaseVerificationsSection from '@/features/investigation-case/components/CaseVerificationsSection'
 import CaseClosureActions from '@/features/investigation-case/components/CaseClosureActions'
+import CaseWorkStatusControl from '@/features/investigation-case/components/CaseWorkStatusControl'
 import ClosedCaseBanner from '@/features/investigation-case/components/ClosedCaseBanner'
 import DeclareExpertiseDialog from '@/features/investigation-case/components/DeclareExpertiseDialog'
 import ExpertiseBanner from '@/features/investigation-case/components/ExpertiseBanner'
@@ -103,6 +104,7 @@ export default function InvestigationCaseDetailsPage() {
             {t('investigationCase.details.title', { caseNumber: investigationCase.caseNumber })}
           </H1>
           <CaseStatusBadge status={investigationCase.status} />
+          <CaseWorkStatusControl investigationCase={investigationCase} />
           <CaseClosureActions investigationCase={investigationCase} />
           {isCaseOperator && !investigationCase.expertise && (
             <Button variant="outline" size="small" onClick={() => setIsDeclaringExpertise(true)}>
