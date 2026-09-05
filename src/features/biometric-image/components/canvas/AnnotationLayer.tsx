@@ -49,6 +49,11 @@ type AnnotationLayerProps = {
   onPairMiss?: () => void
   /** Passe la suppression par la confirmation du canevas quand la minutie est appariée. */
   onRequestMinutiaDeletion?: RequestMinutiaDeletion
+  /** Mode lecture des concordances (L7-3) : ne montre que les minuties appariées. */
+  isConcordanceMode?: boolean
+  revealedMinutiaIds?: Set<string>
+  activeMinutiaId?: string | null
+  registerMinutiaNode?: (id: string, node: Konva.Group | null) => void
 }
 
 /** Walk up the Konva tree to find whether the clicked node belongs to an existing annotation. */
@@ -82,6 +87,10 @@ export default function AnnotationLayer({
   onMinutiaClick,
   onPairMiss,
   onRequestMinutiaDeletion,
+  isConcordanceMode = false,
+  revealedMinutiaIds,
+  activeMinutiaId = null,
+  registerMinutiaNode,
 }: AnnotationLayerProps) {
   const { t } = useTranslation()
   const layerRef = useRef<Konva.Layer>(null)
@@ -278,6 +287,10 @@ export default function AnnotationLayer({
             pairNumber={minutiaNumbers?.get(layer.id) ?? null}
             isArmed={layer.id === armedMinutiaId}
             onPairClick={() => onMinutiaClick?.(layer.id)}
+            isConcordanceMode={isConcordanceMode}
+            isRevealed={revealedMinutiaIds?.has(layer.id) ?? false}
+            isEntering={layer.id === activeMinutiaId}
+            onNodeRef={(node) => registerMinutiaNode?.(layer.id, node)}
           />
         )
 
@@ -304,7 +317,9 @@ export default function AnnotationLayer({
     <KonvaLayer ref={layerRef} listening={isInteractive}>
       {imageLayout && (
         <Group ref={groupRef} {...imageLayout} onClick={() => select(null)}>
-          {annotations.filter((a) => a.isVisible).map(renderShape)}
+          {annotations
+            .filter((a) => a.isVisible && (!isConcordanceMode || minutiaNumbers?.has(a.id)))
+            .map(renderShape)}
 
           {draft && (
             <Line

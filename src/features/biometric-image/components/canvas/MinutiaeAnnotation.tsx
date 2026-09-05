@@ -1,9 +1,14 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Circle, Line, Group, Text } from 'react-konva'
+import Konva from 'konva'
 import type { Layer } from '@/features/biometric-image/types/layer'
 import { minutiaTypeOf, type MinutiaSettings } from '@/features/biometric-image/lib/minutiae'
 import { edgeAndTip, angleFromOffset } from './annotationUtils'
+
+/** Pulse d'échelle joué par Konva.Tween — tourne hors du cycle de rendu React. */
+const ENTER_TWEEN_DURATION_S = 0.35
+const ENTER_TWEEN_PEAK_SCALE = 1.4
 
 const HANDLE_RADIUS = 4
 const HANDLE_STROKE_WIDTH = 1.5
@@ -26,6 +31,12 @@ type MinutiaeAnnotationProps = {
   pairNumber?: number | null
   isArmed?: boolean
   onPairClick?: () => void
+  /** Mode lecture des concordances (L7-3) : plus d'édition, minuties non révélées estompées. */
+  isConcordanceMode?: boolean
+  isRevealed?: boolean
+  isEntering?: boolean
+  /** Remonte le nœud Konva de la minutie pour le calcul de sa position écran. */
+  onNodeRef?: (node: Konva.Group | null) => void
 }
 
 export default function MinutiaeAnnotation({
@@ -41,6 +52,10 @@ export default function MinutiaeAnnotation({
   pairNumber = null,
   isArmed = false,
   onPairClick,
+  isConcordanceMode = false,
+  isRevealed = false,
+  isEntering = false,
+  onNodeRef,
 }: MinutiaeAnnotationProps) {
   const { t } = useTranslation()
   const settings = layer.settings as MinutiaSettings
@@ -48,6 +63,31 @@ export default function MinutiaeAnnotation({
   // Track handle drag with state so it's safe to read during render
   const [draggingHandle, setDraggingHandle] = useState(false)
   const isDraggingHandle = useRef(false)
+  const groupRef = useRef<Konva.Group>(null)
+
+  // Pulse d'échelle à l'apparition d'une paire : Konva.Tween tourne dans la
+  // boucle interne de Konva, sans passer par un re-render React par frame.
+  useEffect(() => {
+    if (!isEntering) return
+    const node = groupRef.current
+    if (!node) return
+    node.scale({ x: 1, y: 1 })
+    const tween = new Konva.Tween({
+      node,
+      duration: ENTER_TWEEN_DURATION_S,
+      scaleX: ENTER_TWEEN_PEAK_SCALE,
+      scaleY: ENTER_TWEEN_PEAK_SCALE,
+      easing: Konva.Easings.EaseOut,
+      onFinish: () => {
+        tween.reverse()
+      },
+    })
+    tween.play()
+    return () => {
+      tween.destroy()
+      node.scale({ x: 1, y: 1 })
+    }
+  }, [isEntering])
 
   const hasDirection = settings.type === 'minutia'
   const angleDeg = liveAngleDeg ?? settings.angle ?? 0
@@ -64,14 +104,22 @@ export default function MinutiaeAnnotation({
   const labelFontSize = Math.max(onScreen(LABEL_MIN_FONT_SIZE), radius * 1.3)
   const badgeRadius = Math.max(onScreen(BADGE_RADIUS_MIN), radius * 0.8)
 
+  const isDimmed = isConcordanceMode && !isRevealed && !isEntering
+
   return (
     <Group
+      ref={(node) => {
+        groupRef.current = node
+        onNodeRef?.(node)
+      }}
       name="annotation"
       x={settings.x}
       y={settings.y}
-      draggable={!draggingHandle && !isPairingMode}
+      opacity={isDimmed ? 0.15 : 1}
+      draggable={!draggingHandle && !isPairingMode && !isConcordanceMode}
       onClick={(e) => {
         e.cancelBubble = true
+        if (isConcordanceMode) return
         if (isPairingMode) onPairClick?.()
         else onSelect()
       }}
@@ -102,7 +150,7 @@ export default function MinutiaeAnnotation({
         />
       )}
 
-      {!isPairingMode && (
+      {!isPairingMode && !isConcordanceMode && (
         <Group scaleX={mirrorScaleX} rotation={-rotationDeg} listening={false}>
           <Text
             text={typeLabel}
@@ -135,7 +183,7 @@ export default function MinutiaeAnnotation({
       )}
 
       {/* Rotation handle — visible when selected */}
-      {hasDirection && isSelected && !isPairingMode && (
+      {hasDirection && isSelected && !isPairingMode && !isConcordanceMode && (
         <Circle
           x={tip.x}
           y={tip.y}

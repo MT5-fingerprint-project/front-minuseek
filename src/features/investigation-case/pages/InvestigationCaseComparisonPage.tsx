@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
@@ -17,7 +17,10 @@ import BlindVerificationBanner from '@/features/investigation-case/components/co
 import VerificationPanel from '@/features/investigation-case/components/comparison/VerificationPanel'
 import { useMissionOnCase } from '@/features/investigation-case/hooks/useMissionOnCase'
 import { useMinutiaPairs } from '@/features/investigation-case/hooks/useMinutiaPairs'
+import { useConcordancePlayback } from '@/features/investigation-case/hooks/useConcordancePlayback'
 import { minutiaPairKeys } from '@/features/investigation-case/hooks/minutiaPairKeys'
+import ConcordancePlaybackControls from '@/features/investigation-case/components/comparison/ConcordancePlaybackControls'
+import ConcordanceLinkOverlay from '@/features/investigation-case/components/comparison/ConcordanceLinkOverlay'
 import { DETACHED_REFERENCE_TRACE_CHANGED } from '@/features/investigation-case/types/detachedReference'
 import { isInProgress } from '@/features/shared/types/verification'
 import { useCaseIsClosed } from '@/features/investigation-case/hooks/useCaseIsClosed'
@@ -89,6 +92,26 @@ export default function InvestigationCaseComparisonPage() {
   const minutiaPairs = useMinutiaPairs(traceId, referenceId)
   const canPair = !!traceId && !!referenceId
 
+  // Mode démonstration des concordances (L7-3) : lecture pair par pair, état UI
+  // éphémère, rien n'est enregistré.
+  const sortedPairs = useMemo(
+    () => [...minutiaPairs.pairs].sort((a, b) => a.number - b.number),
+    [minutiaPairs.pairs]
+  )
+  const playback = useConcordancePlayback(sortedPairs.length)
+  const isConcordanceMode = playback.status !== 'idle'
+  const activePair = playback.activeIndex != null ? (sortedPairs[playback.activeIndex] ?? null) : null
+  // `activePair` fait toujours partie de `revealedPairs` (revealedCount = activeIndex + 1).
+  const revealedPairs = useMemo(() => sortedPairs.slice(0, playback.revealedCount), [sortedPairs, playback.revealedCount])
+  const revealedTraceIds = useMemo(
+    () => new Set(revealedPairs.map((pair) => pair.traceMinutiaLayerId)),
+    [revealedPairs]
+  )
+  const revealedReferenceIds = useMemo(
+    () => new Set(revealedPairs.map((pair) => pair.referenceMinutiaLayerId)),
+    [revealedPairs]
+  )
+
   // Changer de trace ou d'empreinte périme la sélection en cours d'appariement.
   // Ajustée pendant le rendu (pas dans un effet) : évite un rendu supplémentaire.
   const [armedFor, setArmedFor] = useState<string>()
@@ -100,10 +123,17 @@ export default function InvestigationCaseComparisonPage() {
   }
 
   const togglePairingMode = () => {
-    if (!canPair) return
+    if (!canPair || isConcordanceMode) return
     setPairingMode((active) => !active)
     setArmed(null)
     setPendingRequalification(null)
+  }
+
+  const startConcordance = () => {
+    if (isPairingMode || sortedPairs.length === 0) return
+    setPairingMode(false)
+    setArmed(null)
+    playback.play()
   }
 
   // Seule la page a les deux listes de calques : la règle de type se joue donc ici, avant l'appel.
@@ -194,14 +224,20 @@ export default function InvestigationCaseComparisonPage() {
 
   const isReferenceDetached = referenceWindow.isOpen
 
+  // Le trait de liaison ne peut pas traverser deux fenêtres du système
+  // d'exploitation : détacher l'empreinte de référence coupe la démonstration.
+  const stopPlayback = playback.stop
+  useEffect(() => {
+    if (isReferenceDetached && isConcordanceMode) stopPlayback()
+  }, [isReferenceDetached, isConcordanceMode, stopPlayback])
+
   // La popup est une instance d'app à part : la trace choisie ici ne lui parvient
   // que par l'adresse d'ouverture, puis par message. Sans elle, elle ignore les
   // appariements et laisserait supprimer une minutie appariée sans un mot.
   const detachedReferenceUrl =
     slug && id
-      ? `${window.location.origin}/${slug}/affaires/${id}/comparaison/empreintes${
-          traceId ? `?trace=${traceId}` : ''
-        }`
+      ? `${window.location.origin}/${slug}/affaires/${id}/comparaison/empreintes${traceId ? `?trace=${traceId}` : ''
+      }`
       : null
 
   const toggleDetachReference = () => {
@@ -262,25 +298,57 @@ export default function InvestigationCaseComparisonPage() {
           minutiaNumbers={minutiaPairs.numberByMinutiaId}
           onMinutiaClick={(minutiaId) => handleMinutiaClick('trace', minutiaId)}
           onPairMiss={handlePairMiss}
+          isConcordanceMode={isConcordanceMode}
+          revealedMinutiaIds={revealedTraceIds}
+          activeMinutiaId={isConcordanceMode ? (activePair?.traceMinutiaLayerId ?? null) : null}
         />
         <ResizableHandle withHandle className="w-2 bg-transparent">
           {/* Ancré sur le séparateur → suit le drag ; posé vers le bas. */}
           <div
-            className="pointer-events-auto absolute bottom-2 left-1/2 z-20 flex flex-col -translate-x-1/2 -translate-y-full items-center gap-4"
+            className="pointer-events-auto absolute bottom-2 left-1/2 z-20 flex flex-col -translate-x-1/2 -translate-y-full items-center gap-3"
             onMouseDown={(e) => e.stopPropagation()}
             data-tour="hit-match"
           >
-            {!isCaseClosed && mission === undefined && (
-              <>
-                <HitButton isHit={isHit} disabled={isHitDisabled} onClick={onToggleHit} />
-                <PairingControls
-                  isActive={isPairingMode}
-                  disabled={!canPair}
-                  pairCount={minutiaPairs.pairs.length}
-                  onToggle={togglePairingMode}
+            {mission === undefined &&
+              (isConcordanceMode ? (
+                <ConcordancePlaybackControls
+                  status={playback.status}
+                  speed={playback.speed}
+                  revealedCount={playback.revealedCount}
+                  pairCount={sortedPairs.length}
+                  onPlay={startConcordance}
+                  onToggle={playback.toggle}
+                  onSpeedChange={playback.setSpeed}
+                  onStop={playback.stop}
                 />
-              </>
-            )}
+              ) : (
+                <>
+                  {!isCaseClosed && (
+                    <>
+                      <HitButton isHit={isHit} disabled={isHitDisabled} onClick={onToggleHit} />
+                      <PairingControls
+                        isActive={isPairingMode}
+                        disabled={!canPair}
+                        pairCount={minutiaPairs.pairs.length}
+                        onToggle={togglePairingMode}
+                      />
+                    </>
+                  )}
+                  <ConcordancePlaybackControls
+                    status="idle"
+                    speed={playback.speed}
+                    revealedCount={0}
+                    pairCount={sortedPairs.length}
+                    disabledReason={
+                      sortedPairs.length === 0 ? 'noPairs' : isPairingMode ? 'pairingActive' : null
+                    }
+                    onPlay={startConcordance}
+                    onToggle={playback.toggle}
+                    onSpeedChange={playback.setSpeed}
+                    onStop={playback.stop}
+                  />
+                </>
+              ))}
           </div>
         </ResizableHandle>
         <ComparisonWindow
@@ -298,8 +366,20 @@ export default function InvestigationCaseComparisonPage() {
           minutiaNumbers={minutiaPairs.numberByMinutiaId}
           onMinutiaClick={(minutiaId) => handleMinutiaClick('reference', minutiaId)}
           onPairMiss={handlePairMiss}
+          isConcordanceMode={isConcordanceMode}
+          revealedMinutiaIds={revealedReferenceIds}
+          activeMinutiaId={isConcordanceMode ? (activePair?.referenceMinutiaLayerId ?? null) : null}
         />
       </ResizablePanelGroup>
+      <ConcordanceLinkOverlay
+        isActive={isConcordanceMode}
+        pairs={revealedPairs}
+        activePairId={activePair?.id ?? null}
+        getTracePosition={(minutiaId) => trace.concordanceRef.current?.getMinutiaScreenPosition(minutiaId) ?? null}
+        getReferencePosition={(minutiaId) =>
+          reference.concordanceRef.current?.getMinutiaScreenPosition(minutiaId) ?? null
+        }
+      />
       {pendingRequalification && (
         <PairRequalificationDialog
           sideToQualify={pendingRequalification.sideToQualify}

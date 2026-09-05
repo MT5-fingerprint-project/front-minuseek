@@ -60,6 +60,10 @@ export type ComparisonWorkbenchProps = {
   minutiaNumbers?: Map<string, number>
   onMinutiaClick?: (minutiaId: string) => void
   onPairMiss?: () => void
+  /** Mode lecture des concordances (L7-3). */
+  isConcordanceMode?: boolean
+  revealedMinutiaIds?: Set<string>
+  activeMinutiaId?: string | null
 }
 
 /**
@@ -87,6 +91,9 @@ export default function ComparisonWorkbench({
   minutiaNumbers,
   onMinutiaClick,
   onPairMiss,
+  isConcordanceMode = false,
+  revealedMinutiaIds,
+  activeMinutiaId = null,
 }: ComparisonWorkbenchProps) {
   const { t } = useTranslation()
   const keys = TITLES[type]
@@ -238,6 +245,10 @@ export default function ComparisonWorkbench({
             minutiaNumbers={minutiaNumbers}
             onMinutiaClick={onMinutiaClick}
             onPairMiss={onPairMiss}
+            concordanceHandleRef={w.concordanceRef}
+            isConcordanceMode={isConcordanceMode}
+            revealedMinutiaIds={revealedMinutiaIds}
+            activeMinutiaId={activeMinutiaId}
           />
           {isImageSizeDialogOpen && w.sourceGeometry && (
             <ImageSizeDialog

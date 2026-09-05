@@ -1,6 +1,10 @@
 import { useRef, useState } from 'react'
 import { usePanelRef } from 'react-resizable-panels'
-import type { CanvasZoomHandle, ExportHandle } from '@/features/biometric-image/components/canvas/BiometricImageCanvas'
+import type {
+  CanvasZoomHandle,
+  ConcordanceHandle,
+  ExportHandle,
+} from '@/features/biometric-image/components/canvas/BiometricImageCanvas'
 import type { SourceGeometry } from '@/features/biometric-image/components/canvas/DraggableImage'
 import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
 
@@ -10,6 +14,7 @@ export function useComparisonWindow() {
   const panelRef = usePanelRef()
   const zoomRef = useRef<CanvasZoomHandle>(null)
   const exportRef = useRef<ExportHandle>(null)
+  const concordanceRef = useRef<ConcordanceHandle>(null)
 
   const [isCollapsed, setCollapsed] = useState(false)
   const [isFilesVisible, setFilesVisible] = useState(true)
@@ -32,6 +37,7 @@ export function useComparisonWindow() {
     panelRef,
     zoomRef,
     exportRef,
+    concordanceRef,
     isCollapsed,
     syncCollapsed,
     isFilesVisible,
