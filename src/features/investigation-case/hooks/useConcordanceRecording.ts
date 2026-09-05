@@ -46,10 +46,16 @@ export function useConcordanceRecording() {
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
   const originRef = useRef({ x: 0, y: 0 })
   const paramsRef = useRef<StartParams | null>(null)
-  const linkStateRef = useRef<{ pairs: MinutiaPair[]; activePairId: string | null; counterLabel: string }>({
+  const linkStateRef = useRef<{
+    pairs: MinutiaPair[]
+    activePairId: string | null
+    counterLabel: string
+    activeTypeLabel: string
+  }>({
     pairs: [],
     activePairId: null,
     counterLabel: '',
+    activeTypeLabel: '',
   })
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const recorderRef = useRef<MediaRecorder | null>(null)
@@ -58,8 +64,13 @@ export function useConcordanceRecording() {
 
   const canRecord = isVideoRecordingSupported()
 
-  const setLinkState = (pairs: MinutiaPair[], activePairId: string | null, counterLabel: string) => {
-    linkStateRef.current = { pairs, activePairId, counterLabel }
+  const setLinkState = (
+    pairs: MinutiaPair[],
+    activePairId: string | null,
+    counterLabel: string,
+    activeTypeLabel: string
+  ) => {
+    linkStateRef.current = { pairs, activePairId, counterLabel, activeTypeLabel }
   }
 
   const drawTick = () => {
@@ -69,7 +80,7 @@ export function useConcordanceRecording() {
     const traceFrame = params.trace.current?.captureFrame()
     const referenceFrame = params.reference.current?.captureFrame()
     if (!traceFrame || !referenceFrame) return
-    const { pairs, activePairId, counterLabel } = linkStateRef.current
+    const { pairs, activePairId, counterLabel, activeTypeLabel } = linkStateRef.current
     drawCompositeFrame(ctx, {
       origin: originRef.current,
       pixelRatio: VIDEO_FRAME_PIXEL_RATIO,
@@ -78,6 +89,7 @@ export function useConcordanceRecording() {
       traceCaption: params.traceCaption,
       referenceCaption: params.referenceCaption,
       counterLabel,
+      activeTypeLabel,
       pairs,
       activePairId,
       getTracePosition: params.getTracePosition,

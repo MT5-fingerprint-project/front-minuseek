@@ -1,7 +1,8 @@
 {
   "common": {
     "actions": {
-      "cancel": "Annuler"
+      "cancel": "Annuler",
+      "closeNotification": "Fermer la notification"
     },
     "errors": {
       "generic": "Une erreur est survenue",

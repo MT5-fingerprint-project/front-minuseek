@@ -182,7 +182,8 @@ export default function InvestigationCaseComparisonPage() {
     recording.setLinkState(
       revealedPairs,
       activePair?.id ?? null,
-      t('investigationCase.comparison.concordanceCounter', { current: playback.revealedCount, total: sortedPairs.length })
+      t('investigationCase.comparison.concordanceCounter', { current: playback.revealedCount, total: sortedPairs.length }),
+      activePair ? t(`biometricImage.minutia.types.${activePair.minutiaType}`) : ''
     )
   })
 

@@ -1,5 +1,12 @@
 import type { MinutiaPair } from '@/features/investigation-case/types/minutiaPair'
-import { LINK_COLOR, LINK_STROKE_WIDTH } from '@/features/investigation-case/lib/concordanceLinkStyle'
+import {
+  LINK_COLOR,
+  LINK_LABEL_FONT_SIZE,
+  LINK_LABEL_HALO_COLOR,
+  LINK_LABEL_HALO_WIDTH,
+  LINK_LABEL_OFFSET_Y,
+  LINK_STROKE_WIDTH,
+} from '@/features/investigation-case/lib/concordanceLinkStyle'
 import { VIDEO_FOOTER_HEIGHT, VIDEO_HEADER_HEIGHT } from '@/features/investigation-case/lib/exportConcordanceVideo'
 
 export type ScreenPosition = { x: number; y: number }
@@ -133,6 +140,8 @@ type DrawCompositeFrameParams = {
   traceCaption: string
   referenceCaption: string
   counterLabel: string
+  /** Type de la minutie de la paire montrée, écrit au milieu du trait. */
+  activeTypeLabel: string
   pairs: MinutiaPair[]
   activePairId: string | null
   getTracePosition: (minutiaId: string) => ScreenPosition | null
@@ -152,6 +161,7 @@ export function drawCompositeFrame(ctx: CanvasRenderingContext2D, params: DrawCo
     traceCaption,
     referenceCaption,
     counterLabel,
+    activeTypeLabel,
     pairs,
     activePairId,
     getTracePosition,
@@ -180,11 +190,30 @@ export function drawCompositeFrame(ctx: CanvasRenderingContext2D, params: DrawCo
   const from = getTracePosition(shown.traceMinutiaLayerId)
   const to = getReferencePosition(shown.referenceMinutiaLayerId)
   if (!from || !to) return
+  const fromX = (from.x - origin.x) * pixelRatio
+  const fromY = (from.y - origin.y) * pixelRatio + headerHeight
+  const toX = (to.x - origin.x) * pixelRatio
+  const toY = (to.y - origin.y) * pixelRatio + headerHeight
   ctx.beginPath()
-  ctx.moveTo((from.x - origin.x) * pixelRatio, (from.y - origin.y) * pixelRatio + headerHeight)
-  ctx.lineTo((to.x - origin.x) * pixelRatio, (to.y - origin.y) * pixelRatio + headerHeight)
+  ctx.moveTo(fromX, fromY)
+  ctx.lineTo(toX, toY)
   ctx.strokeStyle = LINK_COLOR
   ctx.lineWidth = LINK_STROKE_WIDTH * pixelRatio
   ctx.lineCap = 'round'
   ctx.stroke()
+
+  // Même halo que l'overlay SVG à l'écran (`paint-order: stroke`) : le contour
+  // blanc est tracé avant le remplissage, sinon il rongerait les lettres.
+  if (activeTypeLabel.length === 0) return
+  ctx.font = `600 ${LINK_LABEL_FONT_SIZE * pixelRatio}px system-ui, sans-serif`
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.lineJoin = 'round'
+  const labelX = (fromX + toX) / 2
+  const labelY = (fromY + toY) / 2 - LINK_LABEL_OFFSET_Y * pixelRatio
+  ctx.strokeStyle = LINK_LABEL_HALO_COLOR
+  ctx.lineWidth = LINK_LABEL_HALO_WIDTH * pixelRatio
+  ctx.strokeText(activeTypeLabel, labelX, labelY)
+  ctx.fillStyle = LINK_COLOR
+  ctx.fillText(activeTypeLabel, labelX, labelY)
 }
