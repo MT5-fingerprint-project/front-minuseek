@@ -9,8 +9,9 @@ export const LINK_STROKE_WIDTH = 4
 /** Type de la minutie appariée, écrit au milieu du trait. Le halo blanc le garde
  * lisible aussi bien sur une crête sombre que sur un fond de poudre clair, sans
  * poser un cartouche opaque qui masquerait le dessin. */
-export const LINK_LABEL_FONT_SIZE = 14
+export const LINK_LABEL_FONT_SIZE = 17
 export const LINK_LABEL_HALO_COLOR = '#ffffff'
-export const LINK_LABEL_HALO_WIDTH = 4
-/** Décalage au-dessus du trait, pour que l'étiquette ne le chevauche pas. */
-export const LINK_LABEL_OFFSET_Y = 11
+export const LINK_LABEL_HALO_WIDTH = 5
+/** Décalage au-dessus du trait, pour que l'étiquette ne le chevauche pas. Il suit
+ * la taille du texte, sinon une police plus grande viendrait mordre le trait. */
+export const LINK_LABEL_OFFSET_Y = 13

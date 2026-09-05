@@ -716,7 +716,9 @@
       "deleteTitle": "Supprimer une minutie appariée ?",
       "deleteDescription": "Cette minutie forme la paire {{number}} : la supprimer défera aussi la paire.",
       "deleteConfirm": "Supprimer la minutie",
-      "typeLockedByPair": "Cette minutie est appariée : défaites la paire avant d'en changer le type"
+      "typeChangeTitle": "Requalifier une minutie appariée ?",
+      "typeChangeDescription": "Cette minutie forme la paire {{number}} : la passer en {{type}} changera aussi le type de la minutie correspondante sur l'autre image.",
+      "typeChangeConfirm": "Requalifier la paire"
     },
     "toolbar": {
       "modes": {
