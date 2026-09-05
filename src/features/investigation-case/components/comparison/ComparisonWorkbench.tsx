@@ -168,14 +168,29 @@ export default function ComparisonWorkbench({
         {w.selectedTrace && (
           <button
             type="button"
-            onClick={() => setIsImageSizeDialogOpen((open) => !open)}
-            title={t('biometricImage.imageSize.title')}
-            className="flex items-center gap-1 rounded-full bg-grey-light-1 px-2 py-1 text-xs font-medium text-grey-medium-2 hover:text-grey-dark"
+            // Une pièce sans échelle se mesure sur sa règle photographiée : la saisie
+            // au clavier ne s'ouvre qu'une fois une résolution établie, pour la corriger.
+            onClick={() =>
+              resolutionDpi === null
+                ? w.rulerRef.current?.arm()
+                : setIsImageSizeDialogOpen((open) => !open)
+            }
+            title={t(
+              resolutionDpi === null
+                ? 'biometricImage.imageSize.calibrateWithRuler'
+                : 'biometricImage.imageSize.title',
+            )}
+            className={cn(
+              'flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium hover:text-grey-dark',
+              resolutionDpi === null
+                ? 'bg-orange-light text-orange-medium hover:text-orange-medium'
+                : 'bg-grey-light-1 text-grey-medium-2',
+            )}
           >
             {resolutionDpi !== null
               ? t('biometricImage.imageSize.chip', { value: Math.round(pxPerCmFromResolutionDpi(resolutionDpi)) })
               : t('biometricImage.imageSize.chipUncalibrated')}
-            <Icon name="pen" size={14} color="currentColor" />
+            <Icon name={resolutionDpi === null ? 'ruler' : 'pen'} size={14} color="currentColor" />
           </button>
         )}
       </div>
@@ -240,6 +255,7 @@ export default function ComparisonWorkbench({
             onScaleChange={w.handleScaleChange}
             onSourceGeometryChange={w.setSourceGeometry}
             exportHandleRef={w.exportRef}
+            rulerHandleRef={w.rulerRef}
             isPairingMode={isPairingMode}
             armedMinutiaId={armedMinutiaId}
             minutiaNumbers={minutiaNumbers}

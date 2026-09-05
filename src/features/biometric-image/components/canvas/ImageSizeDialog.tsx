@@ -13,8 +13,6 @@ import {
   resolutionDpiFromPxPerCm,
 } from '@/features/biometric-image/lib/imageSize'
 
-const DEFAULT_PX_PER_CM = pxPerCmFromResolutionDpi(300) // repli Photoshop-esque quand l'image n'est pas calibrée
-
 type SizeUnit = 'px' | 'cm'
 
 type ImageSizeDialogProps = {
@@ -38,17 +36,25 @@ export default function ImageSizeDialog({
   onClose,
 }: ImageSizeDialogProps) {
   const { t } = useTranslation()
-  const initialPxPerCm = resolutionDpi !== null ? pxPerCmFromResolutionDpi(resolutionDpi) : DEFAULT_PX_PER_CM
+  // Une image non calibrée ouvre ce dialogue à vide : proposer une valeur par défaut
+  // reviendrait à faire signer une résolution inventée, que le moteur de comparaison
+  // et la planche à l'échelle 1 du rapport prendraient ensuite pour une mesure.
+  const initialPxPerCm = resolutionDpi === null ? null : pxPerCmFromResolutionDpi(resolutionDpi)
   const [unit, setUnit] = useState<SizeUnit>('cm')
 
-  const [resolutionText, setResolutionText] = useState(() => initialPxPerCm.toFixed(1))
-  const [widthText, setWidthText] = useState(() => formatCm(physicalSizeCm(sourceWidth, initialPxPerCm)))
-  const [heightText, setHeightText] = useState(() => formatCm(physicalSizeCm(sourceHeight, initialPxPerCm)))
+  const [resolutionText, setResolutionText] = useState(() => initialPxPerCm?.toFixed(1) ?? '')
+  const [widthText, setWidthText] = useState(() =>
+    formatCm(initialPxPerCm === null ? null : physicalSizeCm(sourceWidth, initialPxPerCm)),
+  )
+  const [heightText, setHeightText] = useState(() =>
+    formatCm(initialPxPerCm === null ? null : physicalSizeCm(sourceHeight, initialPxPerCm)),
+  )
 
   const pxPerCm = Number(resolutionText)
-  const deducedDpi = resolutionDpiFromPxPerCm(pxPerCm)
-  const isOutOfRange = deducedDpi < MIN_RESOLUTION_DPI || deducedDpi > MAX_RESOLUTION_DPI
-  const isInvalid = !Number.isFinite(pxPerCm) || pxPerCm <= 0 || isOutOfRange
+  const hasResolution = resolutionText.trim() !== '' && Number.isFinite(pxPerCm) && pxPerCm > 0
+  const deducedDpi = hasResolution ? resolutionDpiFromPxPerCm(pxPerCm) : null
+  const isOutOfRange = deducedDpi !== null && (deducedDpi < MIN_RESOLUTION_DPI || deducedDpi > MAX_RESOLUTION_DPI)
+  const isInvalid = !hasResolution || isOutOfRange
 
   const applyResolution = (next: number) => {
     setResolutionText(next.toFixed(1))
@@ -83,7 +89,15 @@ export default function ImageSizeDialog({
     }
   }
 
-  const handleReset = () => applyResolution(initialPxPerCm)
+  const handleReset = () => {
+    if (initialPxPerCm === null) {
+      setResolutionText('')
+      setWidthText('')
+      setHeightText('')
+      return
+    }
+    applyResolution(initialPxPerCm)
+  }
 
   return (
     <div className="absolute bottom-3 left-1/2 z-20 w-80 -translate-x-1/2 rounded-md bg-white p-4 shadow-lg">
@@ -161,7 +175,7 @@ export default function ImageSizeDialog({
               type="number"
               min={0}
               step="any"
-              aria-invalid={isInvalid}
+              aria-invalid={isOutOfRange}
               value={resolutionText}
               onChange={(e) => handleResolutionChange(e.target.value)}
               className="h-8 text-sm"
@@ -179,7 +193,7 @@ export default function ImageSizeDialog({
               type="number"
               min={0}
               step="any"
-              aria-invalid={isInvalid}
+              aria-invalid={isOutOfRange}
               value={resolutionText}
               onChange={(e) => handleResolutionChange(e.target.value)}
               className="h-8 text-sm"
@@ -194,7 +208,7 @@ export default function ImageSizeDialog({
         </span>
       </div>
 
-      {isOutOfRange && (
+      {deducedDpi !== null && isOutOfRange && (
         <FieldError className="mb-2">
           {t('biometricImage.imageSize.outOfRange', { value: Math.round(deducedDpi) })}
         </FieldError>
@@ -209,7 +223,7 @@ export default function ImageSizeDialog({
           variant="blue"
           size="small"
           disabled={isInvalid || isSaving}
-          onClick={() => onValidate(Math.round(deducedDpi * 100) / 100)}
+          onClick={() => deducedDpi !== null && onValidate(Math.round(deducedDpi * 100) / 100)}
         >
           <Icon name="check" size={16} color="currentColor" />
           {t('biometricImage.imageSize.validate')}

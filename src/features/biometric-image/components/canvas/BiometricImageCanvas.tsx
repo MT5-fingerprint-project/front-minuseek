@@ -48,6 +48,11 @@ export type ConcordanceHandle = {
   getMinutiaScreenPosition: (minutiaId: string) => { x: number; y: number } | null
 }
 
+/** Arme la règle depuis le pied de fenêtre, où la pastille annonce l'absence d'échelle. */
+export type RulerHandle = {
+  arm: () => void
+}
+
 type BiometricImageCanvasProps = {
   image: BiometricImage | undefined
   type: BiometricImageType
@@ -60,6 +65,7 @@ type BiometricImageCanvasProps = {
   onScaleChange?: (scale: number) => void
   onSourceGeometryChange?: (geometry: SourceGeometry | null) => void
   exportHandleRef?: React.RefObject<ExportHandle | null>
+  rulerHandleRef?: React.RefObject<RulerHandle | null>
   /** Mode démonstration (L7-2b) : appariement des minuties entre trace et empreinte. */
   isPairingMode?: boolean
   armedMinutiaId?: string | null
@@ -85,6 +91,7 @@ export default function BiometricImageCanvas({
   onScaleChange,
   onSourceGeometryChange,
   exportHandleRef,
+  rulerHandleRef,
   isPairingMode = false,
   armedMinutiaId = null,
   minutiaNumbers,
@@ -192,6 +199,13 @@ export default function BiometricImageCanvas({
     setIsRulerActive((prev) => !prev)
     setActiveTool(null)
   }
+
+  useImperativeHandle(rulerHandleRef, () => ({
+    arm: () => {
+      setIsRulerActive(true)
+      setActiveTool(null)
+    },
+  }))
 
   const handleValidateCalibration = (resolutionDpi: number) => {
     if (!image) return
