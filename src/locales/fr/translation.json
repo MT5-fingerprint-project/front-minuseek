@@ -740,7 +740,8 @@
       "outOfRange": "{{value}} points par pouce est hors de l'intervalle accepté (50 à 10 000)",
       "validate": "Calibrer",
       "success": "Image calibrée",
-      "error": "Le calibrage a échoué"
+      "error": "Le calibrage a échoué",
+      "uncalibratedBadge": "Non calibrée"
     },
     "scaleBar": {
       "label": "1 cm",
@@ -757,7 +758,8 @@
       "validate": "Valider",
       "outOfRange": "{{value}} points par pouce est hors de l'intervalle accepté (50 à 10 000)",
       "chip": "{{value}} px/cm",
-      "chipUncalibrated": "Non calibrée"
+      "chipUncalibrated": "Non calibrée",
+      "calibrateWithRuler": "Mesurer l'échelle sur la règle photographiée"
     },
     "withdraw": {
       "success": "Pièce retirée du dossier",
