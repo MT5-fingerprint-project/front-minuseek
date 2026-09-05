@@ -16,7 +16,6 @@ import {
   useReportRecipients,
 } from '@/features/investigation-case/hooks/useReportRecipients'
 import type { CaseRecipientInput } from '@/features/investigation-case/types/reportRecipient'
-import { CaseStatusBadge } from '@/features/investigation-case/components/CaseStatusBadge'
 import InvestigationCaseEditForm from '@/features/investigation-case/components/InvestigationCaseEditForm'
 import CaseJudicialHeaderSummary from '@/features/investigation-case/components/CaseJudicialHeaderSummary'
 import CaseRecipientForm from '@/features/investigation-case/components/CaseRecipientForm'
@@ -103,7 +102,6 @@ export default function InvestigationCaseDetailsPage() {
           <H1 className="text-2xl font-bold">
             {t('investigationCase.details.title', { caseNumber: investigationCase.caseNumber })}
           </H1>
-          <CaseStatusBadge status={investigationCase.status} />
           <CaseWorkStatusControl investigationCase={investigationCase} />
           <CaseClosureActions investigationCase={investigationCase} />
           {isCaseOperator && !investigationCase.expertise && (

@@ -744,6 +744,7 @@
       "resolutionDeduced": "Résolution déduite : {{value}} points par pouce",
       "outOfRange": "{{value}} points par pouce est hors de l'intervalle accepté (50 à 10 000)",
       "validate": "Calibrer",
+      "manualEntry": "Saisir la résolution",
       "success": "Image calibrée",
       "error": "Le calibrage a échoué",
       "uncalibratedBadge": "Non calibrée"

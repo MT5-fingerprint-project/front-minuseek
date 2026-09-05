@@ -107,7 +107,7 @@ export default function CaseClosureActions({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="outline" size="small">
+        <Button variant="destructive" size="small">
           {t('investigationCase.closure.close')}
         </Button>
       </AlertDialogTrigger>
