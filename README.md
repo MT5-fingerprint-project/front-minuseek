@@ -22,6 +22,20 @@ vers `API_PROXY_TARGET` (par défaut `http://app:3000`).
 
 > Aucune URL n'est codée en dur : tout passe par le `.env`.
 
+### Export vidéo de la démonstration des concordances
+
+Le bouton "Enregistrer la démonstration" du comparateur capture la lecture des concordances
+via `MediaRecorder`/`captureStream` (natifs du navigateur, aucune dépendance chargée côté
+client) et télécharge le fichier obtenu. Le format annoncé dans l'interface avant de cliquer
+dépend de ce que le navigateur sait produire : Chrome/Edge récents encodent nativement en
+**MP4/H.264**, sans rien charger de plus — c'est le format retenu en priorité. Sur un navigateur
+qui ne sait produire que du **WebM** (ex. Firefox), convertir un fichier destiné au dossier vers
+un format plus largement lisible avec `ffmpeg` :
+
+```bash
+ffmpeg -i demonstration.webm -c:v libx264 -pix_fmt yuv420p -c:a aac demonstration.mp4
+```
+
 ### Commandes Makefile
 
 | Commande         | Description                                            |

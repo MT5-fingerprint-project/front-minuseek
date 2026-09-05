@@ -129,6 +129,12 @@
       "concordanceSpeedTitle": "Vitesse de lecture",
       "concordanceSpeedOption": "Vitesse {{speed}}x",
       "concordanceCounter": "{{current}}/{{total}}",
+      "recordButtonTitle": "Enregistrer la démonstration en vidéo (format {{format}})",
+      "recordButtonDisabledUnsupported": "L'enregistrement vidéo n'est pas pris en charge par ce navigateur",
+      "recordingIndicatorLabel": "REC",
+      "recordingCancelButton": "Annuler l'enregistrement",
+      "recordingSavedToast": "Vidéo de la démonstration enregistrée (format {{format}})",
+      "recordingAbortedToast": "Enregistrement interrompu : aucun fichier n'a été produit",
       "tour": {
         "next": "Suivant",
         "previous": "Précédent",

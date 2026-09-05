@@ -5,6 +5,7 @@ import type {
   ConcordanceHandle,
   ExportHandle,
   RulerHandle,
+  VideoFrameHandle,
 } from '@/features/biometric-image/components/canvas/BiometricImageCanvas'
 import type { SourceGeometry } from '@/features/biometric-image/components/canvas/DraggableImage'
 import type { BiometricImage } from '@/features/biometric-image/types/biometricImage'
@@ -17,6 +18,7 @@ export function useComparisonWindow() {
   const exportRef = useRef<ExportHandle>(null)
   const concordanceRef = useRef<ConcordanceHandle>(null)
   const rulerRef = useRef<RulerHandle>(null)
+  const videoFrameRef = useRef<VideoFrameHandle>(null)
 
   const [isCollapsed, setCollapsed] = useState(false)
   const [isFilesVisible, setFilesVisible] = useState(true)
@@ -41,6 +43,7 @@ export function useComparisonWindow() {
     exportRef,
     concordanceRef,
     rulerRef,
+    videoFrameRef,
     isCollapsed,
     syncCollapsed,
     isFilesVisible,
