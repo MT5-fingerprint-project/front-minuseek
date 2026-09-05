@@ -43,6 +43,11 @@ export type ExportHandle = {
   exportToBlob: () => Promise<Blob>
 }
 
+/** Mode lecture des concordances (L7-3) : position écran courante d'une minutie. */
+export type ConcordanceHandle = {
+  getMinutiaScreenPosition: (minutiaId: string) => { x: number; y: number } | null
+}
+
 /** Arme la règle depuis le pied de fenêtre, où la pastille annonce l'absence d'échelle. */
 export type RulerHandle = {
   arm: () => void
@@ -67,6 +72,11 @@ type BiometricImageCanvasProps = {
   minutiaNumbers?: Map<string, number>
   onMinutiaClick?: (minutiaId: string) => void
   onPairMiss?: () => void
+  /** Mode lecture des concordances (L7-3). */
+  concordanceHandleRef?: React.RefObject<ConcordanceHandle | null>
+  isConcordanceMode?: boolean
+  revealedMinutiaIds?: Set<string>
+  activeMinutiaId?: string | null
 }
 
 export default function BiometricImageCanvas({
@@ -87,10 +97,15 @@ export default function BiometricImageCanvas({
   minutiaNumbers,
   onMinutiaClick,
   onPairMiss,
+  concordanceHandleRef,
+  isConcordanceMode = false,
+  revealedMinutiaIds,
+  activeMinutiaId = null,
 }: BiometricImageCanvasProps) {
   const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement>(null)
   const stageRef = useRef<Konva.Stage>(null)
+  const minutiaNodesRef = useRef(new Map<string, Konva.Group>())
   const size = useContainerSize(containerRef)
 
   const [measuredGeometry, setMeasuredGeometry] = useState<{ imageId: string; geometry: SourceGeometry } | null>(null)
@@ -216,6 +231,22 @@ export default function BiometricImageCanvas({
     },
   }))
 
+  const registerMinutiaNode = (id: string, node: Konva.Group | null) => {
+    if (node) minutiaNodesRef.current.set(id, node)
+    else minutiaNodesRef.current.delete(id)
+  }
+
+  useImperativeHandle(concordanceHandleRef, () => ({
+    getMinutiaScreenPosition: (minutiaId) => {
+      const node = minutiaNodesRef.current.get(minutiaId)
+      const container = containerRef.current
+      if (!node || !container) return null
+      const abs = node.getAbsolutePosition()
+      const rect = container.getBoundingClientRect()
+      return { x: rect.left + abs.x, y: rect.top + abs.y }
+    },
+  }))
+
   const handleSourceGeometryChange = (geometry: SourceGeometry) => {
     if (!imageId) return
     setMeasuredGeometry({ imageId, geometry })
@@ -296,6 +327,10 @@ export default function BiometricImageCanvas({
               onMinutiaClick={onMinutiaClick}
               onPairMiss={onPairMiss}
               onRequestMinutiaDeletion={minutiaDeletionGuard.requestDeletion}
+              isConcordanceMode={isConcordanceMode}
+              revealedMinutiaIds={revealedMinutiaIds}
+              activeMinutiaId={activeMinutiaId}
+              registerMinutiaNode={registerMinutiaNode}
             />
             <CalibrationLayer
               key={`${image.id}-${calibrationResetSignal}`}
@@ -328,7 +363,7 @@ export default function BiometricImageCanvas({
               onCancel={handleCancelCalibration}
             />
           )}
-          {isToolbarVisible && !isPairingMode && (
+          {isToolbarVisible && !isPairingMode && !isConcordanceMode && (
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
               <CanvasToolbar
                 type={type}

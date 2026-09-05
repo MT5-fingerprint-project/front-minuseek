@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { usePanelRef } from 'react-resizable-panels'
 import type {
   CanvasZoomHandle,
+  ConcordanceHandle,
   ExportHandle,
   RulerHandle,
 } from '@/features/biometric-image/components/canvas/BiometricImageCanvas'
@@ -14,6 +15,7 @@ export function useComparisonWindow() {
   const panelRef = usePanelRef()
   const zoomRef = useRef<CanvasZoomHandle>(null)
   const exportRef = useRef<ExportHandle>(null)
+  const concordanceRef = useRef<ConcordanceHandle>(null)
   const rulerRef = useRef<RulerHandle>(null)
 
   const [isCollapsed, setCollapsed] = useState(false)
@@ -37,6 +39,7 @@ export function useComparisonWindow() {
     panelRef,
     zoomRef,
     exportRef,
+    concordanceRef,
     rulerRef,
     isCollapsed,
     syncCollapsed,

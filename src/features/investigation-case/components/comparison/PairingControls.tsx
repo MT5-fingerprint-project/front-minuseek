@@ -29,21 +29,21 @@ export default function PairingControls({ isActive, disabled, pairCount, onToggl
         title={title}
         aria-pressed={isActive}
         className={cn(
-          'inline-flex items-center gap-1 rounded-full px-3 py-1 font-medium text-white shadow-sm ring-[5px] ring-white transition-colors',
+          'inline-flex items-center gap-1 rounded-full px-2 py-1 font-medium text-white shadow-sm ring-[3px] ring-white transition-colors',
           !disabled && !isActive && 'bg-grey-medium-2 hover:bg-grey-dark',
           !disabled && isActive && 'bg-blue-medium-1',
           disabled && 'cursor-not-allowed bg-grey-medium-1'
         )}
       >
-        <span className={cn('text-base leading-none', disabled && 'opacity-70')}>
+        <span className={cn('text-sm leading-none', disabled && 'opacity-70')}>
           {t('investigationCase.comparison.pairingLabel')}
         </span>
-        <Icon name="link" size={20} color="white" aria-hidden className={cn(disabled && 'opacity-70')} />
+        <Icon name="link" size={16} color="white" aria-hidden className={cn(disabled && 'opacity-70')} />
       </button>
       {isActive && (
         <span
           className={cn(
-            'rounded-full px-2 py-0.5 text-xs font-medium shadow-sm ring-2 ring-white',
+            'rounded-full px-1.5 py-0.5 text-[11px] font-medium shadow-sm ring-2 ring-white',
             pairCount >= REQUIRED_MINUTIAE ? 'bg-green-medium text-white' : 'bg-white text-grey-dark'
           )}
         >

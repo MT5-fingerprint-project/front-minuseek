@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { cn } from '@/features/shared/lib/utils'
 import { Icon } from '@/features/shared/icons'
 import type { IconName } from '@/features/shared/icons'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/features/shared/ui/tooltip'
 
 type NavItemProps = {
   link: string
@@ -12,7 +13,7 @@ type NavItemProps = {
 }
 
 export default function NavItem({ link, icon, label, isActive = false, isCollapsed = false }: NavItemProps) {
-  return (
+  const link_ = (
     <Link
       to={link}
       title={!isCollapsed ? label : undefined}
@@ -24,5 +25,14 @@ export default function NavItem({ link, icon, label, isActive = false, isCollaps
       <Icon name={icon} size={24} color="white" />
       {!isCollapsed && label}
     </Link>
+  )
+
+  if (!isCollapsed) return link_
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{link_}</TooltipTrigger>
+      <TooltipContent side="right">{label}</TooltipContent>
+    </Tooltip>
   )
 }
