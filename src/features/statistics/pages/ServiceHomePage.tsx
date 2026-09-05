@@ -1,11 +1,9 @@
 import { useState } from 'react'
-import { Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Icon } from '@/features/shared/icons'
 import { H1 } from '@/features/shared/ui/typography'
 import { Skeleton } from '@/features/shared/ui/skeleton'
 import AppHeader from '@/features/shared/components/AppHeader'
-import { useAuth } from '@/features/shared/auth/auth-context'
 import { useCurrentUser } from '@/features/shared/hooks/useCurrentUser'
 import { useServiceUsers } from '@/features/users/hooks/useServiceUsers'
 import { NO_SERVICE_USERS_FILTER } from '@/features/users/types/serviceUser'
@@ -25,10 +23,9 @@ const OPERATOR_CHOICES_LIMIT = 200
 
 export default function ServiceHomePage() {
   const { t } = useTranslation()
-  const { slug } = useAuth()
   const [selectedOperatorId, setSelectedOperatorId] = useState<string | null>(null)
 
-  const { data: currentUser, isPending: isCurrentUserPending } = useCurrentUser()
+  const { data: currentUser } = useCurrentUser()
   const isServiceManager = currentUser?.role === 'ADMIN'
 
   const statisticsQuery = useServiceStatistics(selectedOperatorId, isServiceManager)
@@ -36,10 +33,6 @@ export default function ServiceHomePage() {
     { ...NO_SERVICE_USERS_FILTER, page: 1, limit: OPERATOR_CHOICES_LIMIT },
     isServiceManager
   )
-
-  if (!isCurrentUserPending && !isServiceManager) {
-    return <Navigate to={`/${slug}/affaires`} replace />
-  }
 
   const operators = operatorsQuery.data?.data ?? []
   const statistics = statisticsQuery.data

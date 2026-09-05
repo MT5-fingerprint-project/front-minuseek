@@ -9,16 +9,17 @@ import { isInProgress } from '@/features/shared/types/verification'
 import { useAuth } from '@/features/shared/auth/auth-context'
 import { cn } from '@/features/shared/lib/utils'
 
-const SERVICE_NAV = [
-  { path: 'affaires', icon: 'folder', labelKey: 'navigation.cases' },
+const CASES_NAV = [{ path: 'affaires', icon: 'folder', labelKey: 'navigation.cases' }] as const
+
+const MANAGER_NAV = [
   { path: 'utilisateurs', icon: 'personGroup', labelKey: 'navigation.users' },
   { path: 'parametres', icon: 'settings', labelKey: 'navigation.settings' },
 ] as const
 
-const VERIFICATION_NAV = {
-  path: 'verifications',
+const PEER_REVIEW_NAV = {
+  path: 'dossier-pair',
   icon: 'folder',
-  labelKey: 'navigation.casesToVerify',
+  labelKey: 'navigation.peerReviewCases',
 } as const
 
 export default function AppHeader() {
@@ -34,8 +35,9 @@ export default function AppHeader() {
   const label = username ?? t('auth.account')
   const isServiceManager = currentUser?.role === 'ADMIN'
   const entries = [
-    ...(isServiceManager ? SERVICE_NAV : []),
-    ...(missions.some(isInProgress) ? [VERIFICATION_NAV] : []),
+    ...CASES_NAV,
+    ...(missions.some(isInProgress) ? [PEER_REVIEW_NAV] : []),
+    ...(isServiceManager ? MANAGER_NAV : []),
   ]
 
   const serviceHomePath = `/${slug}`
@@ -59,19 +61,17 @@ export default function AppHeader() {
 
         {entries.length > 0 && (
           <nav aria-label={t('navigation.serviceNavigation')} className="flex items-center gap-1">
-            {isServiceManager && (
-              <Link
-                to={serviceHomePath}
-                aria-current={isOnServiceHome ? 'page' : undefined}
-                className={cn(
-                  'flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors',
-                  isOnServiceHome ? 'bg-blue-light-1 font-medium' : 'hover:bg-grey-light-1'
-                )}
-              >
-                <Icon name="home" size={18} color="currentColor" />
-                {t('navigation.home')}
-              </Link>
-            )}
+            <Link
+              to={serviceHomePath}
+              aria-current={isOnServiceHome ? 'page' : undefined}
+              className={cn(
+                'flex items-center gap-2 rounded-full px-3 py-1.5 text-sm transition-colors',
+                isOnServiceHome ? 'bg-blue-light-1 font-medium' : 'hover:bg-grey-light-1'
+              )}
+            >
+              <Icon name="home" size={18} color="currentColor" />
+              {t('navigation.home')}
+            </Link>
             {entries.map((entry) => {
               const isCurrent = isCurrentSection(entry.path)
               return (
