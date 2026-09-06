@@ -751,8 +751,21 @@
         "pointArrow": "Point & flèche",
         "pencil": "Crayon",
         "ruler": "Règle",
-        "minutiaType": "Type de minutie"
+        "minutiaType": "Type de minutie",
+        "markerSize": "Taille des repères"
       }
+    },
+    "markerSize": {
+      "steps": {
+        "xSmall": "Très petits",
+        "small": "Petits",
+        "medium": "Moyens",
+        "large": "Grands",
+        "xLarge": "Très grands"
+      },
+      "diameter": "⌀ {{value}} mm sur la peau",
+      "success": "Taille des repères enregistrée",
+      "error": "L'enregistrement de la taille des repères a échoué"
     },
     "minutia": {
       "types": {

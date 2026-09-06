@@ -8,11 +8,10 @@ import type { Layer } from '@/features/biometric-image/types/layer'
 import type { ImageLayout } from '@/features/biometric-image/components/canvas/DraggableImage'
 import type { AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import type { MinutiaType } from '@/features/biometric-image/lib/minutiae'
+import { markerStrokeWidthOf } from '@/features/biometric-image/lib/markerSize'
 import MinutiaeAnnotation from './MinutiaeAnnotation'
 
 
-const MARKER_RADIUS_RATIO = 0.015
-const MARKER_RADIUS_MIN = 6
 const STROKE_RATIO = 0.00375
 const STROKE_MIN = 1.5
 
@@ -36,6 +35,8 @@ type AnnotationLayerProps = {
   viewScale: number
   sourceWidth: number
   sourceHeight: number
+  /** Taille des repères de la pièce, en pixels source : gouverne tous ses cercles, posés compris. */
+  markRadius: number
   selectedId: string | null
   onSelect: (id: string | null) => void
   hoveredLayerId?: string | null
@@ -77,6 +78,7 @@ export default function AnnotationLayer({
   viewScale,
   sourceWidth,
   sourceHeight,
+  markRadius,
   selectedId,
   onSelect,
   hoveredLayerId,
@@ -106,8 +108,8 @@ export default function AnnotationLayer({
 
   const select = onSelect
   const longestSide = Math.max(sourceWidth, sourceHeight)
-  const sourceRadius = Math.max(MARKER_RADIUS_MIN, Math.round(longestSide * MARKER_RADIUS_RATIO))
   const sourceStrokeWidth = Math.max(STROKE_MIN, longestSide * STROKE_RATIO)
+  const markerStrokeWidth = markerStrokeWidthOf(markRadius)
   // Ce qui appartient à l'outil garde une taille constante à l'écran, donc se divise par le zoom.
   const onScreen = (screenPixels: number) => screenPixels / viewScale
 
@@ -185,7 +187,7 @@ export default function AnnotationLayer({
             type: 'circle',
             x: sourcePos.x,
             y: sourcePos.y,
-            radius: sourceRadius,
+            radius: markRadius,
             color: activeColor,
             minutiaType: activeMinutiaType,
             frame: ANNOTATION_FRAME,
@@ -205,7 +207,7 @@ export default function AnnotationLayer({
             x: sourcePos.x,
             y: sourcePos.y,
             angle: 0,
-            radius: sourceRadius,
+            radius: markRadius,
             color: activeColor,
             minutiaType: activeMinutiaType,
             frame: ANNOTATION_FRAME,
@@ -258,7 +260,7 @@ export default function AnnotationLayer({
     return () => { stage.off('.annot') }
   // createLayer/updateLayer mutate refs are stable; re-bind when tool/color/zIndex base change
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTool, activeColor, activeMinutiaType, fingerprintId, layerCount, sourceRadius, sourceStrokeWidth, isPairingMode])
+  }, [activeTool, activeColor, activeMinutiaType, fingerprintId, layerCount, markRadius, sourceStrokeWidth, isPairingMode])
 
   const renderShape = (layer: Layer) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -277,7 +279,8 @@ export default function AnnotationLayer({
             key={layer.id}
             layer={layer}
             isSelected={isSelected}
-            strokeWidth={sourceStrokeWidth + emphasis}
+            radius={markRadius}
+            strokeWidth={markerStrokeWidth + emphasis}
             viewScale={viewScale}
             mirrorScaleX={imageLayout?.scaleX ?? 1}
             rotationDeg={imageLayout?.rotation ?? 0}

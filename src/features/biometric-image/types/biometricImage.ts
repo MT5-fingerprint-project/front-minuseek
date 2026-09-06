@@ -55,6 +55,9 @@ export interface BiometricImage {
   // les minuties sont enregistrées. `null` pour une pièce déposée avant leur mesure.
   sourceWidth: number | null
   sourceHeight: number | null
+  // Taille des repères réglée sur la pièce, en pixels source. `null` tant que personne
+  // ne l'a choisie : les cercles suivent alors le plus grand côté, comme avant le réglage.
+  markRadius: number | null
   origin: TraceOrigin | null
   location: string | null
   revelationTechnique: RevelationTechnique | null
@@ -86,6 +89,7 @@ export interface BiometricImageDto {
   resolutionDpi?: number | null
   sourceWidth?: number | null
   sourceHeight?: number | null
+  markRadius?: number | null
   origin?: TraceOrigin | null
   location?: string | null
   revelationTechnique?: RevelationTechnique | null

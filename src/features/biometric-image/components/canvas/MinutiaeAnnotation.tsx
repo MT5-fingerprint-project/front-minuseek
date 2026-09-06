@@ -20,6 +20,8 @@ const BADGE_RADIUS_MIN = 7
 type MinutiaeAnnotationProps = {
   layer: Layer
   isSelected: boolean
+  /** Taille réglée sur la pièce ; `settings.radius` n'est plus que la mémoire de la pose. */
+  radius: number
   strokeWidth: number
   viewScale: number
   mirrorScaleX: number
@@ -42,6 +44,7 @@ type MinutiaeAnnotationProps = {
 export default function MinutiaeAnnotation({
   layer,
   isSelected,
+  radius,
   strokeWidth,
   viewScale,
   mirrorScaleX,
@@ -91,7 +94,6 @@ export default function MinutiaeAnnotation({
 
   const hasDirection = settings.type === 'minutia'
   const angleDeg = liveAngleDeg ?? settings.angle ?? 0
-  const radius = settings.radius
   const { edge, tip } = edgeAndTip(angleDeg, radius)
   const onScreen = (screenPixels: number) => screenPixels / viewScale
 

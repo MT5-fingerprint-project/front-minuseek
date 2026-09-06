@@ -19,13 +19,14 @@ import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
 import { useCanvasFilters } from '@/features/biometric-image/hooks/useCanvasFilters'
 import { useLayers, useUpdateLayer } from '@/features/biometric-image/hooks/useLayers'
 import { useMinutiaDeletionGuard } from '@/features/biometric-image/hooks/useMinutiaDeletionGuard'
-import { useBiometricImages, useCalibrateBiometricImage } from '@/features/biometric-image/hooks/useBiometricImages'
+import { useBiometricImages, useCalibrateBiometricImage, useSetMarkRadius } from '@/features/biometric-image/hooks/useBiometricImages'
 import { useCaseExpertise } from '@/features/investigation-case/hooks/useCaseExpertise'
 import { Badge } from '@/features/shared/ui/badge'
 import { cn } from '@/features/shared/lib/utils'
 import { ANNOTATION_COLORS, type AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
 import type { CalibrationPoint } from '@/features/biometric-image/lib/calibration'
 import { stageToPngBlob } from '@/features/biometric-image/lib/exportImage'
+import { defaultMarkRadiusOf } from '@/features/biometric-image/lib/markerSize'
 import { VIDEO_FRAME_PIXEL_RATIO } from '@/features/investigation-case/lib/exportConcordanceVideo'
 import {
   DEFAULT_MINUTIA_TYPE,
@@ -176,6 +177,10 @@ export default function BiometricImageCanvas({
   const { data: images } = useBiometricImages(type, image?.caseId ?? '')
   const freshImage = images?.find((img) => img.id === image?.id) ?? image
   const calibrate = useCalibrateBiometricImage(type, image?.caseId ?? '')
+  const setMarkRadius = useSetMarkRadius(type, image?.caseId ?? '')
+
+  const longestSide = Math.max(sourceWidth, sourceHeight)
+  const markRadius = freshImage?.markRadius ?? defaultMarkRadiusOf(longestSide)
 
   const isPanMode = mode === 'hand' && !isPairingMode
 
@@ -220,6 +225,11 @@ export default function BiometricImageCanvas({
       input: { settings: pendingTypeChange.settings },
     })
     setPendingTypeChange(null)
+  }
+
+  const handleMarkRadiusChange = (radius: number) => {
+    if (!image) return
+    setMarkRadius.mutate({ id: image.id, markRadius: radius })
   }
 
   const handleToggleRuler = () => {
@@ -361,6 +371,7 @@ export default function BiometricImageCanvas({
               viewScale={view.scale}
               sourceWidth={sourceWidth}
               sourceHeight={sourceHeight}
+              markRadius={markRadius}
               selectedId={selectedAnnotationId}
               onSelect={handleSelectAnnotation}
               hoveredLayerId={hoveredLayerId}
@@ -424,6 +435,10 @@ export default function BiometricImageCanvas({
                 activeMinutiaType={activeMinutiaType}
                 onActiveMinutiaTypeChange={handleActiveMinutiaTypeChange}
                 selectedMinutiaType={selectedMinutiaType}
+                markRadius={markRadius}
+                longestSide={longestSide}
+                resolutionDpi={freshImage?.resolutionDpi ?? null}
+                onMarkRadiusChange={handleMarkRadiusChange}
                 isRulerActive={isRulerActive}
                 onToggleRuler={handleToggleRuler}
               />
