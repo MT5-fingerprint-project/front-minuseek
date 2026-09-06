@@ -57,6 +57,7 @@ function mapDtoToBiometricImage(dto: BiometricImageDto): BiometricImage {
     resolutionDpi: dto.resolutionDpi ?? null,
     sourceWidth: dto.sourceWidth ?? null,
     sourceHeight: dto.sourceHeight ?? null,
+    markRadius: dto.markRadius ?? null,
     origin: dto.origin ?? null,
     location: dto.location ?? null,
     revelationTechnique: dto.revelationTechnique ?? null,
@@ -129,6 +130,9 @@ export const BiometricImageAPI = {
 
   calibrate: (type: BiometricImageType, id: string, resolutionDpi: number) =>
     apiClient.patch(`${endpointByType[type]}/${id}/calibration`, { resolutionDpi }).then(() => undefined),
+
+  setMarkRadius: (type: BiometricImageType, id: string, markRadius: number) =>
+    apiClient.patch(`${endpointByType[type]}/${id}/mark-radius`, { markRadius }).then(() => undefined),
 
   upload: (type: BiometricImageType, { caseId, file, subjectId, position }: UploadInput) => {
     const formData = new FormData()

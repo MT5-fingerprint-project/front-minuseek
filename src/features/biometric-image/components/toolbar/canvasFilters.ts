@@ -278,7 +278,7 @@ export type AnnotationToolType = 'circle' | 'circleArrow' | 'pencil'
 
 export const MINUTIA_TOOLS: AnnotationToolType[] = ['circle', 'circleArrow']
 
-type AnnotationPanel = 'color' | 'minutiaType'
+type AnnotationPanel = 'color' | 'minutiaType' | 'markerSize'
 
 type AnnotationTool = {
   icon: IconName
@@ -292,6 +292,7 @@ export const ANNOTATION_TOOLS: AnnotationTool[] = [
   { icon: 'circle'     as IconName, label: 'biometricImage.toolbar.tools.point',        tool: 'circle'      as AnnotationToolType },
   { icon: 'circleLine' as IconName, label: 'biometricImage.toolbar.tools.pointArrow',   tool: 'circleArrow' as AnnotationToolType },
   { icon: 'penTrace'   as IconName, label: 'biometricImage.toolbar.tools.pencil',       tool: 'pencil'      as AnnotationToolType },
+  { icon: 'target'     as IconName, label: 'biometricImage.toolbar.tools.markerSize',   panel: 'markerSize' },
 ]
 
 /**

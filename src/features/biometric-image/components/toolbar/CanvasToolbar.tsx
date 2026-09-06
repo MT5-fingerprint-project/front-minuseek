@@ -9,6 +9,7 @@ import FilterPanel from './FilterPanel'
 import FilterControl from './FilterControl'
 import ColorPalette from './ColorPalette'
 import MinutiaTypePalette from './MinutiaTypePalette'
+import MarkerSizePalette from './MarkerSizePalette'
 import type { MinutiaType } from '@/features/biometric-image/lib/minutiae'
 import {
   IMAGE_TOOLS,
@@ -20,7 +21,7 @@ import {
   type AnnotationToolType,
 } from './canvasFilters'
 
-type AnnotationPanel = 'color' | 'minutiaType'
+type AnnotationPanel = 'color' | 'minutiaType' | 'markerSize'
 
 export type CanvasMode = 'hand' | 'image' | 'annotation'
 
@@ -38,6 +39,10 @@ type CanvasToolbarProps = {
   activeMinutiaType: MinutiaType
   onActiveMinutiaTypeChange: (type: MinutiaType) => void
   selectedMinutiaType: MinutiaType | undefined
+  markRadius: number
+  longestSide: number
+  resolutionDpi: number | null
+  onMarkRadiusChange: (markRadius: number) => void
   isRulerActive: boolean
   onToggleRuler: () => void
 }
@@ -56,6 +61,10 @@ export default function CanvasToolbar({
   activeMinutiaType,
   onActiveMinutiaTypeChange,
   selectedMinutiaType,
+  markRadius,
+  longestSide,
+  resolutionDpi,
+  onMarkRadiusChange,
   isRulerActive,
   onToggleRuler,
 }: CanvasToolbarProps) {
@@ -180,6 +189,17 @@ export default function CanvasToolbar({
           activeType={displayedMinutiaType}
           onSelect={(minutiaType) => {
             onActiveMinutiaTypeChange(minutiaType)
+            setOpenPanel(null)
+          }}
+        />
+      )}
+      {mode === 'annotation' && openPanel === 'markerSize' && (
+        <MarkerSizePalette
+          markRadius={markRadius}
+          longestSide={longestSide}
+          resolutionDpi={resolutionDpi}
+          onSelect={(radius) => {
+            onMarkRadiusChange(radius)
             setOpenPanel(null)
           }}
         />

@@ -244,6 +244,30 @@ export function useCalibrateBiometricImage(type: BiometricImageType, caseId: str
   })
 }
 
+export function useSetMarkRadius(type: BiometricImageType, caseId: string) {
+  const queryClient = useQueryClient()
+  const { t } = useTranslation()
+
+  return useMutation({
+    mutationFn: ({ id, markRadius }: { id: string; markRadius: number }) =>
+      BiometricImageAPI.setMarkRadius(type, id, markRadius),
+    onSuccess: (_data, variables) => {
+      // Écrit la taille dans le cache avant l'invalidation : les repères se redessinent
+      // au choix du cran, sans attendre l'aller-retour réseau.
+      queryClient.setQueryData<BiometricImage[]>(biometricImageKeys.list(type, caseId), (images) =>
+        images?.map((image) =>
+          image.id === variables.id ? { ...image, markRadius: variables.markRadius } : image,
+        ),
+      )
+      queryClient.invalidateQueries({ queryKey: biometricImageKeys.list(type, caseId) })
+      toast.success(t('biometricImage.markerSize.success'))
+    },
+    onError: () => {
+      toast.error(t('biometricImage.markerSize.error'))
+    },
+  })
+}
+
 export function useUploadBiometricImage(type: BiometricImageType) {
   const queryClient = useQueryClient()
   const { t } = useTranslation()
