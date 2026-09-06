@@ -128,7 +128,8 @@ export default function DraggableImage({
   const densityTier = 2 ** Math.ceil(Math.log2(displayDensity))
   const renderedMaxSide = Math.max(width, height)
   const cacheSideLimit = renderedMaxSide > 0 ? MAX_CACHE_SIDE / renderedMaxSide : 1
-  const cachePixelRatio = Math.min(densityTier, 1, cacheSideLimit)
+  const drawnResolutionLimit = image && width > 0 ? image.width / width : 1
+  const cachePixelRatio = Math.min(densityTier, 1, cacheSideLimit, drawnResolutionLimit)
 
   useEffect(() => {
     const node = imageRef.current
