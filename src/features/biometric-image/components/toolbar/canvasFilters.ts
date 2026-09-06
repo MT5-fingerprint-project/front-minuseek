@@ -214,17 +214,17 @@ export const FILTER_META: Record<string, { labelKey: string; icon: IconName; kon
   },
   levelsBlack: {
     labelKey: 'biometricImage.toolbar.tools.levelsBlack',
-    icon: 'target',
+    icon: 'levels',
     konva: { type: 'filter', filter: Levels, prop: 'levelsBlackPoint', scale: 1 / 100 },
   },
   levelsGamma: {
     labelKey: 'biometricImage.toolbar.tools.levelsGamma',
-    icon: 'target',
+    icon: 'levels',
     konva: { type: 'filter', filter: Levels, prop: 'levelsGammaAmount', scale: 1 / 100 },
   },
   levelsWhite: {
     labelKey: 'biometricImage.toolbar.tools.levelsWhite',
-    icon: 'target',
+    icon: 'levels',
     konva: { type: 'filter', filter: Levels, prop: 'levelsWhitePoint', scale: 1 / 100 },
   },
   sharpening: {
@@ -257,7 +257,7 @@ export const IMAGE_TOOLS: ImageTool[] = [
     ],
   },
   {
-    icon: 'target' as IconName,
+    icon: 'levels' as IconName,
     label: 'biometricImage.toolbar.tools.levels',
     isExpertOnly: true,
     filters: [
