@@ -34,6 +34,7 @@ export const AUDIT_EVENT_TYPES = [
   'LOCATION_PHOTO_UPLOADED',
   'LOCATION_PHOTO_DELETED',
   'CONCORDANCE_VIDEO_DEPOSITED',
+  'MARK_RADIUS_SET',
 ] as const
 
 export type AuditEventType = (typeof AUDIT_EVENT_TYPES)[number]

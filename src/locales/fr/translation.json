@@ -904,7 +904,8 @@
       "LOCATION_PHOTO_UPLOADED": "Photographie de localisation versée",
       "LOCATION_PHOTO_DELETED": "Photographie de localisation retirée",
       "SUBJECT_REGISTERED": "Personne déclarée au dossier",
-      "CONCORDANCE_VIDEO_DEPOSITED": "Vidéo de démonstration des concordances déposée sous scellé"
+      "CONCORDANCE_VIDEO_DEPOSITED": "Vidéo de démonstration des concordances déposée sous scellé",
+      "MARK_RADIUS_SET": "Taille des repères de la pièce réglée"
     },
     "pagination": {
       "previous": "Précédent",
