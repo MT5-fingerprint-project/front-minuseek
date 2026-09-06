@@ -54,6 +54,7 @@ type PendingRequalification = {
   traceMinutiaId: string
   referenceMinutiaId: string
   sideToQualify: 'TRACE' | 'REFERENCE'
+  currentType: MinutiaType
   newType: MinutiaType
 }
 
@@ -244,20 +245,12 @@ export default function InvestigationCaseComparisonPage() {
       return
     }
     const decision = resolvePairType(traceType, referenceType)
-    if (decision.outcome === 'REFUSED') {
-      toast.error(
-        t('investigationCase.comparison.pairingTypeMismatch', {
-          traceType: t(`biometricImage.minutia.types.${decision.traceType}`),
-          referenceType: t(`biometricImage.minutia.types.${decision.referenceType}`),
-        })
-      )
-      return
-    }
     if (decision.outcome === 'QUALIFIES') {
       setPendingRequalification({
         traceMinutiaId,
         referenceMinutiaId,
         sideToQualify: decision.sideToQualify,
+        currentType: decision.sideToQualify === 'TRACE' ? traceType : referenceType,
         newType: decision.type,
       })
       return
@@ -502,6 +495,7 @@ export default function InvestigationCaseComparisonPage() {
       {pendingRequalification && (
         <PairRequalificationDialog
           sideToQualify={pendingRequalification.sideToQualify}
+          currentType={pendingRequalification.currentType}
           newType={pendingRequalification.newType}
           onConfirm={confirmRequalification}
           onCancel={() => setPendingRequalification(null)}

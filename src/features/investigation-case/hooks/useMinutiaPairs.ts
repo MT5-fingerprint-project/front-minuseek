@@ -24,7 +24,7 @@ export function useMinutiaPairs(traceId: string | undefined, referencePrintId: s
 
   const invalidatePairsAndLayers = () => {
     queryClient.invalidateQueries({ queryKey: minutiaPairKeys.all })
-    // Apparier peut requalifier la minutie indéterminée : le calque des deux côtés a bougé.
+    // Apparier requalifie la minutie qui cède son type : le calque des deux côtés a bougé.
     queryClient.invalidateQueries({ queryKey: layerKeys.all })
   }
 
