@@ -41,6 +41,7 @@ const EVENT_ICONS: Record<AuditEventType, IconName> = {
   TRACE_LOCATION_STATED: 'location',
   LOCATION_PHOTO_UPLOADED: 'location',
   LOCATION_PHOTO_DELETED: 'close',
+  CONCORDANCE_VIDEO_DEPOSITED: 'fileExport',
 }
 
 const FALLBACK_EVENT_ICON: IconName = 'information'

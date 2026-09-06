@@ -1,6 +1,5 @@
 import { useImperativeHandle, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
 import { Stage, Layer } from 'react-konva'
 import type Konva from 'konva'
 import type { BiometricImage, BiometricImageType } from '@/features/biometric-image/types/biometricImage'
@@ -8,6 +7,7 @@ import DraggableImage, { type DrawnFrame, type ImageLayout, type SourceGeometry 
 import DestroyedImagePlaceholder from '@/features/biometric-image/components/DestroyedImagePlaceholder'
 import AnnotationLayer from '@/features/biometric-image/components/canvas/AnnotationLayer'
 import PairedMinutiaDeletionDialog from '@/features/biometric-image/components/canvas/PairedMinutiaDeletionDialog'
+import PairedMinutiaTypeChangeDialog from '@/features/biometric-image/components/canvas/PairedMinutiaTypeChangeDialog'
 import CalibrationLayer from '@/features/biometric-image/components/canvas/CalibrationLayer'
 import CalibrationDialog from '@/features/biometric-image/components/canvas/CalibrationDialog'
 import ScaleBarOverlay from '@/features/biometric-image/components/canvas/ScaleBarOverlay'
@@ -31,6 +31,7 @@ import {
   DEFAULT_MINUTIA_TYPE,
   isMinutiaSettings,
   minutiaTypeOf,
+  type MinutiaSettings,
   type MinutiaType,
 } from '@/features/biometric-image/lib/minutiae'
 
@@ -150,15 +151,18 @@ export default function BiometricImageCanvas({
   const [selected, setSelected] = useState<{ id: string; tool: AnnotationToolType | null } | null>(null)
   const selectedAnnotationId = selected?.tool === activeTool ? selected.id : null
   const updateSelectedType = useUpdateLayer()
+  const [pendingTypeChange, setPendingTypeChange] = useState<{
+    pairNumber: number
+    minutiaType: MinutiaType
+    layerId: string
+    settings: MinutiaSettings
+  } | null>(null)
   const minutiaDeletionGuard = useMinutiaDeletionGuard(minutiaNumbers)
   const [isRulerActive, setIsRulerActive] = useState(false)
-  // Marqué par l'id de l'image : un changement d'image invalide le segment sans effet dédié.
   const [rulerSegment, setRulerSegment] = useState<
     { imageId: string; from: CalibrationPoint; to: CalibrationPoint } | null
   >(null)
   const activeRulerSegment = rulerSegment?.imageId === image?.id ? rulerSegment : null
-  // Incrémenté à la validation et à l'annulation : force le remontage du calque de
-  // calibrage pour effacer son segment tracé, sur le modèle de `recenterSignal`.
   const [calibrationResetSignal, setCalibrationResetSignal] = useState(0)
   const { data: layers = [] } = useLayers(image?.id)
   const expertise = useCaseExpertise(image?.caseId ?? '')
@@ -198,15 +202,24 @@ export default function BiometricImageCanvas({
   const handleActiveMinutiaTypeChange = (minutiaType: MinutiaType) => {
     setActiveMinutiaType(minutiaType)
     if (!selectedLayer || !isMinutiaSettings(selectedLayer.settings)) return
+    if (minutiaTypeOf(selectedLayer.settings) === minutiaType) return
 
-    if (minutiaNumbers?.has(selectedLayer.id)) {
-      toast.info(t('biometricImage.pairing.typeLockedByPair'))
+    const settings = { ...selectedLayer.settings, minutiaType }
+    const pairNumber = minutiaNumbers?.get(selectedLayer.id)
+    if (pairNumber !== undefined) {
+      setPendingTypeChange({ pairNumber, minutiaType, layerId: selectedLayer.id, settings })
       return
     }
+    updateSelectedType.mutate({ id: selectedLayer.id, input: { settings } })
+  }
+
+  const confirmTypeChange = () => {
+    if (!pendingTypeChange) return
     updateSelectedType.mutate({
-      id: selectedLayer.id,
-      input: { settings: { ...selectedLayer.settings, minutiaType } },
+      id: pendingTypeChange.layerId,
+      input: { settings: pendingTypeChange.settings },
     })
+    setPendingTypeChange(null)
   }
 
   const handleToggleRuler = () => {
@@ -430,6 +443,12 @@ export default function BiometricImageCanvas({
             pairNumber={minutiaDeletionGuard.pendingPairNumber}
             onConfirm={minutiaDeletionGuard.confirmDeletion}
             onCancel={minutiaDeletionGuard.cancelDeletion}
+          />
+          <PairedMinutiaTypeChangeDialog
+            pairNumber={pendingTypeChange?.pairNumber ?? null}
+            minutiaType={pendingTypeChange?.minutiaType ?? null}
+            onConfirm={confirmTypeChange}
+            onCancel={() => setPendingTypeChange(null)}
           />
         </>
       ) : (

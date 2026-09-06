@@ -1,4 +1,4 @@
-export const SEAL_KINDS = ['TRACE', 'REFERENCE_PRINT', 'REPORT'] as const
+export const SEAL_KINDS = ['TRACE', 'REFERENCE_PRINT', 'REPORT', 'CONCORDANCE_VIDEO'] as const
 
 export type SealKind = (typeof SEAL_KINDS)[number]
 

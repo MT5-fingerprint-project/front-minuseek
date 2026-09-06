@@ -1,7 +1,8 @@
 {
   "common": {
     "actions": {
-      "cancel": "Annuler"
+      "cancel": "Annuler",
+      "closeNotification": "Fermer la notification"
     },
     "errors": {
       "generic": "Une erreur est survenue",
@@ -124,6 +125,7 @@
       "pairingRequalifyDescription": "La minutie de {{side}} est indéterminée : l'apparier la requalifiera en {{type}}.",
       "pairingRequalifyConfirm": "Apparier et requalifier",
       "concordanceButtonLabel": "DEMO",
+      "concordanceScreenLocked": "Atelier verrouillé pendant la démonstration",
       "concordanceButton": "Rejouer la démonstration des concordances",
       "concordanceButtonDisabledNoPairs": "Créez au moins une paire de minuties pour lancer la démonstration",
       "concordanceButtonDisabledDetached": "Rattachez la fenêtre des empreintes pour lancer la démonstration",
@@ -140,6 +142,19 @@
       "recordingCancelButton": "Annuler l'enregistrement",
       "recordingSavedToast": "Vidéo de la démonstration enregistrée (format {{format}})",
       "recordingAbortedToast": "Enregistrement interrompu : aucun fichier n'a été produit",
+      "recordingNotSealedToast": "Vidéo non déposée : elle n'a pas été scellée, rien n'a été téléchargé",
+      "videoCaption": {
+        "traceCote": "Trace papillaire cotée {{cote}}",
+        "traceNumber": "Trace n° {{number}}",
+        "named": "{{civility}} {{lastName}} {{firstName}}",
+        "civility": {
+          "MALE": "M.",
+          "FEMALE": "Mme"
+        },
+        "positionOf": "{{position}} de {{named}}",
+        "referencePrint": "Empreinte de référence",
+        "referencePrintOf": "Empreinte de référence de {{named}}"
+      },
       "tour": {
         "next": "Suivant",
         "previous": "Précédent",
@@ -701,7 +716,9 @@
       "deleteTitle": "Supprimer une minutie appariée ?",
       "deleteDescription": "Cette minutie forme la paire {{number}} : la supprimer défera aussi la paire.",
       "deleteConfirm": "Supprimer la minutie",
-      "typeLockedByPair": "Cette minutie est appariée : défaites la paire avant d'en changer le type"
+      "typeChangeTitle": "Requalifier une minutie appariée ?",
+      "typeChangeDescription": "Cette minutie forme la paire {{number}} : la passer en {{type}} changera aussi le type de la minutie correspondante sur l'autre image.",
+      "typeChangeConfirm": "Requalifier la paire"
     },
     "toolbar": {
       "modes": {
@@ -871,7 +888,8 @@
       "TRACE_LOCATION_STATED": "Localisation consignée sur le terrain",
       "LOCATION_PHOTO_UPLOADED": "Photographie de localisation versée",
       "LOCATION_PHOTO_DELETED": "Photographie de localisation retirée",
-      "SUBJECT_REGISTERED": "Personne déclarée au dossier"
+      "SUBJECT_REGISTERED": "Personne déclarée au dossier",
+      "CONCORDANCE_VIDEO_DEPOSITED": "Vidéo de démonstration des concordances déposée sous scellé"
     },
     "pagination": {
       "previous": "Précédent",
@@ -944,13 +962,14 @@
     "dropZone": {
       "label": "Choisir un fichier, ou le faire glisser ici",
       "hovered": "Relâchez pour vérifier ce fichier",
-      "hint": "Le rapport que vous avez reçu, ou l'une de ses images.",
+      "hint": "Le rapport que vous avez reçu, l'une de ses images, ou une vidéo de démonstration.",
       "limit": "Taille maximale : 100 Mo."
     },
     "kind": {
       "TRACE": "une trace papillaire",
       "REFERENCE_PRINT": "une empreinte de référence",
-      "REPORT": "un rapport"
+      "REPORT": "un rapport",
+      "CONCORDANCE_VIDEO": "une vidéo de démonstration des concordances"
     },
     "verdict": {
       "sealed": "Scellé par {{laboratory}} le {{date}}",

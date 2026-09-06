@@ -24,16 +24,18 @@ export type ConcordanceRecordingResult = { blob: Blob; format: ConcordanceVideoF
 type StartParams = {
   trace: React.RefObject<VideoFrameHandle | null>
   reference: React.RefObject<VideoFrameHandle | null>
-  /** Figés pour toute la durée de l'enregistrement : quelle fenêtre est laquelle. */
-  traceLabel: string
-  referenceLabel: string
+  /** Figées pour toute la durée de l'enregistrement : la désignation écrite
+   * sous chaque image. */
+  traceCaption: string
+  referenceCaption: string
   getTracePosition: (minutiaId: string) => ScreenPosition | null
   getReferencePosition: (minutiaId: string) => ScreenPosition | null
 }
 
 /**
  * Enregistrement vidéo de la démonstration des concordances (L7-4) : compose
- * les deux `Stage` Konva du comparateur + le trait de liaison sur un canvas
+ * les deux `Stage` Konva du comparateur, leurs désignations et le trait de
+ * liaison de la paire montrée, sur un canvas
  * hors-écran, redessiné à intervalle régulier pendant que `MediaRecorder`
  * capture son flux (`captureStream`). Pur état UI éphémère côté client —
  * aucune donnée serveur, rien n'est enregistré côté back.
@@ -44,10 +46,16 @@ export function useConcordanceRecording() {
   const ctxRef = useRef<CanvasRenderingContext2D | null>(null)
   const originRef = useRef({ x: 0, y: 0 })
   const paramsRef = useRef<StartParams | null>(null)
-  const linkStateRef = useRef<{ pairs: MinutiaPair[]; activePairId: string | null; counterLabel: string }>({
+  const linkStateRef = useRef<{
+    pairs: MinutiaPair[]
+    activePairId: string | null
+    counterLabel: string
+    activeTypeLabel: string
+  }>({
     pairs: [],
     activePairId: null,
     counterLabel: '',
+    activeTypeLabel: '',
   })
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const recorderRef = useRef<MediaRecorder | null>(null)
@@ -56,8 +64,13 @@ export function useConcordanceRecording() {
 
   const canRecord = isVideoRecordingSupported()
 
-  const setLinkState = (pairs: MinutiaPair[], activePairId: string | null, counterLabel: string) => {
-    linkStateRef.current = { pairs, activePairId, counterLabel }
+  const setLinkState = (
+    pairs: MinutiaPair[],
+    activePairId: string | null,
+    counterLabel: string,
+    activeTypeLabel: string
+  ) => {
+    linkStateRef.current = { pairs, activePairId, counterLabel, activeTypeLabel }
   }
 
   const drawTick = () => {
@@ -67,15 +80,16 @@ export function useConcordanceRecording() {
     const traceFrame = params.trace.current?.captureFrame()
     const referenceFrame = params.reference.current?.captureFrame()
     if (!traceFrame || !referenceFrame) return
-    const { pairs, activePairId, counterLabel } = linkStateRef.current
+    const { pairs, activePairId, counterLabel, activeTypeLabel } = linkStateRef.current
     drawCompositeFrame(ctx, {
       origin: originRef.current,
       pixelRatio: VIDEO_FRAME_PIXEL_RATIO,
       traceFrame,
       referenceFrame,
-      traceLabel: params.traceLabel,
-      referenceLabel: params.referenceLabel,
+      traceCaption: params.traceCaption,
+      referenceCaption: params.referenceCaption,
       counterLabel,
+      activeTypeLabel,
       pairs,
       activePairId,
       getTracePosition: params.getTracePosition,
@@ -143,6 +157,11 @@ export function useConcordanceRecording() {
     recorder.ondataavailable = (event) => {
       if (event.data.size > 0) chunksRef.current.push(event.data)
     }
+
+    recorder.onerror = (event) => {
+      const failure = (event as Event & { error?: DOMException }).error
+      console.error('[concordance] MediaRecorder a échoué', failure ?? event)
+    }
     recorderRef.current = recorder
     recorder.start()
     intervalRef.current = setInterval(drawTick, DRAW_INTERVAL_MS)
@@ -150,7 +169,6 @@ export function useConcordanceRecording() {
     return true
   }
 
-  /** Arrête proprement et résout le blob vidéo final (`null` si rien n'a pu être capturé). */
   const finish = (): Promise<ConcordanceRecordingResult | null> => {
     const recorder = recorderRef.current
     if (!recorder || recorder.state === 'inactive') {
@@ -170,7 +188,7 @@ export function useConcordanceRecording() {
     })
   }
 
-  /** Abandon (pas de fichier) : détachement de la fenêtre référence, suppression d'une paire pendant la lecture… */
+
   const cancel = () => {
     const recorder = recorderRef.current
     if (recorder && recorder.state !== 'inactive') {

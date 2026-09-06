@@ -16,10 +16,14 @@ export const VIDEO_BITRATE_BPS = 8_000_000
 /** Laisse un tick de dessin capturer l'état final complet avant de couper le
  * flux — sans ça la dernière minutie révélée peut manquer à l'appel. */
 export const RECORDING_STOP_GRACE_MS = 400
-/** Bandeau au-dessus des deux images : quelle fenêtre est laquelle, et le
- * compteur de paires — perdus dans la vidéo sinon (seul le canvas Konva de
- * chaque fenêtre est capturé, pas le titre ni les contrôles autour). */
+/** Bandeau au-dessus des deux images : le compteur de paires — perdu dans la
+ * vidéo sinon (seul le canvas Konva de chaque fenêtre est capturé, pas le titre
+ * ni les contrôles autour). */
 export const VIDEO_HEADER_HEIGHT = 32
+/** Bandeau sous les images : la désignation de la trace et celle de l'empreinte,
+ * chacune sous la sienne. Sans elles, la vidéo montre deux images anonymes — un
+ * magistrat ne peut pas savoir de quelle pièce il s'agit. */
+export const VIDEO_FOOTER_HEIGHT = 34
 
 export type ConcordanceVideoFormat = {
   mimeType: string

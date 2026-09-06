@@ -18,10 +18,17 @@ import VerificationPanel from '@/features/investigation-case/components/comparis
 import { useMissionOnCase } from '@/features/investigation-case/hooks/useMissionOnCase'
 import { useMinutiaPairs } from '@/features/investigation-case/hooks/useMinutiaPairs'
 import { useConcordancePlayback } from '@/features/investigation-case/hooks/useConcordancePlayback'
+import { useSubjects } from '@/features/investigation-case/hooks/useSubjects'
 import { useConcordanceRecording } from '@/features/investigation-case/hooks/useConcordanceRecording'
 import { useInvestigationCase } from '@/features/investigation-case/hooks/useInvestigationCases'
 import { minutiaPairKeys } from '@/features/investigation-case/hooks/minutiaPairKeys'
 import ConcordancePlaybackControls from '@/features/investigation-case/components/comparison/ConcordancePlaybackControls'
+import ConcordanceScreenShield from '@/features/investigation-case/components/comparison/ConcordanceScreenShield'
+import { ConcordanceVideoAPI } from '@/features/investigation-case/services/ConcordanceVideoAPI.services'
+import {
+  referenceCaptionOf,
+  traceCaptionOf,
+} from '@/features/investigation-case/lib/concordanceCaptions'
 import ConcordanceLinkOverlay from '@/features/investigation-case/components/comparison/ConcordanceLinkOverlay'
 import { downloadBlob } from '@/features/biometric-image/lib/exportImage'
 import {
@@ -107,6 +114,8 @@ export default function InvestigationCaseComparisonPage() {
     [minutiaPairs.pairs]
   )
   const { data: investigationCase } = useInvestigationCase(id ?? '')
+  const { data: subjects = [] } = useSubjects(id ?? '')
+  const referenceSubject = subjects.find((subject) => subject.id === reference.selectedTrace?.subjectId)
   const recording = useConcordanceRecording()
   // Vérif navigateur bon marché (pas d'appel réseau) : sert uniquement à annoncer
   // le format dans l'interface avant de lancer l'enregistrement (cf. critère du ticket).
@@ -119,15 +128,34 @@ export default function InvestigationCaseComparisonPage() {
   // toujours à sa dernière paire — un délai de grâce laisse un tick de dessin
   // capturer cet état final avant de couper le flux (sinon la dernière minutie
   // révélée peut manquer à l'appel).
+  // Le scellé passe avant le téléchargement : une vidéo posée sur le poste de
+  // l'opérateur sans avoir été déposée est une vidéo dont la page publique
+  // répondra « fichier inconnu », et c'est exactement le cas où l'outil ment.
+  const depositRecording = async (blob: Blob, fileName: string): Promise<boolean> => {
+    if (!id || !traceId || !referenceId) return false
+    try {
+      await ConcordanceVideoAPI.deposit(id, {
+        traceId,
+        referencePrintId: referenceId,
+        file: new File([blob], fileName, { type: blob.type }),
+      })
+      return true
+    } catch {
+      toast.error(t('investigationCase.comparison.recordingNotSealedToast'))
+      return false
+    }
+  }
+
   const handlePlaybackComplete = () => {
     if (!recording.isRecording) return
     window.setTimeout(() => {
-      recording.finish().then((result) => {
+      recording.finish().then(async (result) => {
         if (!result) {
           toast.error(t('investigationCase.comparison.recordingAbortedToast'))
           return
         }
         const fileName = concordanceVideoFileName(investigationCase?.caseNumber ?? '', new Date(), result.format.extension)
+        if (!(await depositRecording(result.blob, fileName))) return
         downloadBlob(result.blob, fileName)
         toast.success(t('investigationCase.comparison.recordingSavedToast', { format: result.format.label }))
       })
@@ -154,7 +182,8 @@ export default function InvestigationCaseComparisonPage() {
     recording.setLinkState(
       revealedPairs,
       activePair?.id ?? null,
-      t('investigationCase.comparison.concordanceCounter', { current: playback.revealedCount, total: sortedPairs.length })
+      t('investigationCase.comparison.concordanceCounter', { current: playback.revealedCount, total: sortedPairs.length }),
+      activePair ? t(`biometricImage.minutia.types.${activePair.minutiaType}`) : ''
     )
   })
 
@@ -194,8 +223,8 @@ export default function InvestigationCaseComparisonPage() {
     recording.start({
       trace: trace.videoFrameRef,
       reference: reference.videoFrameRef,
-      traceLabel: t('investigationCase.comparison.tracesWindow'),
-      referenceLabel: t('investigationCase.comparison.referencePrintsWindow'),
+      traceCaption: traceCaptionOf(t, trace.selectedTrace),
+      referenceCaption: referenceCaptionOf(t, reference.selectedTrace, referenceSubject),
       getTracePosition,
       getReferencePosition,
     })
@@ -365,7 +394,8 @@ export default function InvestigationCaseComparisonPage() {
     <div className="flex h-full flex-col gap-2">
       <ClosedCaseBanner caseId={id} />
       {isBlind && <BlindVerificationBanner />}
-      <ResizablePanelGroup orientation="horizontal" className="h-full min-h-[500px]">
+      <div className="relative h-full min-h-[500px]">
+        <ResizablePanelGroup orientation="horizontal" className="h-full">
         <ComparisonWindow
           side="left"
           type="traces"
@@ -459,7 +489,9 @@ export default function InvestigationCaseComparisonPage() {
           revealedMinutiaIds={revealedReferenceIds}
           activeMinutiaId={isConcordanceMode ? (activePair?.referenceMinutiaLayerId ?? null) : null}
         />
-      </ResizablePanelGroup>
+        </ResizablePanelGroup>
+        {isConcordanceMode && <ConcordanceScreenShield />}
+      </div>
       <ConcordanceLinkOverlay
         isActive={isConcordanceMode}
         pairs={revealedPairs}
