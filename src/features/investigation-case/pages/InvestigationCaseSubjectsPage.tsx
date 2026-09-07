@@ -51,6 +51,7 @@ export default function InvestigationCaseSubjectsPage() {
       </div>
 
       <div className="flex flex-col gap-10 lg:flex-row">
+        <SubjectTypeColumn title={t('subject.list.victims')} subjects={victims} className="bg-blue-light-2/40" />
         <SubjectTypeColumn
           title={t('subject.list.closeAssociates')}
           subjects={closeAssociates}
@@ -61,7 +62,6 @@ export default function InvestigationCaseSubjectsPage() {
           subjects={personsOfInterest}
           className="bg-blue-light-1"
         />
-        <SubjectTypeColumn title={t('subject.list.victims')} subjects={victims} className="bg-blue-light-2/40" />
       </div>
 
       <SubjectCreateForm

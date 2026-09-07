@@ -452,7 +452,7 @@
     },
     "list": {
       "title": "Sujets de l'affaire n°{{caseNumber}}",
-      "summary": "{{closeAssociates}}, {{personsOfInterest}} et {{victims}}",
+      "summary": "{{victims}}, {{closeAssociates}} et {{personsOfInterest}}",
       "closeAssociateCount_one": "{{count}} familier",
       "closeAssociateCount_other": "{{count}} familiers",
       "personOfInterestCount_one": "{{count}} mis en cause",
