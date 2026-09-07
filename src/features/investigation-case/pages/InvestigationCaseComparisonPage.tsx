@@ -307,6 +307,8 @@ export default function InvestigationCaseComparisonPage() {
     const comparable = referencePrints.filter((print) => print.imageDestroyedAt === null)
     if (!trace.selectedTrace || comparable.length === 0 || !id) return
     compare.mutate({ caseId: id, trace: trace.selectedTrace, referencePrints: comparable })
+
+    toast.success('Les empreintes ont été réorganisées par pertinence par rapport à la trace sélectionnée !')
   }
 
   const onToggleHit = () => {

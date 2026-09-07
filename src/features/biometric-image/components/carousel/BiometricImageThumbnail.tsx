@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { Sparkle, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/features/shared/lib/utils'
 import { Icon } from '@/features/shared/icons'
@@ -73,13 +73,10 @@ export default function BiometricImageThumbnail({
           {matching !== undefined && (
             <Badge
               className={cn(
-                'absolute top-1 left-1 tabular-nums',
-                matching.match
-                  ? 'bg-green-medium/90 text-white hover:bg-green-medium/90'
-                  : 'bg-black/55 text-white/90 hover:bg-black/55',
+                'absolute top-1 left-1 px-1 py-0 tabular-nums bg-green-medium/90 text-white hover:bg-green-medium/90',
               )}
             >
-              {Math.round(matching.score)}
+              <Sparkle size={13} />
             </Badge>
           )}
           {matching === undefined && image.cote && (
