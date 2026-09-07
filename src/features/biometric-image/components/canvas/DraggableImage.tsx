@@ -3,7 +3,8 @@ import { Image as KonvaImage } from 'react-konva'
 import Konva from 'konva'
 import type { Filter } from 'konva/lib/Node'
 import type { CanvasFilters, KonvaFilterDef } from '@/features/biometric-image/components/toolbar/canvasFilters'
-import { FILTER_META } from '@/features/biometric-image/components/toolbar/canvasFilters'
+import { CURVE_LUT_ATTR, FILTER_META } from '@/features/biometric-image/components/toolbar/canvasFilters'
+import { buildCurveLut, isIdentityCurve, type CurvePoint } from '@/features/biometric-image/lib/toneCurve'
 
 const MAX_CACHE_SIDE = 4096
 
@@ -55,6 +56,7 @@ type DraggableImageProps = {
   thumbUrl?: string | null
   sourceSize?: DrawnFrame | null
   filters?: CanvasFilters
+  curvePoints?: CurvePoint[] | null
   isDraggable?: boolean
   viewScale?: number
   onLayoutChange?: (layout: ImageLayout) => void
@@ -67,6 +69,7 @@ export default function DraggableImage({
   thumbUrl,
   sourceSize,
   filters,
+  curvePoints,
   isDraggable = true,
   viewScale = 1,
   onLayoutChange,
@@ -81,18 +84,26 @@ export default function DraggableImage({
 
   const filterSignature = JSON.stringify(activeEntriesOfKind(filters, 'filter'))
   const transformSignature = JSON.stringify(activeEntriesOfKind(filters, 'transform'))
+  // La courbe est le dernier traitement de la pile : c'est aussi le dernier
+  // calque que l'atelier crée, donc l'ordre que le rapport rejoue.
+  const curveSignature = isIdentityCurve(curvePoints) ? '' : JSON.stringify(curvePoints)
 
   const { konvaFilters, filterProps } = useMemo(() => {
     const definitions: Filter[] = []
-    const props: Record<string, number> = {}
+    const props: Record<string, number | Uint8ClampedArray> = {}
     for (const [key, value] of JSON.parse(filterSignature) as FilterEntry[]) {
       const definition = FILTER_META[key]?.konva
       if (definition?.type !== 'filter') continue
       if (!definitions.includes(definition.filter)) definitions.push(definition.filter)
       if (definition.prop) props[definition.prop] = value * definition.scale
     }
+    const curve = FILTER_META.curve?.konva
+    if (curveSignature !== '' && curve?.type === 'lut') {
+      definitions.push(curve.filter)
+      props[CURVE_LUT_ATTR] = buildCurveLut(JSON.parse(curveSignature) as CurvePoint[])
+    }
     return { konvaFilters: definitions, filterProps: props }
-  }, [filterSignature])
+  }, [filterSignature, curveSignature])
 
   // Transforms — go as direct Konva node props
   const transformProps = useMemo(() => {

@@ -2,6 +2,7 @@ import Konva from 'konva'
 import type { Filter } from 'konva/lib/Node'
 import type { ParseKeys } from 'i18next'
 import type { IconName } from '@/features/shared/icons'
+import { CURVE_LEVELS } from '@/features/biometric-image/lib/toneCurve'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -21,6 +22,7 @@ export type FilterConfig = {
 export type KonvaFilterDef =
   | { type: 'filter'; filter: Filter; prop: string; scale: number }
   | { type: 'transform'; prop: string; transform: (v: number) => number }
+  | { type: 'lut'; filter: Filter; prop: string }
 
 // ─── Defaults ─────────────────────────────────────────────────────────────────
 
@@ -93,6 +95,20 @@ const Levels: Filter = function (imageData) {
     data[i] = remapped[data[i]]
     data[i + 1] = remapped[data[i + 1]]
     data[i + 2] = remapped[data[i + 2]]
+  }
+}
+
+export const CURVE_LUT_ATTR = 'curveLut'
+
+const ToneCurve: Filter = function (imageData) {
+  const data = imageData.data
+  const lut = this.getAttr(CURVE_LUT_ATTR) as Uint8ClampedArray | undefined
+  if (!lut || lut.length !== CURVE_LEVELS) return
+
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = lut[data[i]]
+    data[i + 1] = lut[data[i + 1]]
+    data[i + 2] = lut[data[i + 2]]
   }
 }
 
@@ -227,6 +243,11 @@ export const FILTER_META: Record<string, { labelKey: string; icon: IconName; kon
     icon: 'levels',
     konva: { type: 'filter', filter: Levels, prop: 'levelsWhitePoint', scale: 1 / 100 },
   },
+  curve: {
+    labelKey: 'biometricImage.toolbar.tools.curve',
+    icon: 'curve',
+    konva: { type: 'lut', filter: ToneCurve, prop: CURVE_LUT_ATTR },
+  },
   sharpening: {
     labelKey: 'biometricImage.toolbar.tools.sharpening',
     icon: 'trace',
@@ -237,7 +258,15 @@ export const FILTER_META: Record<string, { labelKey: string; icon: IconName; kon
 
 // ─── Toolbar tool lists ────────────────────────────────────────────────────────
 
-export type ImageTool = { icon: IconName; label: ParseKeys; filters: FilterConfig[]; isExpertOnly?: boolean }
+export type ImagePanel = 'curve'
+
+export type ImageTool = {
+  icon: IconName
+  label: ParseKeys
+  filters: FilterConfig[]
+  panel?: ImagePanel
+  isExpertOnly?: boolean
+}
 
 export const IMAGE_TOOLS: ImageTool[] = [
   { icon: 'mirror'       as IconName, label: 'biometricImage.toolbar.tools.mirror',       filters: [{ filterKey: 'mirror',    inputType: 'toggle' }] },
@@ -271,6 +300,13 @@ export const IMAGE_TOOLS: ImageTool[] = [
     label: 'biometricImage.toolbar.tools.sharpening',
     isExpertOnly: true,
     filters: [{ filterKey: 'sharpening', min: 0, max: 200, origin: 'left' }],
+  },
+  {
+    icon: 'curve' as IconName,
+    label: 'biometricImage.toolbar.tools.curve',
+    isExpertOnly: true,
+    panel: 'curve',
+    filters: [],
   },
 ]
 

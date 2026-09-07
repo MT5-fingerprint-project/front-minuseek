@@ -11,6 +11,7 @@ import ColorPalette from './ColorPalette'
 import MinutiaTypePalette from './MinutiaTypePalette'
 import MarkerSizePalette from './MarkerSizePalette'
 import type { MinutiaType } from '@/features/biometric-image/lib/minutiae'
+import type { CurvePoint } from '@/features/biometric-image/lib/toneCurve'
 import {
   IMAGE_TOOLS,
   ANNOTATION_TOOLS,
@@ -18,8 +19,10 @@ import {
   RULER_TOOL,
   type CanvasFilters,
   type FilterConfig,
+  type ImagePanel,
   type AnnotationToolType,
 } from './canvasFilters'
+import { isIdentityCurve } from '@/features/biometric-image/lib/toneCurve'
 
 type AnnotationPanel = 'color' | 'minutiaType' | 'markerSize'
 
@@ -32,6 +35,9 @@ type CanvasToolbarProps = {
   filters: CanvasFilters
   isExpertCase?: boolean
   onFiltersChange: (filters: CanvasFilters) => void
+  curvePoints: CurvePoint[]
+  isCurveWindowOpen: boolean
+  onToggleCurveWindow: () => void
   activeTool: AnnotationToolType | null
   onActiveToolChange: (tool: AnnotationToolType | null) => void
   activeColor: string
@@ -54,6 +60,9 @@ export default function CanvasToolbar({
   filters,
   isExpertCase = false,
   onFiltersChange,
+  curvePoints,
+  isCurveWindowOpen,
+  onToggleCurveWindow,
   activeTool,
   onActiveToolChange,
   activeColor,
@@ -120,7 +129,12 @@ export default function CanvasToolbar({
     if (openPanel === 'minutiaType') setOpenPanel(null)
   }
 
-  const handleToolClick = (label: string, filterConfigs: FilterConfig[]) => {
+  const handleToolClick = (label: string, filterConfigs: FilterConfig[], panel?: ImagePanel) => {
+    if (panel === 'curve') {
+      setOpenFilter(null)
+      onToggleCurveWindow()
+      return
+    }
     if (filterConfigs.length > 1) {
       setOpenFilter((prev) => (prev === label ? null : label))
       return
@@ -149,7 +163,8 @@ export default function CanvasToolbar({
 
   const openTool = IMAGE_TOOLS.find((tool) => tool.label === openFilter)
 
-  const isToolActive = (label: string, filterConfigs: FilterConfig[]) => {
+  const isToolActive = (label: string, filterConfigs: FilterConfig[], panel?: ImagePanel) => {
+    if (panel === 'curve') return isCurveWindowOpen || !isIdentityCurve(curvePoints)
     if (filterConfigs.length > 1) {
       return (
         openFilter === label ||
@@ -237,7 +252,7 @@ export default function CanvasToolbar({
         />
         <span className="h-6 w-px bg-white/25" />
         {mode === 'image' &&
-          IMAGE_TOOLS.map(({ icon, label, filters: filterConfigs, isExpertOnly }) => {
+          IMAGE_TOOLS.map(({ icon, label, filters: filterConfigs, panel, isExpertOnly }) => {
             const isLocked = isExpertOnly === true && !isExpertCase
             return (
               <ItemToolbar
@@ -248,9 +263,9 @@ export default function CanvasToolbar({
                     ? t('biometricImage.toolbar.expertLocked', { tool: t(label) })
                     : t(label)
                 }
-                active={isToolActive(label, filterConfigs)}
+                active={isToolActive(label, filterConfigs, panel)}
                 disabled={isLocked}
-                onClick={() => handleToolClick(label, filterConfigs)}
+                onClick={() => handleToolClick(label, filterConfigs, panel)}
               />
             )
           })}
