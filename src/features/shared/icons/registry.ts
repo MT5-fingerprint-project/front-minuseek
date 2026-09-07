@@ -11,6 +11,7 @@ import Close from './close.svg?react'
 import CloseSmall from './close-small.svg?react'
 import Compare from './compare.svg?react'
 import Contrast from './contrast.svg?react'
+import Curve from './curve.svg?react'
 import DateStart from './date-start.svg?react'
 import FileExport from './file-export.svg?react'
 import Fingerprint from './fingerprint.svg?react'
@@ -80,6 +81,7 @@ export const icons = {
   closeSmall: CloseSmall,
   compare: Compare,
   contrast: Contrast,
+  curve: Curve,
   dateStart: DateStart,
   fileExport: FileExport,
   fingerprint: Fingerprint,

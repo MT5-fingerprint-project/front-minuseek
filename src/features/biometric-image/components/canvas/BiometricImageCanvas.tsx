@@ -13,6 +13,7 @@ import CalibrationDialog from '@/features/biometric-image/components/canvas/Cali
 import ScaleBarOverlay from '@/features/biometric-image/components/canvas/ScaleBarOverlay'
 import CanvasGridOverlay from '@/features/biometric-image/components/canvas/CanvasGridOverlay'
 import CanvasToolbar, { type CanvasMode } from '@/features/biometric-image/components/toolbar/CanvasToolbar'
+import CurveWindow from '@/features/biometric-image/components/toolbar/CurveWindow'
 import LayersPanelContainer from '@/features/biometric-image/components/layers/LayersPanelContainer'
 import { useCanvasView, type CanvasZoomHandle } from '@/features/biometric-image/components/canvas/useCanvasView'
 import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
@@ -141,8 +142,16 @@ export default function BiometricImageCanvas({
   const [drawnFrame, setDrawnFrame] = useState<{ imageId: string; frame: DrawnFrame } | null>(null)
   const content = drawnFrame?.imageId === imageId ? drawnFrame.frame : null
   const { view, handleWheel, panTo, recenterSignal } = useCanvasView({ size, content, zoomHandleRef, onScaleChange })
-  const { sliderValues, effectiveFilters, handleFilterChange } = useCanvasFilters(image?.id)
+  const {
+    sliderValues,
+    effectiveFilters,
+    handleFilterChange,
+    curvePoints,
+    effectiveCurvePoints,
+    handleCurveChange,
+  } = useCanvasFilters(image?.id)
   const [mode, setMode] = useState<CanvasMode>('image')
+  const [isCurveWindowOpen, setCurveWindowOpen] = useState(false)
   const [activeTool, setActiveTool] = useState<AnnotationToolType | null>(null)
   const [activeColor, setActiveColor] = useState<string>(ANNOTATION_COLORS[0])
   const [activeMinutiaType, setActiveMinutiaType] = useState<MinutiaType>(DEFAULT_MINUTIA_TYPE)
@@ -353,6 +362,7 @@ export default function BiometricImageCanvas({
                 thumbUrl={image.thumbUrl}
                 sourceSize={servedFrame}
                 filters={effectiveFilters}
+                curvePoints={effectiveCurvePoints}
                 isDraggable={!isPanMode && activeTool === null && !isRulerActive}
                 viewScale={view.scale}
                 onLayoutChange={handleLayoutChange}
@@ -419,6 +429,14 @@ export default function BiometricImageCanvas({
               onManualEntry={onRequestManualResolution && handleManualResolution}
             />
           )}
+          {isCurveWindowOpen && mode === 'image' && (
+            <CurveWindow
+              points={curvePoints}
+              imageUrl={image.thumbUrl ?? image.url}
+              onChange={handleCurveChange}
+              onClose={() => setCurveWindowOpen(false)}
+            />
+          )}
           {isToolbarVisible && !isPairingMode && !isConcordanceMode && (
             <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
               <CanvasToolbar
@@ -428,6 +446,9 @@ export default function BiometricImageCanvas({
                 filters={sliderValues}
                 isExpertCase={expertise !== null}
                 onFiltersChange={handleFilterChange}
+                curvePoints={curvePoints}
+                isCurveWindowOpen={isCurveWindowOpen}
+                onToggleCurveWindow={() => setCurveWindowOpen((open) => !open)}
                 activeTool={activeTool}
                 onActiveToolChange={handleActiveToolChange}
                 activeColor={activeColor}

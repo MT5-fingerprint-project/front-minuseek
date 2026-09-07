@@ -12,6 +12,7 @@
     "window": {
       "reduce": "Réduire la fenêtre",
       "expand": "Agrandir la fenêtre",
+      "close": "Fermer la fenêtre",
       "showFiles": "Afficher l'import",
       "hideFiles": "Masquer l'import",
       "showLayers": "Afficher les calques",
@@ -746,6 +747,7 @@
         "levelsGamma": "Gamma",
         "levelsWhite": "Point blanc",
         "sharpening": "Netteté locale",
+        "curve": "Courbe tonale",
         "palette": "Palette de couleurs",
         "point": "Point",
         "pointArrow": "Point & flèche",
@@ -753,6 +755,11 @@
         "ruler": "Règle",
         "minutiaType": "Type de minutie",
         "markerSize": "Taille des repères"
+      },
+      "curve": {
+        "hint": "Cliquer pour ajouter un point, double-cliquer pour le retirer",
+        "readout": "{{input}} → {{output}}",
+        "reset": "Réinitialiser"
       }
     },
     "markerSize": {
