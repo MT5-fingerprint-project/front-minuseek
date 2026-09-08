@@ -65,6 +65,7 @@ export default function MinutiaeAnnotation({
   const [liveAngleDeg, setLiveAngleDeg] = useState<number | null>(null)
   // Track handle drag with state so it's safe to read during render
   const [draggingHandle, setDraggingHandle] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
   const isDraggingHandle = useRef(false)
   const groupRef = useRef<Konva.Group>(null)
 
@@ -98,11 +99,7 @@ export default function MinutiaeAnnotation({
   const onScreen = (screenPixels: number) => screenPixels / viewScale
 
   const minutiaType = minutiaTypeOf(settings)
-  const typeLabel = t(
-    isSelected
-      ? `biometricImage.minutia.types.${minutiaType}`
-      : `biometricImage.minutia.shortTypes.${minutiaType}`,
-  )
+  const typeLabel = t(`biometricImage.minutia.types.${minutiaType}`)
   const labelFontSize = Math.max(onScreen(LABEL_MIN_FONT_SIZE), radius * 1.3)
   const badgeRadius = Math.max(onScreen(BADGE_RADIUS_MIN), radius * 0.8)
 
@@ -119,6 +116,8 @@ export default function MinutiaeAnnotation({
       y={settings.y}
       opacity={isDimmed ? 0.15 : 1}
       draggable={!draggingHandle && !isPairingMode && !isConcordanceMode}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => {
         e.cancelBubble = true
         if (isConcordanceMode) return
@@ -139,6 +138,7 @@ export default function MinutiaeAnnotation({
       )}
       <Circle
         radius={radius}
+        fill="transparent"
         stroke={settings.color}
         strokeWidth={strokeWidth}
         hitStrokeWidth={onScreen(HIT_STROKE_WIDTH)}
@@ -152,7 +152,7 @@ export default function MinutiaeAnnotation({
         />
       )}
 
-      {!isPairingMode && !isConcordanceMode && (
+      {!isPairingMode && !isConcordanceMode && isHovered && (
         <Group scaleX={mirrorScaleX} rotation={-rotationDeg} listening={false}>
           <Text
             text={typeLabel}
@@ -166,7 +166,7 @@ export default function MinutiaeAnnotation({
         </Group>
       )}
 
-      {pairNumber !== null && (
+      {pairNumber !== null && isHovered && (
         <Group scaleX={mirrorScaleX} rotation={-rotationDeg} listening={false}>
           <Circle x={radius + onScreen(LABEL_GAP) + badgeRadius} y={0} radius={badgeRadius} fill={settings.color} />
           <Text

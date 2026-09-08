@@ -782,14 +782,6 @@
         "ISLAND": "îlot",
         "ENCLOSURE": "anneau",
         "UNDETERMINED": "indéterminée"
-      },
-      "shortTypes": {
-        "RIDGE_ENDING": "AL",
-        "BIFURCATION": "BI",
-        "TRIFURCATION": "TR",
-        "ISLAND": "ÎL",
-        "ENCLOSURE": "AN",
-        "UNDETERMINED": "?"
       }
     },
     "calibration": {

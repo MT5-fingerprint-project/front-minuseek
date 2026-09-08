@@ -219,8 +219,8 @@ export default function CanvasToolbar({
           }}
         />
       )}
-      <div className="flex items-center gap-3 rounded-md bg-blue-dark-1 px-3 py-2 text-white shadow-lg">
-        <div className="flex items-center gap-1 rounded-sm bg-white/25 p-1">
+      <div className="flex items-center gap-1.5 rounded-md bg-blue-dark-1 px-2 py-1.5 text-white shadow-lg">
+        <div className="flex items-center gap-0.5 rounded-sm bg-white/25 p-0.5">
           <ModeButton
             icon="hand"
             label={t('biometricImage.toolbar.modes.hand')}

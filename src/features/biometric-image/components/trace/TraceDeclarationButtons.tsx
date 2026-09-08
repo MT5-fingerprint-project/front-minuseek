@@ -1,7 +1,13 @@
 import { useTranslation } from 'react-i18next'
+import { ChevronDownIcon } from 'lucide-react'
 import { cn } from '@/features/shared/lib/utils'
 import { Button } from '@/features/shared/ui/button'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/features/shared/ui/tooltip'
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/features/shared/ui/dropdown-menu'
 import {
   useDeclareExploitability,
   useDeclareNotIdentified,
@@ -12,45 +18,7 @@ import type { BiometricImage } from '@/features/biometric-image/types/biometricI
 type TraceDeclarationButtonsProps = {
   trace: Pick<BiometricImage, 'id' | 'status' | 'notIdentified'>
   caseId: string
-  /** `panel` (défaut) : boutons pleins + explications, pour le panneau de la trace.
-   *  `compact` : toggle Inexploitable/Exploitable + bouton Non identifiée séparé,
-   *  pour la barre du bas du comparateur. Deux contrôles distincts : l'exploitabilité
-   *  est exclusive (Inex XOR Exp), la non-identification est indépendante — les
-   *  fondre dans un même toggle laisserait croire à tort qu'elles s'excluent aussi. */
   variant?: 'panel' | 'compact'
-}
-
-function CompactSegment({
-  active,
-  label,
-  ariaLabel,
-  disabled,
-  onClick,
-  className,
-}: {
-  active: boolean
-  label: string
-  ariaLabel: string
-  disabled: boolean
-  onClick: () => void
-  className?: string
-}) {
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      aria-label={ariaLabel}
-      aria-pressed={active}
-      onClick={onClick}
-      className={cn(
-        'rounded-full px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50',
-        active ? 'bg-blue-medium-1 text-white' : 'text-grey-medium-2 hover:text-grey-dark',
-        className,
-      )}
-    >
-      {label}
-    </button>
-  )
 }
 
 export default function TraceDeclarationButtons({ trace, caseId, variant = 'panel' }: TraceDeclarationButtonsProps) {
@@ -66,40 +34,66 @@ export default function TraceDeclarationButtons({ trace, caseId, variant = 'pane
     : t('trace.exploitability.notIdentified')
 
   if (variant === 'compact') {
+    const shortLabelParts = [
+      trace.status === 'EXPLOITABLE'
+        ? t('trace.exploitability.exploitableShort')
+        : trace.status === 'NOT_EXPLOITABLE'
+          ? t('trace.exploitability.notExploitableShort')
+          : null,
+      trace.notIdentified ? t('trace.exploitability.notIdentifiedShort') : null,
+    ].filter((part): part is string => part !== null)
+    const triggerLabel = shortLabelParts.length > 0 ? shortLabelParts.join(' · ') : t('trace.state.toQualify')
+    const itemClassName = 'rounded py-1.5 pr-6 pl-2 text-sm text-white focus:bg-white/10 focus:text-white'
+
     return (
-      <div className="flex items-center gap-1.5">
-        <div className="flex items-center gap-0.5 rounded-full bg-grey-light-1 p-0.5">
-          <CompactSegment
-            active={trace.status === 'NOT_EXPLOITABLE'}
-            label={t('trace.exploitability.notExploitableShort')}
-            ariaLabel={t('trace.exploitability.notExploitable')}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            disabled={declareExploitability.isPending || isNotIdentifiedPending}
+            aria-label={t('trace.exploitability.title')}
+            className={cn(
+              'flex items-center gap-0.5 rounded-full px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50',
+              shortLabelParts.length > 0
+                ? 'bg-blue-medium-1 text-white'
+                : 'bg-grey-light-1 text-grey-medium-2 hover:text-grey-dark',
+            )}
+          >
+            {triggerLabel}
+            <ChevronDownIcon className="size-3" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          className="min-w-36 rounded-md border-0 bg-blue-dark-1 p-1 text-white shadow-lg ring-0"
+        >
+          <DropdownMenuCheckboxItem
+            checked={trace.status === 'EXPLOITABLE'}
             disabled={declareExploitability.isPending}
-            onClick={() => declareExploitability.mutate({ id: trace.id, exploitable: false })}
-          />
-          <CompactSegment
-            active={trace.status === 'EXPLOITABLE'}
-            label={t('trace.exploitability.exploitableShort')}
-            ariaLabel={t('trace.exploitability.exploitable')}
+            onCheckedChange={(checked) => checked && declareExploitability.mutate({ id: trace.id, exploitable: true })}
+            className={itemClassName}
+          >
+            {t('trace.exploitability.exploitable')}
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={trace.status === 'NOT_EXPLOITABLE'}
             disabled={declareExploitability.isPending}
-            onClick={() => declareExploitability.mutate({ id: trace.id, exploitable: true })}
-          />
-        </div>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="rounded-sm bg-grey-light-1 p-0.25">
-              <CompactSegment
-                active={!!trace.notIdentified}
-                label={t('trace.exploitability.notIdentifiedShort')}
-                ariaLabel={notIdentifiedAriaLabel}
-                disabled={isNotIdentifiedPending}
-                onClick={toggleNotIdentified}
-                className="rounded-md"
-              />
-            </div>
-          </TooltipTrigger>
-          <TooltipContent>{notIdentifiedAriaLabel}</TooltipContent>
-        </Tooltip>
-      </div>
+            onCheckedChange={(checked) => checked && declareExploitability.mutate({ id: trace.id, exploitable: false })}
+            className={itemClassName}
+          >
+            {t('trace.exploitability.notExploitable')}
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem
+            checked={!!trace.notIdentified}
+            disabled={isNotIdentifiedPending}
+            aria-label={notIdentifiedAriaLabel}
+            onCheckedChange={toggleNotIdentified}
+            className={itemClassName}
+          >
+            {t('trace.exploitability.notIdentified')}
+          </DropdownMenuCheckboxItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     )
   }
 

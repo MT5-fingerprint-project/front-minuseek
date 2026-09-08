@@ -16,7 +16,7 @@ export default function ModeButton({ icon, label, isActive, onClick }: ModeButto
         <button
           type="button"
           onClick={onClick}
-          className={cn('rounded-sm p-1.5 hover:bg-white/15', isActive && 'bg-blue-dark-1')}
+          className={cn('rounded-sm p-1 hover:bg-white/15', isActive && 'bg-blue-dark-1')}
         >
           <Icon name={icon} size={20} color="currentColor" />
         </button>

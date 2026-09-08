@@ -241,7 +241,7 @@ export default function ComparisonWorkbench({
           decorations={imageDecorations}
         />
       )}
-      <div className="min-h-0 flex-1 p-2">
+      <div className="min-h-0 flex-1 px-2">
         <div className="relative h-full overflow-hidden rounded-sm border border-grey-light-2">
           <BiometricImageCanvas
             image={freshImage}

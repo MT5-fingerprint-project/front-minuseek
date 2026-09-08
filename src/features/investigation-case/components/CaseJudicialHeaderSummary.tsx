@@ -75,7 +75,7 @@ export default function CaseJudicialHeaderSummary({
   ]
 
   return (
-    <section className="flex flex-col gap-5 px-4 py-3 rounded-sm bg-white">
+    <div className="flex flex-col gap-5">
       <h2 className="text-lg font-semibold">{t('investigationCase.judicialHeader.title')}</h2>
       <dl className="flex flex-wrap gap-x-16 gap-y-3">
         {lines.map((line) => (
@@ -86,6 +86,6 @@ export default function CaseJudicialHeaderSummary({
           </div>
         ))}
       </dl>
-    </section>
+    </div>
   )
 }

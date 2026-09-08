@@ -23,9 +23,17 @@ export default function InvestigationCaseCard({ investigationCase }: { investiga
             {t('investigationCase.card.pvNumber', { pvNumber: investigationCase.pvNumber })}
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs text-grey-medium-2">
-          <Icon name="dateStart" size={18} color="var(--color-grey-medium-1)" />
-          <span>{t('investigationCase.card.createdOn', { date: formattedDate })}</span>
+        <div className="flex flex-col gap-1 text-xs text-grey-medium-2">
+          <div className="flex items-center gap-2">
+            <Icon name="dateStart" size={18} color="var(--color-grey-medium-1)" />
+            <span>{t('investigationCase.card.createdOn', { date: formattedDate })}</span>
+          </div>
+          {investigationCase.offenseLocation && (
+            <div className="flex items-center gap-2">
+              <Icon name="location" size={18} color="var(--color-grey-medium-1)" />
+              <span className="truncate">{investigationCase.offenseLocation}</span>
+            </div>
+          )}
         </div>
       </div>
     </Link>

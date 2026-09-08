@@ -35,6 +35,7 @@ import Link from './link.svg?react'
 import Location from './location.svg?react'
 import Logout from './logout.svg?react'
 import Luminosity from './luminosity.svg?react'
+import MarkerSize from './marker-size.svg?react'
 import Menu from './menu.svg?react'
 import Mirror from './mirror.svg?react'
 import Number from './number.svg?react'
@@ -57,6 +58,7 @@ import Show from './show.svg?react'
 import ShowOff from './show-off.svg?react'
 import SidebarFill from './sidebar-fill.svg?react'
 import SidebarOutline from './sidebar-outline.svg?react'
+import Sharpness from './sharpness.svg?react'
 import Target from './target.svg?react'
 import TextOutline from './text-outline.svg?react'
 import Trace from './trace.svg?react'
@@ -105,6 +107,7 @@ export const icons = {
   location: Location,
   logout: Logout,
   luminosity: Luminosity,
+  markerSize: MarkerSize,
   menu: Menu,
   mirror: Mirror,
   number: Number,
@@ -127,6 +130,7 @@ export const icons = {
   showOff: ShowOff,
   sidebarFill: SidebarFill,
   sidebarOutline: SidebarOutline,
+  sharpness: Sharpness,
   textOutline: TextOutline,
   target: Target,
   trace: Trace,

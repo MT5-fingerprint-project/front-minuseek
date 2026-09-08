@@ -250,7 +250,7 @@ export const FILTER_META: Record<string, { labelKey: string; icon: IconName; kon
   },
   sharpening: {
     labelKey: 'biometricImage.toolbar.tools.sharpening',
-    icon: 'trace',
+    icon: 'sharpness',
     konva: { type: 'filter', filter: LocalSharpening, prop: 'sharpeningAmount', scale: 1 / 100 },
   },
 }
@@ -269,20 +269,20 @@ export type ImageTool = {
 }
 
 export const IMAGE_TOOLS: ImageTool[] = [
-  { icon: 'mirror'       as IconName, label: 'biometricImage.toolbar.tools.mirror',       filters: [{ filterKey: 'mirror',    inputType: 'toggle' }] },
-  { icon: 'rotate'       as IconName, label: 'biometricImage.toolbar.tools.rotation',     filters: [{ filterKey: 'rotation',  min: -180, max: 180, unit: '°', origin: 'center' }] },
-  { icon: 'compare'      as IconName, label: 'biometricImage.toolbar.tools.invertColors', filters: [{ filterKey: 'inversion', inputType: 'toggle' }] },
-  { icon: 'luminosity'   as IconName, label: 'biometricImage.toolbar.tools.luminosity',   filters: [{ filterKey: 'brightness' }] },
-  { icon: 'contrast'     as IconName, label: 'biometricImage.toolbar.tools.contrast',     filters: [{ filterKey: 'contrast'   }] },
-  { icon: 'invertColors' as IconName, label: 'biometricImage.toolbar.tools.saturation',   filters: [{ filterKey: 'saturation' }] },
+  { icon: 'mirror' as IconName, label: 'biometricImage.toolbar.tools.mirror', filters: [{ filterKey: 'mirror', inputType: 'toggle' }] },
+  { icon: 'rotate' as IconName, label: 'biometricImage.toolbar.tools.rotation', filters: [{ filterKey: 'rotation', min: -180, max: 180, unit: '°', origin: 'center' }] },
+  { icon: 'compare' as IconName, label: 'biometricImage.toolbar.tools.invertColors', filters: [{ filterKey: 'inversion', inputType: 'toggle' }] },
+  { icon: 'luminosity' as IconName, label: 'biometricImage.toolbar.tools.luminosity', filters: [{ filterKey: 'brightness' }] },
+  { icon: 'contrast' as IconName, label: 'biometricImage.toolbar.tools.contrast', filters: [{ filterKey: 'contrast' }] },
+  { icon: 'invertColors' as IconName, label: 'biometricImage.toolbar.tools.saturation', filters: [{ filterKey: 'saturation' }] },
   {
     icon: 'palette' as IconName,
     label: 'biometricImage.toolbar.tools.channels',
     isExpertOnly: true,
     filters: [
-      { filterKey: 'channelRed',   labelKey: 'biometricImage.toolbar.tools.channelRed',   inputType: 'toggle' },
+      { filterKey: 'channelRed', labelKey: 'biometricImage.toolbar.tools.channelRed', inputType: 'toggle' },
       { filterKey: 'channelGreen', labelKey: 'biometricImage.toolbar.tools.channelGreen', inputType: 'toggle' },
-      { filterKey: 'channelBlue',  labelKey: 'biometricImage.toolbar.tools.channelBlue',  inputType: 'toggle' },
+      { filterKey: 'channelBlue', labelKey: 'biometricImage.toolbar.tools.channelBlue', inputType: 'toggle' },
     ],
   },
   {
@@ -290,13 +290,13 @@ export const IMAGE_TOOLS: ImageTool[] = [
     label: 'biometricImage.toolbar.tools.levels',
     isExpertOnly: true,
     filters: [
-      { filterKey: 'levelsBlack', labelKey: 'biometricImage.toolbar.tools.levelsBlack', min: 0,    max: 100, origin: 'left' },
+      { filterKey: 'levelsBlack', labelKey: 'biometricImage.toolbar.tools.levelsBlack', min: 0, max: 100, origin: 'left' },
       { filterKey: 'levelsGamma', labelKey: 'biometricImage.toolbar.tools.levelsGamma', min: -100, max: 100, origin: 'center' },
-      { filterKey: 'levelsWhite', labelKey: 'biometricImage.toolbar.tools.levelsWhite', min: 0,    max: 100, origin: 'left' },
+      { filterKey: 'levelsWhite', labelKey: 'biometricImage.toolbar.tools.levelsWhite', min: 0, max: 100, origin: 'left' },
     ],
   },
   {
-    icon: 'trace' as IconName,
+    icon: 'sharpness' as IconName,
     label: 'biometricImage.toolbar.tools.sharpening',
     isExpertOnly: true,
     filters: [{ filterKey: 'sharpening', min: 0, max: 200, origin: 'left' }],
@@ -324,11 +324,11 @@ type AnnotationTool = {
 }
 
 export const ANNOTATION_TOOLS: AnnotationTool[] = [
-  { icon: 'palette'    as IconName, label: 'biometricImage.toolbar.tools.palette',      panel: 'color' },
-  { icon: 'circle'     as IconName, label: 'biometricImage.toolbar.tools.point',        tool: 'circle'      as AnnotationToolType },
-  { icon: 'circleLine' as IconName, label: 'biometricImage.toolbar.tools.pointArrow',   tool: 'circleArrow' as AnnotationToolType },
-  { icon: 'penTrace'   as IconName, label: 'biometricImage.toolbar.tools.pencil',       tool: 'pencil'      as AnnotationToolType },
-  { icon: 'target'     as IconName, label: 'biometricImage.toolbar.tools.markerSize',   panel: 'markerSize' },
+  { icon: 'palette' as IconName, label: 'biometricImage.toolbar.tools.palette', panel: 'color' },
+  { icon: 'markerSize' as IconName, label: 'biometricImage.toolbar.tools.markerSize', panel: 'markerSize' },
+  { icon: 'circle' as IconName, label: 'biometricImage.toolbar.tools.point', tool: 'circle' as AnnotationToolType },
+  { icon: 'circleLine' as IconName, label: 'biometricImage.toolbar.tools.pointArrow', tool: 'circleArrow' as AnnotationToolType },
+  { icon: 'penTrace' as IconName, label: 'biometricImage.toolbar.tools.pencil', tool: 'pencil' as AnnotationToolType },
 ]
 
 /**
