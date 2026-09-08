@@ -22,8 +22,8 @@
       "export": "Exporter l'image affichée",
       "detachWindow": "Ouvrir dans une nouvelle fenêtre",
       "attachWindow": "Fermer la fenêtre détachée",
-      "undo": "Annuler (à venir)",
-      "redo": "Rétablir (à venir)"
+      "undo": "Annuler",
+      "redo": "Rétablir"
     }
   },
   "navigation": {
@@ -184,6 +184,14 @@
             "title": "Annoter l'image",
             "text": "Ce mode permet de poser des minuties ou de tracer des repères sur l'image. Choisissez un outil avant de cliquer dans l'image."
           },
+          "exploitability": {
+            "title": "Exploitabilité de la trace",
+            "text": "Ce menu déclare la trace exploitable ou non, et si elle n'a mené à aucune identification."
+          },
+          "history": {
+            "title": "Annuler / rétablir",
+            "text": "Ces flèches annulent ou rétablissent votre dernière annotation ou réglage sur cette image."
+          },
           "layers": {
             "title": "Calques",
             "text": "Ce bouton affiche les annotations posées, pour les revoir ou les masquer."
@@ -191,6 +199,10 @@
           "analyze": {
             "title": "Analyse automatique",
             "text": "Ce bouton propose un classement des empreintes les plus proches de la trace : c'est une aide au tri, la conclusion reste celle de l'opérateur."
+          },
+          "pairing": {
+            "title": "Apparier les minuties",
+            "text": "Ce mode démonstration fait correspondre manuellement les minuties de la trace et de l'empreinte, pour ensuite rejouer la concordance."
           },
           "match": {
             "title": "Déclarer une correspondance",

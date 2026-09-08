@@ -36,6 +36,16 @@ export const ATELIER_TOUR_STEPS: TourStep[] = [
     selector: '[data-tour="mode-annotation-traces"]',
   },
   {
+    titleKey: 'investigationCase.comparison.tour.steps.exploitability.title',
+    textKey: 'investigationCase.comparison.tour.steps.exploitability.text',
+    selector: '[data-tour="exploitability-dropdown"]',
+  },
+  {
+    titleKey: 'investigationCase.comparison.tour.steps.history.title',
+    textKey: 'investigationCase.comparison.tour.steps.history.text',
+    selector: '[data-tour="history-controls"]',
+  },
+  {
     titleKey: 'investigationCase.comparison.tour.steps.layers.title',
     textKey: 'investigationCase.comparison.tour.steps.layers.text',
     selector: '[data-tour="layers-toggle"]',
@@ -44,6 +54,11 @@ export const ATELIER_TOUR_STEPS: TourStep[] = [
     titleKey: 'investigationCase.comparison.tour.steps.analyze.title',
     textKey: 'investigationCase.comparison.tour.steps.analyze.text',
     selector: '[data-tour="analyze-button"]',
+  },
+  {
+    titleKey: 'investigationCase.comparison.tour.steps.pairing.title',
+    textKey: 'investigationCase.comparison.tour.steps.pairing.text',
+    selector: '[data-tour="pairing-toggle"]',
   },
   {
     titleKey: 'investigationCase.comparison.tour.steps.match.title',

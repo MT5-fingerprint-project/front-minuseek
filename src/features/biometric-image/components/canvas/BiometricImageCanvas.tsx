@@ -1,4 +1,4 @@
-import { useImperativeHandle, useRef, useState } from 'react'
+import { useImperativeHandle, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Stage, Layer } from 'react-konva'
 import type Konva from 'konva'
@@ -19,6 +19,7 @@ import { useCanvasView, type CanvasZoomHandle } from '@/features/biometric-image
 import { useContainerSize } from '@/features/shared/hooks/useContainerSize'
 import { useCanvasFilters } from '@/features/biometric-image/hooks/useCanvasFilters'
 import { useLayers, useUpdateLayer } from '@/features/biometric-image/hooks/useLayers'
+import { useLayerHistory } from '@/features/biometric-image/hooks/useLayerHistory'
 import { useMinutiaDeletionGuard } from '@/features/biometric-image/hooks/useMinutiaDeletionGuard'
 import { useBiometricImages, useCalibrateBiometricImage, useSetMarkRadius } from '@/features/biometric-image/hooks/useBiometricImages'
 import { useCaseExpertise } from '@/features/investigation-case/hooks/useCaseExpertise'
@@ -64,6 +65,13 @@ export type RulerHandle = {
   arm: () => void
 }
 
+/** Annuler/rétablir depuis le pied de fenêtre — porte sur les annotations et le type
+ * de minutie, voir useLayerHistory. */
+export type HistoryHandle = {
+  undo: () => void
+  redo: () => void
+}
+
 type BiometricImageCanvasProps = {
   image: BiometricImage | undefined
   type: BiometricImageType
@@ -77,6 +85,8 @@ type BiometricImageCanvasProps = {
   onSourceGeometryChange?: (geometry: SourceGeometry | null) => void
   exportHandleRef?: React.RefObject<ExportHandle | null>
   rulerHandleRef?: React.RefObject<RulerHandle | null>
+  historyHandleRef?: React.RefObject<HistoryHandle | null>
+  onHistoryChange?: (state: { canUndo: boolean; canRedo: boolean }) => void
   /** Ouvre la saisie clavier de la résolution, pour une image sans réglette photographiée. */
   onRequestManualResolution?: () => void
   /** Mode démonstration (L7-2b) : appariement des minuties entre trace et empreinte. */
@@ -107,6 +117,8 @@ export default function BiometricImageCanvas({
   onSourceGeometryChange,
   exportHandleRef,
   rulerHandleRef,
+  historyHandleRef,
+  onHistoryChange,
   onRequestManualResolution,
   isPairingMode = false,
   armedMinutiaId = null,
@@ -142,6 +154,7 @@ export default function BiometricImageCanvas({
   const [drawnFrame, setDrawnFrame] = useState<{ imageId: string; frame: DrawnFrame } | null>(null)
   const content = drawnFrame?.imageId === imageId ? drawnFrame.frame : null
   const { view, handleWheel, panTo, recenterSignal } = useCanvasView({ size, content, zoomHandleRef, onScaleChange })
+  const history = useLayerHistory(image?.id)
   const {
     sliderValues,
     effectiveFilters,
@@ -149,7 +162,7 @@ export default function BiometricImageCanvas({
     curvePoints,
     effectiveCurvePoints,
     handleCurveChange,
-  } = useCanvasFilters(image?.id)
+  } = useCanvasFilters(image?.id, history.record)
   const [mode, setMode] = useState<CanvasMode>('image')
   const [isCurveWindowOpen, setCurveWindowOpen] = useState(false)
   const [activeTool, setActiveTool] = useState<AnnotationToolType | null>(null)
@@ -225,8 +238,11 @@ export default function BiometricImageCanvas({
       return
     }
     updateSelectedType.mutate({ id: selectedLayer.id, input: { settings } })
+    history.record({ kind: 'update', id: selectedLayer.id, before: selectedLayer.settings, after: settings })
   }
 
+  // Non journalisé : le serveur requalifie aussi la minutie appariée en face, une
+  // cascade que l'historique client ne peut pas défaire de façon fiable.
   const confirmTypeChange = () => {
     if (!pendingTypeChange) return
     updateSelectedType.mutate({
@@ -252,6 +268,16 @@ export default function BiometricImageCanvas({
       setActiveTool(null)
     },
   }))
+
+  useImperativeHandle(historyHandleRef, () => ({
+    undo: history.undo,
+    redo: history.redo,
+  }))
+
+  useEffect(() => {
+    onHistoryChange?.({ canUndo: history.canUndo, canRedo: history.canRedo })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [history.canUndo, history.canRedo])
 
   const handleValidateCalibration = (resolutionDpi: number) => {
     if (!image) return
@@ -396,6 +422,7 @@ export default function BiometricImageCanvas({
               revealedMinutiaIds={revealedMinutiaIds}
               activeMinutiaId={activeMinutiaId}
               registerMinutiaNode={registerMinutiaNode}
+              onRecordHistory={history.record}
             />
             <CalibrationLayer
               key={`${image.id}-${calibrationResetSignal}`}

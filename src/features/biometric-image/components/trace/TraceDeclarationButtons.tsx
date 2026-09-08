@@ -52,6 +52,7 @@ export default function TraceDeclarationButtons({ trace, caseId, variant = 'pane
             type="button"
             disabled={declareExploitability.isPending || isNotIdentifiedPending}
             aria-label={t('trace.exploitability.title')}
+            data-tour="exploitability-dropdown"
             className={cn(
               'flex items-center gap-0.5 rounded-full px-2 py-1 text-xs font-medium transition-colors disabled:opacity-50',
               shortLabelParts.length > 0

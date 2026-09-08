@@ -28,6 +28,7 @@ export default function PairingControls({ isActive, disabled, pairCount, onToggl
         disabled={disabled}
         title={title}
         aria-pressed={isActive}
+        data-tour="pairing-toggle"
         className={cn(
           'inline-flex items-center gap-1 rounded-full px-2 py-1 font-medium text-white shadow-sm ring-[3px] ring-white transition-colors',
           !disabled && !isActive && 'bg-grey-medium-2 hover:bg-grey-dark',

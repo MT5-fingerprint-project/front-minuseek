@@ -199,8 +199,22 @@ export default function ComparisonWorkbench({
         {type === 'traces' && freshImage && (
           <TraceDeclarationButtons trace={freshImage} caseId={caseId} variant="compact" />
         )}
-        <WindowActionButton tone="footer" icon="redo" label={t('common.window.redo')} />
-        <WindowActionButton tone="footer" icon="undo" label={t('common.window.undo')} />
+        <span className="flex items-center gap-1" {...(side === 'left' ? { 'data-tour': 'history-controls' } : {})}>
+          <WindowActionButton
+            tone="footer"
+            icon="undo"
+            label={t('common.window.undo')}
+            onClick={() => w.historyRef.current?.undo()}
+            disabled={!w.canUndo}
+          />
+          <WindowActionButton
+            tone="footer"
+            icon="redo"
+            label={t('common.window.redo')}
+            onClick={() => w.historyRef.current?.redo()}
+            disabled={!w.canRedo}
+          />
+        </span>
         {w.selectedTrace && (
           <WindowActionButton tone="footer" icon="fileExport" label={t('common.window.export')} onClick={handleExport} />
         )}
@@ -256,6 +270,8 @@ export default function ComparisonWorkbench({
             onSourceGeometryChange={w.setSourceGeometry}
             exportHandleRef={w.exportRef}
             rulerHandleRef={w.rulerRef}
+            historyHandleRef={w.historyRef}
+            onHistoryChange={w.handleHistoryChange}
             onRequestManualResolution={() => setIsImageSizeDialogOpen(true)}
             isPairingMode={isPairingMode}
             armedMinutiaId={armedMinutiaId}

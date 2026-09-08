@@ -4,6 +4,7 @@ import type {
   CanvasZoomHandle,
   ConcordanceHandle,
   ExportHandle,
+  HistoryHandle,
   RulerHandle,
   VideoFrameHandle,
 } from '@/features/biometric-image/components/canvas/BiometricImageCanvas'
@@ -19,12 +20,15 @@ export function useComparisonWindow() {
   const concordanceRef = useRef<ConcordanceHandle>(null)
   const rulerRef = useRef<RulerHandle>(null)
   const videoFrameRef = useRef<VideoFrameHandle>(null)
+  const historyRef = useRef<HistoryHandle>(null)
 
   const [isCollapsed, setCollapsed] = useState(false)
   const [isFilesVisible, setFilesVisible] = useState(true)
   const [isLayersVisible, setLayersVisible] = useState(false)
   const [isGridVisible, setGridVisible] = useState(false)
   const [scale, setScale] = useState(1)
+  const [canUndo, setCanUndo] = useState(false)
+  const [canRedo, setCanRedo] = useState(false)
   const [selectedTrace, setSelectedTrace] = useState<BiometricImage>()
   const [sourceGeometry, setSourceGeometry] = useState<SourceGeometry | null>(null)
 
@@ -44,6 +48,13 @@ export function useComparisonWindow() {
     concordanceRef,
     rulerRef,
     videoFrameRef,
+    historyRef,
+    canUndo,
+    canRedo,
+    handleHistoryChange: ({ canUndo, canRedo }: { canUndo: boolean; canRedo: boolean }) => {
+      setCanUndo(canUndo)
+      setCanRedo(canRedo)
+    },
     isCollapsed,
     syncCollapsed,
     isFilesVisible,
