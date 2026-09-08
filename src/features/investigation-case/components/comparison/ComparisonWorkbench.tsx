@@ -205,14 +205,14 @@ export default function ComparisonWorkbench({
             icon="undo"
             label={t('common.window.undo')}
             onClick={() => w.historyRef.current?.undo()}
-            disabled={!w.canUndo}
+            disabled={!w.canUndo || w.isHistoryApplying}
           />
           <WindowActionButton
             tone="footer"
             icon="redo"
             label={t('common.window.redo')}
             onClick={() => w.historyRef.current?.redo()}
-            disabled={!w.canRedo}
+            disabled={!w.canRedo || w.isHistoryApplying}
           />
         </span>
         {w.selectedTrace && (

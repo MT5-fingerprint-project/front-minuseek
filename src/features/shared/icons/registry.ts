@@ -54,11 +54,11 @@ import Rotate from './rotate.svg?react'
 import Ruler from './ruler.svg?react'
 import Search from './search.svg?react'
 import Settings from './settings.svg?react'
+import Sharpness from './sharpness.svg?react'
 import Show from './show.svg?react'
 import ShowOff from './show-off.svg?react'
 import SidebarFill from './sidebar-fill.svg?react'
 import SidebarOutline from './sidebar-outline.svg?react'
-import Sharpness from './sharpness.svg?react'
 import Target from './target.svg?react'
 import TextOutline from './text-outline.svg?react'
 import Trace from './trace.svg?react'
@@ -126,11 +126,11 @@ export const icons = {
   ruler: Ruler,
   search: Search,
   settings: Settings,
+  sharpness: Sharpness,
   show: Show,
   showOff: ShowOff,
   sidebarFill: SidebarFill,
   sidebarOutline: SidebarOutline,
-  sharpness: Sharpness,
   textOutline: TextOutline,
   target: Target,
   trace: Trace,

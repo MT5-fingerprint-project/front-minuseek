@@ -109,6 +109,13 @@ export default function AnnotationLayer({
   const [draft, setDraft] = useState<Draft | null>(null)
   const draftRef = useRef<Draft | null>(null)
   const drawingRef = useRef(false)
+  // Lu par le handler de suppression (effet lié à selectedId, pas à annotations) :
+  // sans ce ref, un snapshot "before" pour l'annuler pourrait dater de plusieurs
+  // rendus, si un autre calque a été modifié pendant que celui-ci restait sélectionné.
+  const annotationsRef = useRef(annotations)
+  useEffect(() => {
+    annotationsRef.current = annotations
+  })
 
   const select = onSelect
   const longestSide = Math.max(sourceWidth, sourceHeight)
@@ -132,7 +139,7 @@ export default function AnnotationLayer({
   useEffect(() => {
     if (!selectedId) return
     const removeAnnotation = () => {
-      const layer = annotations.find((a) => a.id === selectedId)
+      const layer = annotationsRef.current.find((a) => a.id === selectedId)
       deleteLayer.mutate(selectedId)
       if (layer) onRecordHistory?.({ kind: 'delete', layer })
       select(null)

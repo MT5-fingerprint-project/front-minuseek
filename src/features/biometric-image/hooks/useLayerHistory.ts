@@ -23,8 +23,12 @@ export function useLayerHistory(fingerprintId: string | undefined) {
   const deleteLayer = useDeleteLayer()
   const undoStack = useRef<LayerHistoryEntry[]>([])
   const redoStack = useRef<LayerHistoryEntry[]>([])
+  // Ref synchrone (garde anti double-clic) + state (reflété dans l'UI) : le state
+  // seul arriverait trop tard pour bloquer un deuxième clic dans la même frame.
+  const isApplyingRef = useRef(false)
   const [canUndo, setCanUndo] = useState(false)
   const [canRedo, setCanRedo] = useState(false)
+  const [isApplying, setIsApplying] = useState(false)
 
   const sync = () => {
     setCanUndo(undoStack.current.length > 0)
@@ -43,39 +47,67 @@ export function useLayerHistory(fingerprintId: string | undefined) {
     sync()
   }
 
-  const apply = (entry: LayerHistoryEntry, direction: 'undo' | 'redo') => {
+  const apply = async (entry: LayerHistoryEntry, direction: 'undo' | 'redo') => {
     if (entry.kind === 'create') {
-      if (direction === 'undo') deleteLayer.mutate(entry.input.id)
-      else createLayer.mutate(entry.input)
+      if (direction === 'undo') await deleteLayer.mutateAsync(entry.input.id)
+      else await createLayer.mutateAsync(entry.input)
       return
     }
     if (entry.kind === 'update') {
-      updateLayer.mutate({ id: entry.id, input: { settings: direction === 'undo' ? entry.before : entry.after } })
+      await updateLayer.mutateAsync({
+        id: entry.id,
+        input: { settings: direction === 'undo' ? entry.before : entry.after },
+      })
       return
     }
     if (direction === 'undo') {
       const { id, fingerprintId, name, type, zIndex, settings } = entry.layer
-      createLayer.mutate({ id, fingerprintId, name, type, zIndex, settings })
+      await createLayer.mutateAsync({ id, fingerprintId, name, type, zIndex, settings })
     } else {
-      deleteLayer.mutate(entry.layer.id)
+      await deleteLayer.mutateAsync(entry.layer.id)
     }
   }
 
-  const undo = () => {
+  // Si la mutation échoue (déjà toastée par son propre hook), l'entrée retourne sur
+  // sa pile d'origine plutôt que d'avancer : la pile ne doit jamais promettre un état
+  // serveur qui n'a pas été atteint.
+  const undo = async () => {
+    if (isApplyingRef.current) return
     const entry = undoStack.current.pop()
     if (!entry) return
-    apply(entry, 'undo')
-    redoStack.current.push(entry)
+    isApplyingRef.current = true
+    setIsApplying(true)
     sync()
+    try {
+      await apply(entry, 'undo')
+      redoStack.current.push(entry)
+    } catch {
+      undoStack.current.push(entry)
+    } finally {
+      isApplyingRef.current = false
+      setIsApplying(false)
+      sync()
+    }
   }
 
-  const redo = () => {
+  const redo = async () => {
+    if (isApplyingRef.current) return
     const entry = redoStack.current.pop()
     if (!entry) return
-    apply(entry, 'redo')
-    undoStack.current.push(entry)
+    isApplyingRef.current = true
+    setIsApplying(true)
     sync()
+    try {
+      await apply(entry, 'redo')
+      undoStack.current.push(entry)
+    } catch {
+      redoStack.current.push(entry)
+    } finally {
+      isApplyingRef.current = false
+      setIsApplying(false)
+      sync()
+    }
   }
 
-  return { record, undo, redo, canUndo, canRedo }
+  return { record, undo, redo, canUndo, canRedo, isApplying }
 }

@@ -86,7 +86,7 @@ type BiometricImageCanvasProps = {
   exportHandleRef?: React.RefObject<ExportHandle | null>
   rulerHandleRef?: React.RefObject<RulerHandle | null>
   historyHandleRef?: React.RefObject<HistoryHandle | null>
-  onHistoryChange?: (state: { canUndo: boolean; canRedo: boolean }) => void
+  onHistoryChange?: (state: { canUndo: boolean; canRedo: boolean; isApplying: boolean }) => void
   /** Ouvre la saisie clavier de la résolution, pour une image sans réglette photographiée. */
   onRequestManualResolution?: () => void
   /** Mode démonstration (L7-2b) : appariement des minuties entre trace et empreinte. */
@@ -275,9 +275,9 @@ export default function BiometricImageCanvas({
   }))
 
   useEffect(() => {
-    onHistoryChange?.({ canUndo: history.canUndo, canRedo: history.canRedo })
+    onHistoryChange?.({ canUndo: history.canUndo, canRedo: history.canRedo, isApplying: history.isApplying })
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [history.canUndo, history.canRedo])
+  }, [history.canUndo, history.canRedo, history.isApplying])
 
   const handleValidateCalibration = (resolutionDpi: number) => {
     if (!image) return

@@ -41,6 +41,13 @@ export function useCanvasFilters(
   const createLayer = useCreateLayer()
   const updateLayer = useUpdateLayer()
   const deleteLayer = useDeleteLayer()
+  // Lu par le `setTimeout` du debounce, qui se déclenche 500ms après avoir été
+  // programmé : sans ce ref, il verrait `layers` tel qu'il était à la frappe, pas
+  // au moment où il s'exécute réellement (avant/après un calque touché entre-temps).
+  const layersRef = useRef(layers)
+  useEffect(() => {
+    layersRef.current = layers
+  })
 
 
   const persistedFilterIds = layers
@@ -106,7 +113,8 @@ export function useCanvasFilters(
       const value = newFilters[changedKey]
       const settings = { filterKey: changedKey, value }
       const existingId = layerIdByKey.current[changedKey]
-      const existingLayer = existingId ? layers.find((l) => l.id === existingId) : undefined
+      const currentLayers = layersRef.current
+      const existingLayer = existingId ? currentLayers.find((l) => l.id === existingId) : undefined
 
       if (value === 0) {
         if (existingId) {
@@ -131,7 +139,7 @@ export function useCanvasFilters(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           name: t(FILTER_META[changedKey]?.labelKey as any ?? changedKey),
           type: 'FILTER' as const,
-          zIndex: layers.length,
+          zIndex: currentLayers.length,
           settings,
         }
         createLayer.mutate(input)

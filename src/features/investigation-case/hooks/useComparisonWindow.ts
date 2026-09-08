@@ -29,6 +29,7 @@ export function useComparisonWindow() {
   const [scale, setScale] = useState(1)
   const [canUndo, setCanUndo] = useState(false)
   const [canRedo, setCanRedo] = useState(false)
+  const [isHistoryApplying, setIsHistoryApplying] = useState(false)
   const [selectedTrace, setSelectedTrace] = useState<BiometricImage>()
   const [sourceGeometry, setSourceGeometry] = useState<SourceGeometry | null>(null)
 
@@ -51,9 +52,19 @@ export function useComparisonWindow() {
     historyRef,
     canUndo,
     canRedo,
-    handleHistoryChange: ({ canUndo, canRedo }: { canUndo: boolean; canRedo: boolean }) => {
+    isHistoryApplying,
+    handleHistoryChange: ({
+      canUndo,
+      canRedo,
+      isApplying,
+    }: {
+      canUndo: boolean
+      canRedo: boolean
+      isApplying: boolean
+    }) => {
       setCanUndo(canUndo)
       setCanRedo(canRedo)
+      setIsHistoryApplying(isApplying)
     },
     isCollapsed,
     syncCollapsed,
