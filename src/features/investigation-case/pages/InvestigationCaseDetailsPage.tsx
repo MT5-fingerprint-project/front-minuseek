@@ -126,38 +126,42 @@ export default function InvestigationCaseDetailsPage() {
         </TabsList>
 
         <TabsContent value={CASE_TAB} className="flex flex-col gap-6 pt-4">
-          <section className="flex flex-col gap-5 px-4 py-3  rounded-sm bg-white">
-            <div className="flex items-center justify-between gap-4">
-              <h2 className="text-lg font-semibold">{t('investigationCase.details.informations')}</h2>
-              <Button variant="outline" size="small" onClick={() => setIsEditing(true)}>
-                {editLabel}
-                <Icon name="pen" size={12} data-icon="inline-end" color="currentColor" />
-              </Button>
+          <section className="flex flex-col rounded-sm bg-white">
+            <div className="flex flex-col gap-5 p-4">
+              <div className="flex items-center justify-between gap-4">
+                <h2 className="text-lg font-semibold">{t('investigationCase.details.informations')}</h2>
+                <Button variant="outline" size="small" onClick={() => setIsEditing(true)}>
+                  {editLabel}
+                  <Icon name="pen" size={12} data-icon="inline-end" color="currentColor" />
+                </Button>
+              </div>
+              <div className="flex flex-wrap gap-x-16 gap-y-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <Icon name="folder" size={20} color="var( --color-grey-medium-1)" />
+                  <span className="text-muted-foreground font-medium">{t('investigationCase.details.pvNumber')}</span>
+                  <span>{investigationCase.pvNumber}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Icon name="dateStart" size={20} color="var( --color-grey-medium-1)" />
+                  <span className="text-muted-foreground font-medium">{t('investigationCase.details.openedAt')}</span>
+                  <span>{openedDate}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Icon name="person" size={20} color="var( --color-grey-medium-1)" />
+                  <span className="text-muted-foreground font-medium">{t('investigationCase.details.operator')}</span>
+                  <span>
+                    {investigationCase.operator
+                      ? caseUserNameOf(investigationCase.operator)
+                      : t('investigationCase.details.noOperator')}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-wrap gap-x-16 gap-y-3">
-              <div className="flex items-center gap-2 text-sm">
-                <Icon name="folder" size={20} color="var( --color-grey-medium-1)" />
-                <span className="text-muted-foreground font-medium">{t('investigationCase.details.pvNumber')}</span>
-                <span>{investigationCase.pvNumber}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Icon name="dateStart" size={20} color="var( --color-grey-medium-1)" />
-                <span className="text-muted-foreground font-medium">{t('investigationCase.details.openedAt')}</span>
-                <span>{openedDate}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Icon name="person" size={20} color="var( --color-grey-medium-1)" />
-                <span className="text-muted-foreground font-medium">{t('investigationCase.details.operator')}</span>
-                <span>
-                  {investigationCase.operator
-                    ? caseUserNameOf(investigationCase.operator)
-                    : t('investigationCase.details.noOperator')}
-                </span>
-              </div>
+
+            <div className="border-t border-grey-light-1 p-4">
+              <CaseJudicialHeaderSummary investigationCase={investigationCase} />
             </div>
           </section>
-
-          <CaseJudicialHeaderSummary investigationCase={investigationCase} />
 
           {investigationCase.description && (
             <section className="flex flex-col gap-5 px-4 py-3 rounded-sm bg-blue-light-1">

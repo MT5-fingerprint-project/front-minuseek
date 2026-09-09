@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Circle, Line, Group, Text } from 'react-konva'
+import { Circle, Line, Group, Rect, Text } from 'react-konva'
 import Konva from 'konva'
 import type { Layer } from '@/features/biometric-image/types/layer'
 import { minutiaTypeOf, type MinutiaSettings } from '@/features/biometric-image/lib/minutiae'
@@ -15,7 +15,16 @@ const HANDLE_STROKE_WIDTH = 1.5
 const HIT_STROKE_WIDTH = 12
 const LABEL_MIN_FONT_SIZE = 8
 const LABEL_GAP = 4
+const LABEL_PADDING = 3
 const BADGE_RADIUS_MIN = 7
+// Même teinte que --color-blue-light-1 : fond neutre pour lire le type/numéro
+// quelle que soit la couleur (parfois claire) choisie pour la minutie elle-même.
+const LABEL_BG_COLOR = '#E0E0E8'
+const LABEL_TEXT_COLOR = 'black'
+
+function measureTextWidth(text: string, fontSize: number): number {
+  return new Konva.Text({ text, fontSize }).width()
+}
 
 type MinutiaeAnnotationProps = {
   layer: Layer
@@ -65,6 +74,7 @@ export default function MinutiaeAnnotation({
   const [liveAngleDeg, setLiveAngleDeg] = useState<number | null>(null)
   // Track handle drag with state so it's safe to read during render
   const [draggingHandle, setDraggingHandle] = useState(false)
+  const [isHovered, setIsHovered] = useState(false)
   const isDraggingHandle = useRef(false)
   const groupRef = useRef<Konva.Group>(null)
 
@@ -98,13 +108,17 @@ export default function MinutiaeAnnotation({
   const onScreen = (screenPixels: number) => screenPixels / viewScale
 
   const minutiaType = minutiaTypeOf(settings)
-  const typeLabel = t(
-    isSelected
-      ? `biometricImage.minutia.types.${minutiaType}`
-      : `biometricImage.minutia.shortTypes.${minutiaType}`,
-  )
+  const typeLabel = t(`biometricImage.minutia.types.${minutiaType}`)
   const labelFontSize = Math.max(onScreen(LABEL_MIN_FONT_SIZE), radius * 1.3)
   const badgeRadius = Math.max(onScreen(BADGE_RADIUS_MIN), radius * 0.8)
+  const labelGap = onScreen(LABEL_GAP)
+  // Le badge de numéro colle au repère ; le type se pousse après lui pour ne pas
+  // s'écrire par-dessus (les deux n'apparaissent qu'au survol, côte à côte).
+  const badgeX = radius + labelGap
+  const typeLabelX = badgeX + (pairNumber !== null ? badgeRadius * 2 + labelGap : 0)
+  const showTypeLabel = !isPairingMode && !isConcordanceMode && isHovered
+  const typeLabelPadding = onScreen(LABEL_PADDING)
+  const typeLabelWidth = showTypeLabel ? measureTextWidth(typeLabel, labelFontSize) : 0
 
   const isDimmed = isConcordanceMode && !isRevealed && !isEntering
 
@@ -119,6 +133,8 @@ export default function MinutiaeAnnotation({
       y={settings.y}
       opacity={isDimmed ? 0.15 : 1}
       draggable={!draggingHandle && !isPairingMode && !isConcordanceMode}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       onClick={(e) => {
         e.cancelBubble = true
         if (isConcordanceMode) return
@@ -139,6 +155,7 @@ export default function MinutiaeAnnotation({
       )}
       <Circle
         radius={radius}
+        fill="transparent"
         stroke={settings.color}
         strokeWidth={strokeWidth}
         hitStrokeWidth={onScreen(HIT_STROKE_WIDTH)}
@@ -152,26 +169,34 @@ export default function MinutiaeAnnotation({
         />
       )}
 
-      {!isPairingMode && !isConcordanceMode && (
+      {showTypeLabel && (
         <Group scaleX={mirrorScaleX} rotation={-rotationDeg} listening={false}>
+          <Rect
+            x={typeLabelX - typeLabelPadding}
+            y={-labelFontSize / 2 - typeLabelPadding}
+            width={typeLabelWidth + typeLabelPadding * 2}
+            height={labelFontSize + typeLabelPadding * 2}
+            fill={LABEL_BG_COLOR}
+            cornerRadius={onScreen(3)}
+          />
           <Text
             text={typeLabel}
-            x={radius + onScreen(LABEL_GAP)}
+            x={typeLabelX}
             y={0}
             offsetY={labelFontSize / 2}
             fontSize={labelFontSize}
-            fill={settings.color}
+            fill={LABEL_TEXT_COLOR}
             listening={false}
           />
         </Group>
       )}
 
-      {pairNumber !== null && (
+      {pairNumber !== null && isHovered && (
         <Group scaleX={mirrorScaleX} rotation={-rotationDeg} listening={false}>
-          <Circle x={radius + onScreen(LABEL_GAP) + badgeRadius} y={0} radius={badgeRadius} fill={settings.color} />
+          <Circle x={badgeX + badgeRadius} y={0} radius={badgeRadius} fill={LABEL_BG_COLOR} />
           <Text
             text={String(pairNumber)}
-            x={radius + onScreen(LABEL_GAP)}
+            x={badgeX}
             y={-badgeRadius}
             width={badgeRadius * 2}
             height={badgeRadius * 2}
@@ -179,7 +204,7 @@ export default function MinutiaeAnnotation({
             verticalAlign="middle"
             fontSize={badgeRadius * 1.1}
             fontStyle="bold"
-            fill="white"
+            fill={LABEL_TEXT_COLOR}
           />
         </Group>
       )}

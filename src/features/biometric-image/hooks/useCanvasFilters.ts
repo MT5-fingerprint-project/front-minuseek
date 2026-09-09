@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { ParseKeys } from 'i18next'
 import { useTranslation } from 'react-i18next'
 import { useLayers, useCreateLayer, useUpdateLayer, useDeleteLayer } from './useLayers'
+import type { LayerHistoryEntry } from './useLayerHistory'
 import { DEFAULT_FILTERS, FILTER_META, type CanvasFilters } from '../components/toolbar/canvasFilters'
 import {
   DEFAULT_CURVE_POINTS,
@@ -25,7 +26,10 @@ function readCurvePoints(settings: Record<string, unknown>): CurvePoint[] | null
   return read.length === points.length ? sortedCurvePoints(read) : null
 }
 
-export function useCanvasFilters(fingerprintId: string | undefined) {
+export function useCanvasFilters(
+  fingerprintId: string | undefined,
+  onRecordHistory?: (entry: LayerHistoryEntry) => void,
+) {
   const { t } = useTranslation()
   const [sliderValues, setSliderValues] = useState<CanvasFilters>(DEFAULT_FILTERS)
   const [curvePoints, setCurvePoints] = useState<CurvePoint[]>(DEFAULT_CURVE_POINTS)
@@ -37,6 +41,13 @@ export function useCanvasFilters(fingerprintId: string | undefined) {
   const createLayer = useCreateLayer()
   const updateLayer = useUpdateLayer()
   const deleteLayer = useDeleteLayer()
+  // Lu par le `setTimeout` du debounce, qui se déclenche 500ms après avoir été
+  // programmé : sans ce ref, il verrait `layers` tel qu'il était à la frappe, pas
+  // au moment où il s'exécute réellement (avant/après un calque touché entre-temps).
+  const layersRef = useRef(layers)
+  useEffect(() => {
+    layersRef.current = layers
+  })
 
 
   const persistedFilterIds = layers
@@ -102,30 +113,37 @@ export function useCanvasFilters(fingerprintId: string | undefined) {
       const value = newFilters[changedKey]
       const settings = { filterKey: changedKey, value }
       const existingId = layerIdByKey.current[changedKey]
+      const currentLayers = layersRef.current
+      const existingLayer = existingId ? currentLayers.find((l) => l.id === existingId) : undefined
 
-  
       if (value === 0) {
         if (existingId) {
           delete layerIdByKey.current[changedKey]
           deleteLayer.mutate(existingId)
+          if (existingLayer) onRecordHistory?.({ kind: 'delete', layer: existingLayer })
         }
         return
       }
 
       if (existingId) {
         updateLayer.mutate({ id: existingId, input: { settings } })
+        if (existingLayer) {
+          onRecordHistory?.({ kind: 'update', id: existingId, before: existingLayer.settings, after: settings })
+        }
       } else {
         const id = crypto.randomUUID()
         layerIdByKey.current[changedKey] = id
-        createLayer.mutate({
+        const input = {
           id,
           fingerprintId,
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           name: t(FILTER_META[changedKey]?.labelKey as any ?? changedKey),
-          type: 'FILTER',
-          zIndex: layers.length,
+          type: 'FILTER' as const,
+          zIndex: currentLayers.length,
           settings,
-        })
+        }
+        createLayer.mutate(input)
+        onRecordHistory?.({ kind: 'create', input })
       }
     }, 500)
   }
@@ -143,10 +161,12 @@ export function useCanvasFilters(fingerprintId: string | undefined) {
     if (!fingerprintId) return
 
     const existingId = layerIdByKey.current[CURVE_KEY]
+    const existingLayer = existingId ? layers.find((l) => l.id === existingId) : undefined
     if (isIdentityCurve(points)) {
       if (existingId) {
         delete layerIdByKey.current[CURVE_KEY]
         deleteLayer.mutate(existingId)
+        if (existingLayer) onRecordHistory?.({ kind: 'delete', layer: existingLayer })
       }
       return
     }
@@ -154,18 +174,23 @@ export function useCanvasFilters(fingerprintId: string | undefined) {
     const settings = { filterKey: CURVE_KEY, points }
     if (existingId) {
       updateLayer.mutate({ id: existingId, input: { settings } })
+      if (existingLayer) {
+        onRecordHistory?.({ kind: 'update', id: existingId, before: existingLayer.settings, after: settings })
+      }
       return
     }
     const id = crypto.randomUUID()
     layerIdByKey.current[CURVE_KEY] = id
-    createLayer.mutate({
+    const input = {
       id,
       fingerprintId,
       name: t(FILTER_META[CURVE_KEY].labelKey as ParseKeys),
-      type: 'FILTER',
+      type: 'FILTER' as const,
       zIndex: layers.length,
       settings,
-    })
+    }
+    createLayer.mutate(input)
+    onRecordHistory?.({ kind: 'create', input })
   }
 
   // Only apply filters whose layer is visible (unmask = visible, mask = hidden)

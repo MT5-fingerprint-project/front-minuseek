@@ -10,7 +10,7 @@ export default function WindowCollapsed({ onToggleCollapse, onActivate }: Window
   const { t } = useTranslation()
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden rounded-lg border bg-white" onMouseDown={onActivate}>
+    <div className="flex h-full w-full flex-col overflow-hidden rounded-sm border bg-white" onMouseDown={onActivate}>
       <div className="flex items-center justify-center bg-blue-medium-1 px-2 py-2 text-white">
         <button
           type="button"

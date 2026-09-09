@@ -4,6 +4,7 @@ import { Layer as KonvaLayer, Line, Group } from 'react-konva'
 import type Konva from 'konva'
 import { useCreateLayer, useUpdateLayer, useDeleteLayer } from '@/features/biometric-image/hooks/useLayers'
 import type { RequestMinutiaDeletion } from '@/features/biometric-image/hooks/useMinutiaDeletionGuard'
+import type { LayerHistoryEntry } from '@/features/biometric-image/hooks/useLayerHistory'
 import type { Layer } from '@/features/biometric-image/types/layer'
 import type { ImageLayout } from '@/features/biometric-image/components/canvas/DraggableImage'
 import type { AnnotationToolType } from '@/features/biometric-image/components/toolbar/canvasFilters'
@@ -55,6 +56,8 @@ type AnnotationLayerProps = {
   revealedMinutiaIds?: Set<string>
   activeMinutiaId?: string | null
   registerMinutiaNode?: (id: string, node: Konva.Group | null) => void
+  /** Journalise une édition pour l'annuler/rétablir de la fenêtre. */
+  onRecordHistory?: (entry: LayerHistoryEntry) => void
 }
 
 /** Walk up the Konva tree to find whether the clicked node belongs to an existing annotation. */
@@ -93,6 +96,7 @@ export default function AnnotationLayer({
   revealedMinutiaIds,
   activeMinutiaId = null,
   registerMinutiaNode,
+  onRecordHistory,
 }: AnnotationLayerProps) {
   const { t } = useTranslation()
   const layerRef = useRef<Konva.Layer>(null)
@@ -105,6 +109,13 @@ export default function AnnotationLayer({
   const [draft, setDraft] = useState<Draft | null>(null)
   const draftRef = useRef<Draft | null>(null)
   const drawingRef = useRef(false)
+  // Lu par le handler de suppression (effet lié à selectedId, pas à annotations) :
+  // sans ce ref, un snapshot "before" pour l'annuler pourrait dater de plusieurs
+  // rendus, si un autre calque a été modifié pendant que celui-ci restait sélectionné.
+  const annotationsRef = useRef(annotations)
+  useEffect(() => {
+    annotationsRef.current = annotations
+  })
 
   const select = onSelect
   const longestSide = Math.max(sourceWidth, sourceHeight)
@@ -128,7 +139,9 @@ export default function AnnotationLayer({
   useEffect(() => {
     if (!selectedId) return
     const removeAnnotation = () => {
+      const layer = annotationsRef.current.find((a) => a.id === selectedId)
       deleteLayer.mutate(selectedId)
+      if (layer) onRecordHistory?.({ kind: 'delete', layer })
       select(null)
     }
     const onKey = (e: KeyboardEvent) => {
@@ -177,11 +190,11 @@ export default function AnnotationLayer({
 
       if (activeTool === 'circle') {
         drawingRef.current = false
-        createLayer.mutate({
+        const input = {
           id: crypto.randomUUID(),
           fingerprintId,
           name: t('biometricImage.toolbar.tools.point'),
-          type: 'ANNOTATION',
+          type: 'ANNOTATION' as const,
           zIndex: layerCount,
           settings: {
             type: 'circle',
@@ -193,14 +206,16 @@ export default function AnnotationLayer({
             frame: ANNOTATION_FRAME,
             schemaVersion: ANNOTATION_SCHEMA_VERSION,
           },
-        })
+        }
+        createLayer.mutate(input)
+        onRecordHistory?.({ kind: 'create', input })
       } else if (activeTool === 'circleArrow') {
         drawingRef.current = false
-        createLayer.mutate({
+        const input = {
           id: crypto.randomUUID(),
           fingerprintId,
           name: t('biometricImage.toolbar.tools.pointArrow'),
-          type: 'ANNOTATION',
+          type: 'ANNOTATION' as const,
           zIndex: layerCount,
           settings: {
             type: 'minutia',
@@ -213,7 +228,9 @@ export default function AnnotationLayer({
             frame: ANNOTATION_FRAME,
             schemaVersion: ANNOTATION_SCHEMA_VERSION,
           },
-        })
+        }
+        createLayer.mutate(input)
+        onRecordHistory?.({ kind: 'create', input })
       } else if (activeTool === 'pencil') {
         setDraftBoth({ type: 'pencil', points: [pos.x, pos.y] })
       }
@@ -235,11 +252,11 @@ export default function AnnotationLayer({
       drawingRef.current = false
       const d = draftRef.current
       if (d?.type === 'pencil' && d.points.length >= 4) {
-        createLayer.mutate({
+        const input = {
           id: crypto.randomUUID(),
           fingerprintId,
           name: t('biometricImage.toolbar.tools.pencil'),
-          type: 'ANNOTATION',
+          type: 'ANNOTATION' as const,
           zIndex: layerCount,
           settings: {
             type: 'pencil',
@@ -249,7 +266,9 @@ export default function AnnotationLayer({
             frame: ANNOTATION_FRAME,
             schemaVersion: ANNOTATION_SCHEMA_VERSION,
           },
-        })
+        }
+        createLayer.mutate(input)
+        onRecordHistory?.({ kind: 'create', input })
       }
       setDraftBoth(null)
     }
@@ -265,8 +284,10 @@ export default function AnnotationLayer({
   const renderShape = (layer: Layer) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const s = layer.settings as any
-    const persistPosition = (settings: Record<string, unknown>) =>
+    const persistPosition = (settings: Record<string, unknown>) => {
       updateLayer.mutate({ id: layer.id, input: { settings } })
+      onRecordHistory?.({ kind: 'update', id: layer.id, before: layer.settings, after: settings })
+    }
     const isSelected = layer.id === selectedId
     const isHighlighted = layer.id === hoveredLayerId
     const emphasis = onScreen((isSelected ? SELECTED_EMPHASIS : 0) + (isHighlighted ? HOVERED_EMPHASIS : 0))

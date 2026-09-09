@@ -35,6 +35,7 @@ import Link from './link.svg?react'
 import Location from './location.svg?react'
 import Logout from './logout.svg?react'
 import Luminosity from './luminosity.svg?react'
+import MarkerSize from './marker-size.svg?react'
 import Menu from './menu.svg?react'
 import Mirror from './mirror.svg?react'
 import Number from './number.svg?react'
@@ -53,6 +54,7 @@ import Rotate from './rotate.svg?react'
 import Ruler from './ruler.svg?react'
 import Search from './search.svg?react'
 import Settings from './settings.svg?react'
+import Sharpness from './sharpness.svg?react'
 import Show from './show.svg?react'
 import ShowOff from './show-off.svg?react'
 import SidebarFill from './sidebar-fill.svg?react'
@@ -105,6 +107,7 @@ export const icons = {
   location: Location,
   logout: Logout,
   luminosity: Luminosity,
+  markerSize: MarkerSize,
   menu: Menu,
   mirror: Mirror,
   number: Number,
@@ -123,6 +126,7 @@ export const icons = {
   ruler: Ruler,
   search: Search,
   settings: Settings,
+  sharpness: Sharpness,
   show: Show,
   showOff: ShowOff,
   sidebarFill: SidebarFill,
