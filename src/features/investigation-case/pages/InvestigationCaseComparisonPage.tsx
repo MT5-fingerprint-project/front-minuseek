@@ -304,11 +304,25 @@ export default function InvestigationCaseComparisonPage() {
   const runCompare = () => {
     // Une empreinte détruite n'a plus de fichier : l'envoyer au moteur ferait
     // remonter une erreur technique incompréhensible.
-    const comparable = referencePrints.filter((print) => print.imageDestroyedAt === null)
-    if (!trace.selectedTrace || comparable.length === 0 || !id) return
-    compare.mutate({ caseId: id, trace: trace.selectedTrace, referencePrints: comparable })
+    const available = referencePrints.filter((print) => print.imageDestroyedAt === null)
 
-    toast.success('Les empreintes ont été réorganisées par pertinence par rapport à la trace sélectionnée !')
+    // On filtre de la comparaison les empreintes non calibrées
+    const comparable = available.filter((print) => print.resolutionDpi !== null)
+
+    const excludedCount = available.length - comparable.length
+
+    if (!trace.selectedTrace || comparable.length === 0 || !id) return
+    compare.mutate(
+      { caseId: id, trace: trace.selectedTrace, referencePrints: comparable },
+      {
+        onSuccess: () => {
+          if (excludedCount > 0) {
+            toast.info(t('investigationCase.comparison.analyzeExcludedUncalibratedToast', { count: excludedCount }))
+          }
+          toast.success(t('investigationCase.comparison.analyzeSuccessToast'))
+        }
+      }
+    )
   }
 
   const onToggleHit = () => {

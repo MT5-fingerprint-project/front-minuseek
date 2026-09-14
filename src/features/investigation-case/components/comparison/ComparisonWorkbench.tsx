@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { cn } from '@/features/shared/lib/utils'
 import { Button } from '@/features/shared/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/features/shared/ui/tooltip'
 import { Icon } from '@/features/shared/icons'
 import WorkbenchWindow from '@/features/shared/components/window/WorkbenchWindow'
 import WindowActionButton from '@/features/shared/components/window/WindowActionButton'
@@ -119,20 +120,29 @@ export default function ComparisonWorkbench({
           onClick={() => navigate(`/${slug}/affaires/${caseId}/traces?trace=${w.selectedTrace?.id}`)}
         />
         {side === 'left' && (
-          <Button
-            type="button"
-            variant="outline"
-            size="small"
-            disabled={isComparing}
-            onClick={onAnalyze}
-            data-tour="analyze-button"
-            className={cn(
-              'relative mr-1 overflow-hidden rounded-full border-white/30 bg-white/10 text-white hover:bg-white hover:text-blue-medium-1',
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="small"
+                  disabled={isComparing || resolutionDpi === null}
+                  onClick={onAnalyze}
+                  data-tour="analyze-button"
+                  className={cn(
+                    'relative mr-1 overflow-hidden rounded-full border-white/30 bg-white/10 text-white hover:bg-white hover:text-blue-medium-1',
+                  )}
+                >
+                  {isComparing ? <Loader2 size={13} className="animate-spin" /> : <Sparkle size={13} />}
+                  {t('investigationCase.comparison.analyzeButton')}
+                </Button>
+              </span>
+            </TooltipTrigger>
+            {resolutionDpi === null && (
+              <TooltipContent>{t('investigationCase.comparison.analyzeUncalibratedTooltip')}</TooltipContent>
             )}
-          >
-            {isComparing ? <Loader2 size={13} className="animate-spin" /> : <Sparkle size={13} />}
-            {t('investigationCase.comparison.analyzeButton')}
-          </Button>
+          </Tooltip>
         )}
       </>
     ) : undefined
