@@ -2,7 +2,7 @@
 # variables prod, contrairement au back qui
 # est promu par copie de digest.
 # ⚠️ Inerte tant que la prod est au repos : nécessite GCP_SA_KEY_PROD et
-# l'infra prod appliquée (bucket minuseek-front-prod).
+# l'infra prod appliquée (bucket minuseek-prod-front).
 name: deploy-prod
 
 on:
@@ -12,7 +12,7 @@ on:
 concurrency: deploy-prod
 
 env:
-  BUCKET: minuseek-front-prod
+  BUCKET: minuseek-prod-front
   VITE_API_URL: https://api.minuseek.fr/api
   VITE_KEYCLOAK_URL: https://auth.minuseek.fr
 
